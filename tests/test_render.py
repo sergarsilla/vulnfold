@@ -10,7 +10,14 @@ from conftest import make_bucket, make_snapshot
 from rich.console import Console
 
 from vulnfold.collapse import build_patch_plan
-from vulnfold.models import FieldMapping, IndexerSnapshot, PatchPlan, ScanWarning, WarningCode
+from vulnfold.models import (
+    FieldMapping,
+    IndexerSnapshot,
+    PatchPlan,
+    RankBy,
+    ScanWarning,
+    WarningCode,
+)
 from vulnfold.render import (
     NOTHING_TO_REMEDIATE,
     OutputFormat,
@@ -46,11 +53,34 @@ def test_impact_line_states_the_collapse(real_plan: PatchPlan) -> None:
     assert headline == "32,718 findings → 744 actions across 554 packages (ratio 59:1)"
 
 
-def test_impact_line_states_what_the_leading_actions_remove(real_plan: PatchPlan) -> None:
-    detail = impact_lines(real_plan, top=7)[1]
+def test_impact_lines_state_both_product_claims(real_plan: PatchPlan) -> None:
+    """Both claims are shown whichever ranking is active; they need not agree."""
+    lines = impact_lines(real_plan, top=7)
 
-    assert detail.startswith("The first 7 eliminate 23,309 findings (71.2%)")
-    assert detail.endswith("criticals.")
+    assert lines[2] == "First 7 by findings: 23,309 findings (71.2%), on 7 hosts."
+    assert lines[3].startswith("First 7 by criticals: 1,775 criticals (71.2%)")
+
+
+def test_impact_lines_separate_cve_depth_from_host_spread(real_plan: PatchPlan) -> None:
+    """SPEC feedback: nothing may imply cross-host collapse where there is none."""
+    sources = impact_lines(real_plan, top=7)[1]
+
+    assert sources == (
+        "Each action clears 44.0 findings: 40.1 CVEs per package version "
+        "× 1.10 hosts carrying it."
+    )
+
+
+def test_both_claims_are_shown_under_either_ranking(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    by_criticals = impact_lines(build_patch_plan(real_snapshot, mapping), top=7)
+    by_findings = impact_lines(
+        build_patch_plan(real_snapshot, mapping, rank_by=RankBy.FINDINGS), top=7
+    )
+
+    assert by_criticals[2:] == by_findings[2:]
 
 
 def test_impact_line_never_promises_more_actions_than_the_plan_has(
@@ -58,7 +88,13 @@ def test_impact_line_never_promises_more_actions_than_the_plan_has(
 ) -> None:
     plan = build_patch_plan(make_snapshot([make_bucket(findings=10)]), mapping)
 
-    assert impact_lines(plan, top=20)[1].startswith("The first 1 ")
+    assert impact_lines(plan, top=20)[2].startswith("First 1 by findings:")
+
+
+def test_a_single_host_is_not_pluralised(mapping: FieldMapping) -> None:
+    plan = build_patch_plan(make_snapshot([make_bucket(findings=10)]), mapping)
+
+    assert "on 1 host." in impact_lines(plan, top=1)[2]
 
 
 def test_impact_line_says_so_when_there_is_nothing_to_do(mapping: FieldMapping) -> None:
@@ -108,7 +144,8 @@ def test_markdown_opens_with_the_impact_line(real_plan: PatchPlan) -> None:
 
     assert report.startswith("# vulnfold patch plan")
     assert "**32,718 findings → 744 actions across 554 packages (ratio 59:1)**" in report
-    assert "**The first 7 eliminate 23,309 findings (71.2%)" in report
+    assert "**First 7 by findings: 23,309 findings (71.2%), on 7 hosts.**" in report
+    assert "**First 7 by criticals:" in report
 
 
 def test_markdown_lists_no_more_than_the_requested_actions(real_plan: PatchPlan) -> None:
@@ -158,7 +195,8 @@ def test_table_opens_with_the_impact_line(real_plan: PatchPlan) -> None:
     output = render_table(real_plan, top=7)
 
     assert "32,718 findings → 744 actions across 554 packages (ratio 59:1)" in output
-    assert "The first 7 eliminate 23,309 findings (71.2%)" in output
+    assert "First 7 by findings: 23,309 findings (71.2%), on 7 hosts." in output
+    assert "First 7 by criticals:" in output
 
 
 def test_table_lists_the_leading_actions(real_plan: PatchPlan) -> None:
@@ -201,3 +239,35 @@ def test_a_warning_carries_a_stable_code() -> None:
     warning = ScanWarning(code=WarningCode.EMPTY_INDEX, message="nothing here")
 
     assert json.loads(warning.model_dump_json())["code"] == "empty_index"
+
+
+# ---------------------------------------------------------------------------
+# Column widths: Package is the column a reader acts on
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("width", [100, 120, 140, 200])
+def test_package_names_survive_at_every_width(real_plan: PatchPlan, width: int) -> None:
+    console = Console(file=(buffer := StringIO()), width=width, no_color=True)
+    console.print(build_table_view(real_plan, 7))
+    output = buffer.getvalue()
+
+    for action in real_plan.actions[:7]:
+        assert action.package_name in output
+
+
+def test_version_gives_up_its_width_before_package_does(real_plan: PatchPlan) -> None:
+    console = Console(file=(buffer := StringIO()), width=120, no_color=True)
+    console.print(build_table_view(real_plan, 7))
+    output = buffer.getvalue()
+
+    assert "linux-image-6.14.0-37-generic" in output
+    assert "6.14.0-37.37~24.04.1" not in output
+    assert "6.14.0-37.37" in output
+
+
+def test_markdown_never_truncates_anything(real_plan: PatchPlan) -> None:
+    report = render_markdown(real_plan, top=7)
+
+    assert "6.14.0-37.37~24.04.1" in report
+    assert "…" not in report

@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Annotated
 
 import typer
 from rich.console import Console
 
+from vulnfold import __version__
 from vulnfold.client import IndexerClient
 from vulnfold.collapse import build_patch_plan
 from vulnfold.config import (
@@ -19,8 +22,15 @@ from vulnfold.config import (
 )
 from vulnfold.errors import ConfigurationError, VulnfoldError
 from vulnfold.mapping import load_mapping
-from vulnfold.models import PatchPlan
-from vulnfold.render import OutputFormat, build_table_view, render_json, render_markdown
+from vulnfold.models import FieldMapping, IndexerSnapshot, PatchPlan, RankBy
+from vulnfold.render import (
+    OutputFormat,
+    build_evidence_record,
+    build_table_view,
+    render_evidence,
+    render_json,
+    render_markdown,
+)
 
 app = typer.Typer(
     add_completion=False,
@@ -63,10 +73,17 @@ def scan(
     top: Annotated[
         int, typer.Option("--top", min=1, help="Actions listed in table and markdown.")
     ] = DEFAULT_TOP_ACTIONS,
+    rank_by: Annotated[
+        RankBy, typer.Option("--rank-by", help="Order actions by criticals or by findings.")
+    ] = RankBy.CRITICALS,
     group_kernels: Annotated[
         bool,
         typer.Option("--group-kernels", help="Merge each kernel package's versions."),
     ] = False,
+    evidence: Annotated[
+        Path | None,
+        typer.Option("--evidence", help="Write the complete run to this JSON file."),
+    ] = None,
     min_severity: Annotated[
         str | None,
         typer.Option("--min-severity", help="List only actions relevant at this severity or above."),
@@ -80,17 +97,34 @@ def scan(
 ) -> None:
     """Read a Wazuh indexer and print the patch plan it implies."""
     try:
-        plan = _scan(
+        mapping = load_mapping(mapping_name)
+        snapshot = _read_fleet(
             url=url,
             user=user,
             password=_resolve_password(password_env, password),
             index_pattern=index_pattern,
-            mapping_name=mapping_name,
-            group_kernels=group_kernels,
-            min_severity=min_severity,
+            mapping=mapping,
             timeout=timeout,
             insecure=insecure,
         )
+        plan = build_patch_plan(
+            snapshot,
+            mapping,
+            rank_by=rank_by,
+            group_kernels=group_kernels,
+            min_severity=min_severity,
+        )
+        if evidence is not None:
+            _write_evidence(
+                snapshot,
+                mapping,
+                path=evidence,
+                url=url,
+                index_pattern=index_pattern or mapping.index_pattern,
+                rank_by=rank_by,
+                group_kernels=group_kernels,
+                min_severity=min_severity,
+            )
     except VulnfoldError as exc:
         _stderr.print(f"[red]error[/red] {exc}")
         raise typer.Exit(code=1) from exc
@@ -98,19 +132,17 @@ def scan(
     _write(plan, output_format, top)
 
 
-def _scan(
+def _read_fleet(
     *,
     url: str,
     user: str,
     password: str,
     index_pattern: str | None,
-    mapping_name: str,
-    group_kernels: bool,
-    min_severity: str | None,
+    mapping: FieldMapping,
     timeout: float,
     insecure: bool,
-) -> PatchPlan:
-    mapping = load_mapping(mapping_name)
+) -> IndexerSnapshot:
+    """Open a read-only connection and take one snapshot of the fleet."""
     if insecure:
         _stderr.print(
             "[yellow]warning[/yellow] TLS certificate verification is disabled. "
@@ -128,14 +160,41 @@ def _scan(
 
     with IndexerClient(config, mapping) as client:
         client.verify_readable()
-        snapshot = client.fetch_snapshot()
+        return client.fetch_snapshot()
 
-    return build_patch_plan(
-        snapshot,
-        mapping,
+
+def _write_evidence(
+    snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+    *,
+    path: Path,
+    url: str,
+    index_pattern: str,
+    rank_by: RankBy,
+    group_kernels: bool,
+    min_severity: str | None,
+) -> None:
+    """Write the audit record for this run.
+
+    The record is built from the unfiltered plan: --min-severity chooses what
+    is listed on screen, and must never shorten an audit artefact.
+    """
+    complete = build_patch_plan(snapshot, mapping, rank_by=rank_by, group_kernels=group_kernels)
+    record = build_evidence_record(
+        complete,
+        generated_at=datetime.now(timezone.utc),
+        tool_version=__version__,
+        indexer_url=url,
+        index_pattern=index_pattern,
+        mapping_version=mapping.version,
         group_kernels=group_kernels,
         min_severity=min_severity,
     )
+    try:
+        path.write_text(render_evidence(record), encoding="utf-8")
+    except OSError as exc:
+        raise ConfigurationError(f"Cannot write the evidence file {path}: {exc}") from exc
+    _stderr.print(f"evidence written to {path}")
 
 
 def _resolve_password(password_env: str, password: str | None) -> str:

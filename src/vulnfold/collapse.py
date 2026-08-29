@@ -13,11 +13,13 @@ from fnmatch import fnmatch
 from vulnfold.config import KERNEL_PACKAGE_PATTERNS, UNKNOWN_SEVERITY
 from vulnfold.errors import ConfigurationError
 from vulnfold.models import (
+    CollapseSources,
     CoveragePoint,
     FieldMapping,
     IndexerSnapshot,
     PackageBucket,
     PatchPlan,
+    RankBy,
     RemediationAction,
     ScanWarning,
     WarningCode,
@@ -55,27 +57,41 @@ def collapse_findings_to_actions(
     return [_action_from_bucket(bucket, mapping) for bucket in snapshot.buckets]
 
 
-def rank_actions(actions: Sequence[RemediationAction]) -> list[RemediationAction]:
+def rank_actions(
+    actions: Sequence[RemediationAction],
+    rank_by: RankBy = RankBy.CRITICALS,
+) -> list[RemediationAction]:
     """Order actions by remediation impact.
 
-    Criticals first, then highs, then raw finding count. Ties break
-    alphabetically so the same input always renders the same output.
+    Criticals-first sorts on criticals, then highs, then raw finding count.
+    Findings-first sorts on finding count, then criticals, then highs. Ties
+    break alphabetically so the same input always renders the same output.
 
     Args:
         actions: Actions to order.
+        rank_by: Which impact the ordering optimises for.
 
     Returns:
         A new list, ordered by impact.
     """
-    return sorted(
-        actions,
-        key=lambda action: (
+    return sorted(actions, key=lambda action: _rank_key(action, rank_by))
+
+
+def _rank_key(action: RemediationAction, rank_by: RankBy) -> tuple[int, int, int, str, str]:
+    if rank_by is RankBy.FINDINGS:
+        return (
+            -action.finding_count,
             -action.critical_count,
             -action.high_count,
-            -action.finding_count,
             action.package_name,
             action.current_version,
-        ),
+        )
+    return (
+        -action.critical_count,
+        -action.high_count,
+        -action.finding_count,
+        action.package_name,
+        action.current_version,
     )
 
 
@@ -162,9 +178,11 @@ def build_coverage_curve(
     curve: list[CoveragePoint] = []
     findings_so_far = 0
     criticals_so_far = 0
+    agents_so_far: set[str] = set()
     for position, action in enumerate(ranked_actions, start=1):
         findings_so_far += action.finding_count
         criticals_so_far += action.critical_count
+        agents_so_far.update(action.affected_agents)
         curve.append(
             CoveragePoint(
                 action_count=position,
@@ -172,15 +190,43 @@ def build_coverage_curve(
                 findings_percentage=_percentage(findings_so_far, total_findings),
                 cumulative_criticals=criticals_so_far,
                 criticals_percentage=_percentage(criticals_so_far, total_criticals),
+                cumulative_agents=len(agents_so_far),
             )
         )
     return curve
+
+
+def build_collapse_sources(actions: Sequence[RemediationAction]) -> CollapseSources:
+    """Separate the two effects that compress a fleet's findings.
+
+    One package version carrying thousands of CVEs on a single host compresses
+    just as hard as one package repeated across a thousand hosts, and the
+    remediation effort is nothing alike. The identity
+    ``findings = cves * hosts`` holds per action, so the fleet-wide averages
+    factor the same way.
+
+    Args:
+        actions: The plan's actions.
+
+    Returns:
+        Findings per action, and its decomposition into CVE depth and host
+        spread. All three are zero for an empty plan.
+    """
+    action_count = len(actions)
+    covered_findings = sum(action.finding_count for action in actions)
+    covered_cves = sum(action.cve_count for action in actions)
+    return CollapseSources(
+        findings_per_action=_ratio(covered_findings, action_count),
+        cves_per_action=_ratio(covered_cves, action_count),
+        hosts_per_action=_ratio(covered_findings, covered_cves),
+    )
 
 
 def build_patch_plan(
     snapshot: IndexerSnapshot,
     mapping: FieldMapping,
     *,
+    rank_by: RankBy = RankBy.CRITICALS,
     group_kernels: bool = False,
     min_severity: str | None = None,
 ) -> PatchPlan:
@@ -193,11 +239,14 @@ def build_patch_plan(
 
     ``coverage_curve`` always describes the complete ranked plan, even when
     ``min_severity`` shortens the action list, so "the first N actions" keeps
-    one meaning across invocations.
+    one meaning across invocations. Both the findings-ordered and the
+    criticals-ordered curve are always computed, whichever ordering is active:
+    each is a claim the tool makes, and they need not agree.
 
     Args:
         snapshot: Read-only view of the fleet's vulnerability state.
         mapping: Field mapping in force.
+        rank_by: Which impact the listed ordering optimises for.
         group_kernels: Merge each kernel package's versions into one action.
         min_severity: Only list actions relevant at this severity or above.
 
@@ -216,8 +265,15 @@ def build_patch_plan(
             warnings.append(_grouped_cve_count_warning(len(actions) - len(grouped)))
         actions = grouped
 
-    ranked = rank_actions(actions)
-    curve = build_coverage_curve(ranked, snapshot.total_findings)
+    by_findings = build_coverage_curve(
+        rank_actions(actions, RankBy.FINDINGS), snapshot.total_findings
+    )
+    by_criticals = build_coverage_curve(
+        rank_actions(actions, RankBy.CRITICALS), snapshot.total_findings
+    )
+
+    ranked = rank_actions(actions, rank_by)
+    curve = by_findings if rank_by is RankBy.FINDINGS else by_criticals
     listed = filter_by_min_severity(ranked, min_severity, mapping) if min_severity else ranked
 
     return PatchPlan(
@@ -226,10 +282,12 @@ def build_patch_plan(
         total_distinct_cves=snapshot.total_distinct_cves,
         total_distinct_packages=snapshot.total_distinct_packages,
         actions=listed,
-        collapse_ratio=_collapse_ratio(
-            snapshot.total_findings, snapshot.total_distinct_packages
-        ),
+        collapse_ratio=_ratio(snapshot.total_findings, snapshot.total_distinct_packages),
+        collapse_sources=build_collapse_sources(actions),
+        rank_by=rank_by,
         coverage_curve=curve,
+        coverage_by_findings=by_findings,
+        coverage_by_criticals=by_criticals,
         warnings=warnings,
     )
 
@@ -422,7 +480,7 @@ def _percentage(part: int, whole: int) -> float:
     return round(100.0 * part / whole, 2)
 
 
-def _collapse_ratio(numerator: int, denominator: int) -> float:
+def _ratio(numerator: int, denominator: int) -> float:
     if denominator <= 0:
         return 0.0
     return round(numerator / denominator, 2)

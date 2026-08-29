@@ -7,9 +7,23 @@ snapshot was fetched, which is what keeps the domain testable without mocks.
 
 from __future__ import annotations
 
+from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
+class RankBy(str, Enum):
+    """What a plan is ordered by.
+
+    Both orderings answer a real question. Criticals-first answers "what do I
+    fix to cut severe exposure fastest"; findings-first answers "what do I fix
+    to cut the noise fastest". They need not agree, so both coverage curves are
+    always reported whichever one is active.
+    """
+
+    CRITICALS = "criticals"
+    FINDINGS = "findings"
 
 
 class WarningCode(str, Enum):
@@ -119,13 +133,38 @@ class RemediationAction(BaseModel):
 
 
 class CoveragePoint(BaseModel):
-    """What the first ``action_count`` actions of the plan eliminate."""
+    """What the first ``action_count`` actions of the plan eliminate.
+
+    ``cumulative_agents`` is the number of distinct hosts those actions touch.
+    It is what separates the two ways a fleet's findings compress: many CVEs on
+    one package on one host, versus one package repeated across many hosts.
+    """
 
     action_count: int
     cumulative_findings: int
     findings_percentage: float
     cumulative_criticals: int
     criticals_percentage: float
+    cumulative_agents: int
+
+
+class CollapseSources(BaseModel):
+    """Where a fleet's compression actually comes from.
+
+    The three numbers satisfy, up to the rounding applied to each:
+
+        findings_per_action = cves_per_action * hosts_per_action
+
+    A fleet whose kernels each sit on their own machine compresses through
+    ``cves_per_action`` with ``hosts_per_action`` near 1.0: there is no
+    cross-host duplication to collapse. A fleet running one image everywhere
+    compresses through ``hosts_per_action`` instead. Reporting only the product
+    would let a reader assume the wrong one.
+    """
+
+    findings_per_action: float
+    cves_per_action: float
+    hosts_per_action: float
 
 
 class PatchPlan(BaseModel):
@@ -140,5 +179,46 @@ class PatchPlan(BaseModel):
     total_distinct_packages: int
     actions: list[RemediationAction]
     collapse_ratio: float
+    collapse_sources: CollapseSources
+    rank_by: RankBy
     coverage_curve: list[CoveragePoint]
+    coverage_by_findings: list[CoveragePoint]
+    coverage_by_criticals: list[CoveragePoint]
+    warnings: list[ScanWarning] = Field(default_factory=list)
+
+
+EVIDENCE_SCHEMA_VERSION = "1"
+
+
+class EvidenceRecord(BaseModel):
+    """A complete, self-describing record of one scan.
+
+    This is the raw material for ISO 27001 control 8.8 evidence, so the schema
+    is a stable contract: fields are added, never renamed, retyped or removed,
+    and ``schema_version`` rises when that promise cannot be kept. It is
+    documented in ``docs/evidence-schema.md``.
+
+    ``actions`` is always the complete ranked plan. ``min_severity`` is a
+    display filter and is recorded here for reproducibility, but it never
+    shortens the evidence.
+    """
+
+    schema_version: str = EVIDENCE_SCHEMA_VERSION
+    generated_at: datetime
+    tool_version: str
+    indexer_url: str
+    index_pattern: str
+    mapping_version: str
+    rank_by: RankBy
+    group_kernels: bool
+    min_severity: str | None
+    total_findings: int
+    total_agents: int
+    total_distinct_cves: int
+    total_distinct_packages: int
+    collapse_ratio: float
+    collapse_sources: CollapseSources
+    actions: list[RemediationAction]
+    coverage_by_findings: list[CoveragePoint]
+    coverage_by_criticals: list[CoveragePoint]
     warnings: list[ScanWarning] = Field(default_factory=list)

@@ -27,7 +27,7 @@ from vulnfold.collapse import (
 )
 from vulnfold.config import UNKNOWN_SEVERITY
 from vulnfold.errors import ConfigurationError
-from vulnfold.models import FieldMapping, IndexerSnapshot, WarningCode
+from vulnfold.models import FieldMapping, IndexerSnapshot, RankBy, WarningCode
 
 # ---------------------------------------------------------------------------
 # The recorded fleet (SPEC-01 section 9, criterion 2)
@@ -502,3 +502,152 @@ def test_a_package_with_no_version_is_planned_under_unknown(mapping: FieldMappin
 
     assert plan.actions[0].current_version == "unknown"
     assert plan.actions[0].finding_count == 4
+
+
+# ---------------------------------------------------------------------------
+# Ranking mode (--rank-by)
+# ---------------------------------------------------------------------------
+
+
+def test_findings_ranking_orders_by_volume(mapping: FieldMapping) -> None:
+    snapshot = make_snapshot(
+        [
+            make_bucket(package="loud", findings=500, severity={"Medium": 500}),
+            make_bucket(package="severe", findings=10, severity={"Critical": 10}),
+        ]
+    )
+
+    ranked = rank_actions(collapse_findings_to_actions(snapshot, mapping), RankBy.FINDINGS)
+
+    assert [action.package_name for action in ranked] == ["loud", "severe"]
+
+
+def test_criticals_ranking_is_the_default(mapping: FieldMapping) -> None:
+    snapshot = make_snapshot(
+        [
+            make_bucket(package="loud", findings=500, severity={"Medium": 500}),
+            make_bucket(package="severe", findings=10, severity={"Critical": 10}),
+        ]
+    )
+
+    ranked = rank_actions(collapse_findings_to_actions(snapshot, mapping))
+
+    assert [action.package_name for action in ranked] == ["severe", "loud"]
+
+
+def test_both_coverage_curves_are_computed_under_either_ranking(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    """Both are product claims, so neither may depend on the active ordering."""
+    by_criticals = build_patch_plan(real_snapshot, mapping, rank_by=RankBy.CRITICALS)
+    by_findings = build_patch_plan(real_snapshot, mapping, rank_by=RankBy.FINDINGS)
+
+    assert by_criticals.coverage_by_findings == by_findings.coverage_by_findings
+    assert by_criticals.coverage_by_criticals == by_findings.coverage_by_criticals
+
+
+def test_the_active_curve_mirrors_the_active_ranking(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    plan = build_patch_plan(real_snapshot, mapping, rank_by=RankBy.FINDINGS)
+
+    assert plan.rank_by is RankBy.FINDINGS
+    assert plan.coverage_curve == plan.coverage_by_findings
+
+
+def test_the_findings_curve_is_the_best_possible_findings_coverage(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    """No other ordering can clear more findings in the same number of actions."""
+    plan = build_patch_plan(real_snapshot, mapping)
+
+    for position in range(0, 20):
+        findings_first = plan.coverage_by_findings[position].cumulative_findings
+        criticals_first = plan.coverage_by_criticals[position].cumulative_findings
+
+        assert findings_first >= criticals_first
+
+
+# ---------------------------------------------------------------------------
+# Where the collapse comes from
+# ---------------------------------------------------------------------------
+
+
+def test_collapse_sources_factor_findings_into_cve_depth_and_host_spread(
+    mapping: FieldMapping,
+) -> None:
+    snapshot = make_snapshot(
+        [make_bucket(findings=100, agents={"001": 50, "002": 50}, cves=50)]
+    )
+
+    sources = build_patch_plan(snapshot, mapping).collapse_sources
+
+    assert sources.findings_per_action == 100.0
+    assert sources.cves_per_action == 50.0
+    assert sources.hosts_per_action == 2.0
+
+
+def test_a_fleet_with_no_shared_packages_reports_no_host_spread(
+    mapping: FieldMapping,
+) -> None:
+    """One kernel per machine collapses through CVE volume, not duplication."""
+    snapshot = make_snapshot(
+        [
+            make_bucket(package="linux-image-a", findings=500, agents={"001": 500}, cves=500),
+            make_bucket(package="linux-image-b", findings=300, agents={"002": 300}, cves=300),
+        ]
+    )
+
+    sources = build_patch_plan(snapshot, mapping).collapse_sources
+
+    assert sources.hosts_per_action == 1.0
+    assert sources.cves_per_action == 400.0
+
+
+def test_a_fleet_running_one_image_everywhere_reports_host_spread(
+    mapping: FieldMapping,
+) -> None:
+    snapshot = make_snapshot(
+        [make_bucket(findings=1000, agents={f"{n:03d}": 100 for n in range(10)}, cves=100)]
+    )
+
+    sources = build_patch_plan(snapshot, mapping).collapse_sources
+
+    assert sources.hosts_per_action == 10.0
+    assert sources.cves_per_action == 100.0
+
+
+def test_the_recorded_fleet_collapses_through_cve_volume(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    sources = build_patch_plan(real_snapshot, mapping).collapse_sources
+
+    assert sources.cves_per_action > 10.0
+    assert sources.hosts_per_action < 1.5
+
+
+def test_an_empty_plan_reports_no_collapse_sources(mapping: FieldMapping) -> None:
+    sources = build_patch_plan(make_snapshot([], total_findings=0), mapping).collapse_sources
+
+    assert (sources.findings_per_action, sources.cves_per_action, sources.hosts_per_action) == (
+        0.0,
+        0.0,
+        0.0,
+    )
+
+
+def test_the_coverage_curve_counts_distinct_hosts(mapping: FieldMapping) -> None:
+    snapshot = make_snapshot(
+        [
+            make_bucket(package="a", findings=10, agents={"001": 5, "002": 5}),
+            make_bucket(package="b", findings=8, agents={"002": 4, "003": 4}),
+        ]
+    )
+
+    curve = build_patch_plan(snapshot, mapping, rank_by=RankBy.FINDINGS).coverage_curve
+
+    assert [point.cumulative_agents for point in curve] == [2, 3]

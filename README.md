@@ -56,7 +56,11 @@ Options:
   --format [table|json|markdown]
                          Output format.  [default: table]
   --top INTEGER          Actions listed in table and markdown.  [default: 20]
+  --rank-by [criticals|findings]
+                         Order actions by criticals or by findings.
+                         [default: criticals]
   --group-kernels        Merge each kernel package's versions.
+  --evidence PATH        Write the complete run to this JSON file.
   --min-severity TEXT    List only actions relevant at this severity or above.
   --timeout FLOAT        Per-request timeout in seconds.  [default: 30.0]
   --insecure             Disable TLS certificate verification.
@@ -71,6 +75,39 @@ vulnfold scan --url ... --user ... --format json | jq .collapse_ratio
 `collapse_ratio` is findings per distinct package. `coverage_curve` always
 describes the complete ranked plan, even when `--min-severity` shortens the
 listed actions, so "the first N actions" keeps one meaning between runs.
+
+## Two claims, two curves
+
+`--rank-by criticals` (the default) answers *what do I fix to cut severe
+exposure fastest*. `--rank-by findings` answers *what do I fix to cut the noise
+fastest*. They need not agree, so **both** coverage curves are computed and both
+headline claims are printed whichever ordering is active.
+
+The header also separates the two ways findings compress:
+
+```
+32,718 findings → 744 actions across 554 packages (ratio 59:1)
+Each action clears 44.0 findings: 40.1 CVEs per package version × 1.10 hosts carrying it.
+First 7 by findings: 23,309 findings (71.2%), on 7 hosts.
+First 7 by criticals: 1,775 criticals (71.2%), on 7 hosts.
+```
+
+A package version carrying thousands of CVEs on one host compresses exactly as
+hard as one package repeated across a thousand hosts, and the remediation work
+is nothing alike. `1.10 hosts carrying it` says this fleet collapses through CVE
+volume, not through fleet duplication. Reading the ratio alone would suggest the
+opposite.
+
+## Evidence
+
+```bash
+vulnfold scan --url ... --user ... --evidence scan-2026-08-30.json
+```
+
+Writes a complete, self-describing record of the run: timestamp, indexer, index
+pattern, mapping version, fleet totals, both coverage curves and the full ranked
+action list. `--min-severity` never shortens it. The schema is a stable contract
+documented in [docs/evidence-schema.md](docs/evidence-schema.md).
 
 Wazuh ships self-signed certificates by default. `--insecure` disables
 certificate verification and says so on stderr; verification is on otherwise.
