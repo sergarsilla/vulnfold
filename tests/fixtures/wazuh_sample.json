@@ -1,0 +1,6017 @@
+{
+  "took": 10,
+  "timed_out": false,
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 10000,
+      "relation": "gte"
+    },
+    "max_score": null,
+    "hits": []
+  },
+  "aggregations": {
+    "agentes": {
+      "value": 15
+    },
+    "cves_distintos": {
+      "value": 5950
+    },
+    "acciones_reales": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": [
+            "linux-image-6.14.0-37-generic",
+            "6.14.0-37.37~24.04.1"
+          ],
+          "key_as_string": "linux-image-6.14.0-37-generic|6.14.0-37.37~24.04.1",
+          "doc_count": 5155
+        },
+        {
+          "key": [
+            "linux-image-6.17.0-14-generic",
+            "6.17.0-14.14~24.04.1"
+          ],
+          "key_as_string": "linux-image-6.17.0-14-generic|6.17.0-14.14~24.04.1",
+          "doc_count": 5155
+        },
+        {
+          "key": [
+            "linux-image-cloud-amd64",
+            "6.12.74-2"
+          ],
+          "key_as_string": "linux-image-cloud-amd64|6.12.74-2",
+          "doc_count": 4601
+        },
+        {
+          "key": [
+            "linux-oracle",
+            "6.17.0-1020.20"
+          ],
+          "key_as_string": "linux-oracle|6.17.0-1020.20",
+          "doc_count": 4226
+        },
+        {
+          "key": [
+            "linux-image-amd64",
+            "6.12.90-2"
+          ],
+          "key_as_string": "linux-image-amd64|6.12.90-2",
+          "doc_count": 2656
+        },
+        {
+          "key": [
+            "linux-image-amd64",
+            "6.12.100-1"
+          ],
+          "key_as_string": "linux-image-amd64|6.12.100-1",
+          "doc_count": 1062
+        },
+        {
+          "key": [
+            "linux-image-6.12.94+deb13-amd64",
+            "6.12.94-1"
+          ],
+          "key_as_string": "linux-image-6.12.94+deb13-amd64|6.12.94-1",
+          "doc_count": 454
+        },
+        {
+          "key": [
+            "firefox",
+            "148.0-1"
+          ],
+          "key_as_string": "firefox|148.0-1",
+          "doc_count": 430
+        },
+        {
+          "key": [
+            "Mozilla Firefox (x64 es-ES)",
+            "147.0.1"
+          ],
+          "key_as_string": "Mozilla Firefox (x64 es-ES)|147.0.1",
+          "doc_count": 378
+        },
+        {
+          "key": [
+            "Google Chrome",
+            "151.0.7922.174"
+          ],
+          "key_as_string": "Google Chrome|151.0.7922.174",
+          "doc_count": 220
+        },
+        {
+          "key": [
+            "Microsoft Windows 11 Pro 10.0.26100.7840",
+            "10.0.26100.7840"
+          ],
+          "key_as_string": "Microsoft Windows 11 Pro 10.0.26100.7840|10.0.26100.7840",
+          "doc_count": 214
+        },
+        {
+          "key": [
+            "firefox",
+            "146.0.1-1"
+          ],
+          "key_as_string": "firefox|146.0.1-1",
+          "doc_count": 205
+        },
+        {
+          "key": [
+            "n8n",
+            "1.101.2"
+          ],
+          "key_as_string": "n8n|1.101.2",
+          "doc_count": 190
+        },
+        {
+          "key": [
+            "libfreerdp-server3-3",
+            "3.5.1+dfsg1-0ubuntu1.2"
+          ],
+          "key_as_string": "libfreerdp-server3-3|3.5.1+dfsg1-0ubuntu1.2",
+          "doc_count": 151
+        },
+        {
+          "key": [
+            "libfreerdp3-3",
+            "3.5.1+dfsg1-0ubuntu1.2"
+          ],
+          "key_as_string": "libfreerdp3-3|3.5.1+dfsg1-0ubuntu1.2",
+          "doc_count": 151
+        },
+        {
+          "key": [
+            "libwinpr3-3",
+            "3.5.1+dfsg1-0ubuntu1.2"
+          ],
+          "key_as_string": "libwinpr3-3|3.5.1+dfsg1-0ubuntu1.2",
+          "doc_count": 151
+        },
+        {
+          "key": [
+            "Mozilla Firefox (x64 es-ES)",
+            "153.0"
+          ],
+          "key_as_string": "Mozilla Firefox (x64 es-ES)|153.0",
+          "doc_count": 116
+        },
+        {
+          "key": [
+            "vim-common",
+            "2:9.1.1230-2"
+          ],
+          "key_as_string": "vim-common|2:9.1.1230-2",
+          "doc_count": 107
+        },
+        {
+          "key": [
+            "vim-tiny",
+            "2:9.1.1230-2"
+          ],
+          "key_as_string": "vim-tiny|2:9.1.1230-2",
+          "doc_count": 107
+        },
+        {
+          "key": [
+            "vim-common",
+            "2:9.1.0016-1ubuntu7.9"
+          ],
+          "key_as_string": "vim-common|2:9.1.0016-1ubuntu7.9",
+          "doc_count": 74
+        },
+        {
+          "key": [
+            "vim-tiny",
+            "2:9.1.0016-1ubuntu7.9"
+          ],
+          "key_as_string": "vim-tiny|2:9.1.0016-1ubuntu7.9",
+          "doc_count": 74
+        },
+        {
+          "key": [
+            "xxd",
+            "2:9.1.0016-1ubuntu7.9"
+          ],
+          "key_as_string": "xxd|2:9.1.0016-1ubuntu7.9",
+          "doc_count": 74
+        },
+        {
+          "key": [
+            "libopenexr-3-1-30",
+            "3.1.13-2"
+          ],
+          "key_as_string": "libopenexr-3-1-30|3.1.13-2",
+          "doc_count": 61
+        },
+        {
+          "key": [
+            "firefox-esr",
+            "140.11.0esr-1~deb13u1"
+          ],
+          "key_as_string": "firefox-esr|140.11.0esr-1~deb13u1",
+          "doc_count": 60
+        },
+        {
+          "key": [
+            "gir1.2-javascriptcoregtk-4.1",
+            "2.50.4-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "gir1.2-javascriptcoregtk-4.1|2.50.4-0ubuntu0.24.04.1",
+          "doc_count": 59
+        },
+        {
+          "key": [
+            "gir1.2-javascriptcoregtk-6.0",
+            "2.50.4-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "gir1.2-javascriptcoregtk-6.0|2.50.4-0ubuntu0.24.04.1",
+          "doc_count": 59
+        },
+        {
+          "key": [
+            "gir1.2-webkit-6.0",
+            "2.50.4-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "gir1.2-webkit-6.0|2.50.4-0ubuntu0.24.04.1",
+          "doc_count": 59
+        },
+        {
+          "key": [
+            "gir1.2-webkit2-4.1",
+            "2.50.4-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "gir1.2-webkit2-4.1|2.50.4-0ubuntu0.24.04.1",
+          "doc_count": 59
+        },
+        {
+          "key": [
+            "libjavascriptcoregtk-4.1-0",
+            "2.50.4-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libjavascriptcoregtk-4.1-0|2.50.4-0ubuntu0.24.04.1",
+          "doc_count": 59
+        },
+        {
+          "key": [
+            "libjavascriptcoregtk-6.0-1",
+            "2.50.4-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libjavascriptcoregtk-6.0-1|2.50.4-0ubuntu0.24.04.1",
+          "doc_count": 59
+        },
+        {
+          "key": [
+            "libwebkit2gtk-4.1-0",
+            "2.50.4-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libwebkit2gtk-4.1-0|2.50.4-0ubuntu0.24.04.1",
+          "doc_count": 59
+        },
+        {
+          "key": [
+            "libwebkitgtk-6.0-4",
+            "2.50.4-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libwebkitgtk-6.0-4|2.50.4-0ubuntu0.24.04.1",
+          "doc_count": 59
+        },
+        {
+          "key": [
+            "libperl5.40",
+            "5.40.1-6"
+          ],
+          "key_as_string": "libperl5.40|5.40.1-6",
+          "doc_count": 58
+        },
+        {
+          "key": [
+            "perl",
+            "5.40.1-6"
+          ],
+          "key_as_string": "perl|5.40.1-6",
+          "doc_count": 58
+        },
+        {
+          "key": [
+            "perl-base",
+            "5.40.1-6"
+          ],
+          "key_as_string": "perl-base|5.40.1-6",
+          "doc_count": 58
+        },
+        {
+          "key": [
+            "perl-modules-5.40",
+            "5.40.1-6"
+          ],
+          "key_as_string": "perl-modules-5.40|5.40.1-6",
+          "doc_count": 58
+        },
+        {
+          "key": [
+            "Mozilla Firefox (x64 en-US)",
+            "153.0.3"
+          ],
+          "key_as_string": "Mozilla Firefox (x64 en-US)|153.0.3",
+          "doc_count": 55
+        },
+        {
+          "key": [
+            "libjavascriptcoregtk-4.1-0",
+            "2.52.3-2~deb13u1"
+          ],
+          "key_as_string": "libjavascriptcoregtk-4.1-0|2.52.3-2~deb13u1",
+          "doc_count": 49
+        },
+        {
+          "key": [
+            "libwebkit2gtk-4.1-0",
+            "2.52.3-2~deb13u1"
+          ],
+          "key_as_string": "libwebkit2gtk-4.1-0|2.52.3-2~deb13u1",
+          "doc_count": 49
+        },
+        {
+          "key": [
+            "libexpat1",
+            "2.7.1-2"
+          ],
+          "key_as_string": "libexpat1|2.7.1-2",
+          "doc_count": 46
+        },
+        {
+          "key": [
+            "libpq5",
+            "17.9-0+deb13u1"
+          ],
+          "key_as_string": "libpq5|17.9-0+deb13u1",
+          "doc_count": 46
+        },
+        {
+          "key": [
+            "postgresql-17",
+            "17.9-0+deb13u1"
+          ],
+          "key_as_string": "postgresql-17|17.9-0+deb13u1",
+          "doc_count": 46
+        },
+        {
+          "key": [
+            "postgresql-client-17",
+            "17.9-0+deb13u1"
+          ],
+          "key_as_string": "postgresql-client-17|17.9-0+deb13u1",
+          "doc_count": 46
+        },
+        {
+          "key": [
+            "libpython3.13-minimal",
+            "3.13.5-2"
+          ],
+          "key_as_string": "libpython3.13-minimal|3.13.5-2",
+          "doc_count": 44
+        },
+        {
+          "key": [
+            "libpython3.13-stdlib",
+            "3.13.5-2"
+          ],
+          "key_as_string": "libpython3.13-stdlib|3.13.5-2",
+          "doc_count": 44
+        },
+        {
+          "key": [
+            "python3.13",
+            "3.13.5-2"
+          ],
+          "key_as_string": "python3.13|3.13.5-2",
+          "doc_count": 44
+        },
+        {
+          "key": [
+            "python3.13-minimal",
+            "3.13.5-2"
+          ],
+          "key_as_string": "python3.13-minimal|3.13.5-2",
+          "doc_count": 44
+        },
+        {
+          "key": [
+            "imagemagick",
+            "8:6.9.12.98+dfsg1-5.2build2"
+          ],
+          "key_as_string": "imagemagick|8:6.9.12.98+dfsg1-5.2build2",
+          "doc_count": 42
+        },
+        {
+          "key": [
+            "imagemagick-6-common",
+            "8:6.9.12.98+dfsg1-5.2build2"
+          ],
+          "key_as_string": "imagemagick-6-common|8:6.9.12.98+dfsg1-5.2build2",
+          "doc_count": 42
+        },
+        {
+          "key": [
+            "imagemagick-6.q16",
+            "8:6.9.12.98+dfsg1-5.2build2"
+          ],
+          "key_as_string": "imagemagick-6.q16|8:6.9.12.98+dfsg1-5.2build2",
+          "doc_count": 42
+        },
+        {
+          "key": [
+            "libmagickcore-6.q16-7-extra",
+            "8:6.9.12.98+dfsg1-5.2build2"
+          ],
+          "key_as_string": "libmagickcore-6.q16-7-extra|8:6.9.12.98+dfsg1-5.2build2",
+          "doc_count": 42
+        },
+        {
+          "key": [
+            "libmagickcore-6.q16-7t64",
+            "8:6.9.12.98+dfsg1-5.2build2"
+          ],
+          "key_as_string": "libmagickcore-6.q16-7t64|8:6.9.12.98+dfsg1-5.2build2",
+          "doc_count": 42
+        },
+        {
+          "key": [
+            "libmagickwand-6.q16-7t64",
+            "8:6.9.12.98+dfsg1-5.2build2"
+          ],
+          "key_as_string": "libmagickwand-6.q16-7t64|8:6.9.12.98+dfsg1-5.2build2",
+          "doc_count": 42
+        },
+        {
+          "key": [
+            "libgnutls30t64",
+            "3.8.3-1.1ubuntu3.5"
+          ],
+          "key_as_string": "libgnutls30t64|3.8.3-1.1ubuntu3.5",
+          "doc_count": 39
+        },
+        {
+          "key": [
+            "vim",
+            "2:9.1.1230-2"
+          ],
+          "key_as_string": "vim|2:9.1.1230-2",
+          "doc_count": 39
+        },
+        {
+          "key": [
+            "vim-runtime",
+            "2:9.1.1230-2"
+          ],
+          "key_as_string": "vim-runtime|2:9.1.1230-2",
+          "doc_count": 39
+        },
+        {
+          "key": [
+            "bluez",
+            "5.72-0ubuntu5.5"
+          ],
+          "key_as_string": "bluez|5.72-0ubuntu5.5",
+          "doc_count": 38
+        },
+        {
+          "key": [
+            "bluez-cups",
+            "5.72-0ubuntu5.5"
+          ],
+          "key_as_string": "bluez-cups|5.72-0ubuntu5.5",
+          "doc_count": 38
+        },
+        {
+          "key": [
+            "bluez-obexd",
+            "5.72-0ubuntu5.5"
+          ],
+          "key_as_string": "bluez-obexd|5.72-0ubuntu5.5",
+          "doc_count": 38
+        },
+        {
+          "key": [
+            "libbluetooth3",
+            "5.72-0ubuntu5.5"
+          ],
+          "key_as_string": "libbluetooth3|5.72-0ubuntu5.5",
+          "doc_count": 38
+        },
+        {
+          "key": [
+            "libavcodec60",
+            "7:6.1.1-3ubuntu5"
+          ],
+          "key_as_string": "libavcodec60|7:6.1.1-3ubuntu5",
+          "doc_count": 37
+        },
+        {
+          "key": [
+            "libavfilter9",
+            "7:6.1.1-3ubuntu5"
+          ],
+          "key_as_string": "libavfilter9|7:6.1.1-3ubuntu5",
+          "doc_count": 37
+        },
+        {
+          "key": [
+            "libavformat60",
+            "7:6.1.1-3ubuntu5"
+          ],
+          "key_as_string": "libavformat60|7:6.1.1-3ubuntu5",
+          "doc_count": 37
+        },
+        {
+          "key": [
+            "libavutil58",
+            "7:6.1.1-3ubuntu5"
+          ],
+          "key_as_string": "libavutil58|7:6.1.1-3ubuntu5",
+          "doc_count": 37
+        },
+        {
+          "key": [
+            "libpostproc57",
+            "7:6.1.1-3ubuntu5"
+          ],
+          "key_as_string": "libpostproc57|7:6.1.1-3ubuntu5",
+          "doc_count": 37
+        },
+        {
+          "key": [
+            "libswresample4",
+            "7:6.1.1-3ubuntu5"
+          ],
+          "key_as_string": "libswresample4|7:6.1.1-3ubuntu5",
+          "doc_count": 37
+        },
+        {
+          "key": [
+            "libswscale7",
+            "7:6.1.1-3ubuntu5"
+          ],
+          "key_as_string": "libswscale7|7:6.1.1-3ubuntu5",
+          "doc_count": 37
+        },
+        {
+          "key": [
+            "libheif-plugin-aomenc",
+            "1.19.8-1"
+          ],
+          "key_as_string": "libheif-plugin-aomenc|1.19.8-1",
+          "doc_count": 36
+        },
+        {
+          "key": [
+            "libheif-plugin-dav1d",
+            "1.19.8-1"
+          ],
+          "key_as_string": "libheif-plugin-dav1d|1.19.8-1",
+          "doc_count": 36
+        },
+        {
+          "key": [
+            "libheif-plugin-libde265",
+            "1.19.8-1"
+          ],
+          "key_as_string": "libheif-plugin-libde265|1.19.8-1",
+          "doc_count": 36
+        },
+        {
+          "key": [
+            "libheif-plugin-x265",
+            "1.19.8-1"
+          ],
+          "key_as_string": "libheif-plugin-x265|1.19.8-1",
+          "doc_count": 36
+        },
+        {
+          "key": [
+            "libheif1",
+            "1.19.8-1"
+          ],
+          "key_as_string": "libheif1|1.19.8-1",
+          "doc_count": 36
+        },
+        {
+          "key": [
+            "libssl3t64",
+            "3.0.13-0ubuntu3.7"
+          ],
+          "key_as_string": "libssl3t64|3.0.13-0ubuntu3.7",
+          "doc_count": 33
+        },
+        {
+          "key": [
+            "openssl",
+            "3.0.13-0ubuntu3.7"
+          ],
+          "key_as_string": "openssl|3.0.13-0ubuntu3.7",
+          "doc_count": 33
+        },
+        {
+          "key": [
+            "openssh-client",
+            "1:9.6p1-3ubuntu13.14"
+          ],
+          "key_as_string": "openssh-client|1:9.6p1-3ubuntu13.14",
+          "doc_count": 32
+        },
+        {
+          "key": [
+            "firefox-esr",
+            "140.13.0esr-1~deb13u1"
+          ],
+          "key_as_string": "firefox-esr|140.13.0esr-1~deb13u1",
+          "doc_count": 31
+        },
+        {
+          "key": [
+            "aiohttp",
+            "3.13.5"
+          ],
+          "key_as_string": "aiohttp|3.13.5",
+          "doc_count": 28
+        },
+        {
+          "key": [
+            "libsoup-2.4-1",
+            "2.74.3-6ubuntu1.6"
+          ],
+          "key_as_string": "libsoup-2.4-1|2.74.3-6ubuntu1.6",
+          "doc_count": 28
+        },
+        {
+          "key": [
+            "libsoup2.4-common",
+            "2.74.3-6ubuntu1.6"
+          ],
+          "key_as_string": "libsoup2.4-common|2.74.3-6ubuntu1.6",
+          "doc_count": 28
+        },
+        {
+          "key": [
+            "nginx",
+            "1.26.3-3+deb13u2"
+          ],
+          "key_as_string": "nginx|1.26.3-3+deb13u2",
+          "doc_count": 28
+        },
+        {
+          "key": [
+            "nginx-common",
+            "1.26.3-3+deb13u2"
+          ],
+          "key_as_string": "nginx-common|1.26.3-3+deb13u2",
+          "doc_count": 28
+        },
+        {
+          "key": [
+            "imagemagick-7-common",
+            "8:7.1.1.43+dfsg1-1+deb13u9"
+          ],
+          "key_as_string": "imagemagick-7-common|8:7.1.1.43+dfsg1-1+deb13u9",
+          "doc_count": 27
+        },
+        {
+          "key": [
+            "libmagickcore-7.q16-10",
+            "8:7.1.1.43+dfsg1-1+deb13u9"
+          ],
+          "key_as_string": "libmagickcore-7.q16-10|8:7.1.1.43+dfsg1-1+deb13u9",
+          "doc_count": 27
+        },
+        {
+          "key": [
+            "libmagickcore-7.q16-10-extra",
+            "8:7.1.1.43+dfsg1-1+deb13u9"
+          ],
+          "key_as_string": "libmagickcore-7.q16-10-extra|8:7.1.1.43+dfsg1-1+deb13u9",
+          "doc_count": 27
+        },
+        {
+          "key": [
+            "libmagickwand-7.q16-10",
+            "8:7.1.1.43+dfsg1-1+deb13u9"
+          ],
+          "key_as_string": "libmagickwand-7.q16-10|8:7.1.1.43+dfsg1-1+deb13u9",
+          "doc_count": 27
+        },
+        {
+          "key": [
+            "libpq5",
+            "17.10-0+deb13u1"
+          ],
+          "key_as_string": "libpq5|17.10-0+deb13u1",
+          "doc_count": 27
+        },
+        {
+          "key": [
+            "dnsmasq-base",
+            "2.90-2ubuntu0.1"
+          ],
+          "key_as_string": "dnsmasq-base|2.90-2ubuntu0.1",
+          "doc_count": 26
+        },
+        {
+          "key": [
+            "libssl3t64",
+            "3.5.5-1~deb13u2"
+          ],
+          "key_as_string": "libssl3t64|3.5.5-1~deb13u2",
+          "doc_count": 25
+        },
+        {
+          "key": [
+            "openssl",
+            "3.5.5-1~deb13u2"
+          ],
+          "key_as_string": "openssl|3.5.5-1~deb13u2",
+          "doc_count": 25
+        },
+        {
+          "key": [
+            "openssl-provider-legacy",
+            "3.5.5-1~deb13u2"
+          ],
+          "key_as_string": "openssl-provider-legacy|3.5.5-1~deb13u2",
+          "doc_count": 25
+        },
+        {
+          "key": [
+            "openssh-server",
+            "1:9.6p1-3ubuntu13.14"
+          ],
+          "key_as_string": "openssh-server|1:9.6p1-3ubuntu13.14",
+          "doc_count": 24
+        },
+        {
+          "key": [
+            "openssh-sftp-server",
+            "1:9.6p1-3ubuntu13.14"
+          ],
+          "key_as_string": "openssh-sftp-server|1:9.6p1-3ubuntu13.14",
+          "doc_count": 24
+        },
+        {
+          "key": [
+            "rsync",
+            "3.2.7-1ubuntu1.2"
+          ],
+          "key_as_string": "rsync|3.2.7-1ubuntu1.2",
+          "doc_count": 24
+        },
+        {
+          "key": [
+            "curl",
+            "8.5.0-2ubuntu10.8"
+          ],
+          "key_as_string": "curl|8.5.0-2ubuntu10.8",
+          "doc_count": 23
+        },
+        {
+          "key": [
+            "libcurl3t64-gnutls",
+            "8.5.0-2ubuntu10.8"
+          ],
+          "key_as_string": "libcurl3t64-gnutls|8.5.0-2ubuntu10.8",
+          "doc_count": 23
+        },
+        {
+          "key": [
+            "libcurl4t64",
+            "8.5.0-2ubuntu10.8"
+          ],
+          "key_as_string": "libcurl4t64|8.5.0-2ubuntu10.8",
+          "doc_count": 23
+        },
+        {
+          "key": [
+            "bind9-dnsutils",
+            "1:9.18.39-0ubuntu0.24.04.2"
+          ],
+          "key_as_string": "bind9-dnsutils|1:9.18.39-0ubuntu0.24.04.2",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "bind9-host",
+            "1:9.18.39-0ubuntu0.24.04.2"
+          ],
+          "key_as_string": "bind9-host|1:9.18.39-0ubuntu0.24.04.2",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "bind9-libs",
+            "1:9.18.39-0ubuntu0.24.04.2"
+          ],
+          "key_as_string": "bind9-libs|1:9.18.39-0ubuntu0.24.04.2",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "heif-gdk-pixbuf",
+            "1.19.8-1"
+          ],
+          "key_as_string": "heif-gdk-pixbuf|1.19.8-1",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "heif-thumbnailer",
+            "1.19.8-1"
+          ],
+          "key_as_string": "heif-thumbnailer|1.19.8-1",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "libarchive13t64",
+            "3.7.2-2ubuntu0.5"
+          ],
+          "key_as_string": "libarchive13t64|3.7.2-2ubuntu0.5",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "libde265-0",
+            "1.0.15-1+b3"
+          ],
+          "key_as_string": "libde265-0|1.0.15-1+b3",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "libgnutls30t64",
+            "3.8.9-3+deb13u2"
+          ],
+          "key_as_string": "libgnutls30t64|3.8.9-3+deb13u2",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "libldb2",
+            "2:2.8.0+samba4.19.5+dfsg-4ubuntu9.4"
+          ],
+          "key_as_string": "libldb2|2:2.8.0+samba4.19.5+dfsg-4ubuntu9.4",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "libsmbclient0",
+            "2:4.19.5+dfsg-4ubuntu9.4"
+          ],
+          "key_as_string": "libsmbclient0|2:4.19.5+dfsg-4ubuntu9.4",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "libwbclient0",
+            "2:4.19.5+dfsg-4ubuntu9.4"
+          ],
+          "key_as_string": "libwbclient0|2:4.19.5+dfsg-4ubuntu9.4",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "qemu-block-extra",
+            "1:8.2.2+ds-0ubuntu1.13"
+          ],
+          "key_as_string": "qemu-block-extra|1:8.2.2+ds-0ubuntu1.13",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "qemu-system-common",
+            "1:8.2.2+ds-0ubuntu1.13"
+          ],
+          "key_as_string": "qemu-system-common|1:8.2.2+ds-0ubuntu1.13",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "qemu-system-data",
+            "1:8.2.2+ds-0ubuntu1.13"
+          ],
+          "key_as_string": "qemu-system-data|1:8.2.2+ds-0ubuntu1.13",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "qemu-system-gui",
+            "1:8.2.2+ds-0ubuntu1.13"
+          ],
+          "key_as_string": "qemu-system-gui|1:8.2.2+ds-0ubuntu1.13",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "qemu-system-modules-opengl",
+            "1:8.2.2+ds-0ubuntu1.13"
+          ],
+          "key_as_string": "qemu-system-modules-opengl|1:8.2.2+ds-0ubuntu1.13",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "qemu-system-modules-spice",
+            "1:8.2.2+ds-0ubuntu1.13"
+          ],
+          "key_as_string": "qemu-system-modules-spice|1:8.2.2+ds-0ubuntu1.13",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "qemu-system-x86",
+            "1:8.2.2+ds-0ubuntu1.13"
+          ],
+          "key_as_string": "qemu-system-x86|1:8.2.2+ds-0ubuntu1.13",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "qemu-utils",
+            "1:8.2.2+ds-0ubuntu1.13"
+          ],
+          "key_as_string": "qemu-utils|1:8.2.2+ds-0ubuntu1.13",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "samba-libs",
+            "2:4.19.5+dfsg-4ubuntu9.4"
+          ],
+          "key_as_string": "samba-libs|2:4.19.5+dfsg-4ubuntu9.4",
+          "doc_count": 22
+        },
+        {
+          "key": [
+            "gir1.2-soup-3.0",
+            "3.4.4-5ubuntu0.7"
+          ],
+          "key_as_string": "gir1.2-soup-3.0|3.4.4-5ubuntu0.7",
+          "doc_count": 20
+        },
+        {
+          "key": [
+            "libcups2t64",
+            "2.4.10-3+deb13u2"
+          ],
+          "key_as_string": "libcups2t64|2.4.10-3+deb13u2",
+          "doc_count": 20
+        },
+        {
+          "key": [
+            "libde265-0",
+            "1.0.15-1build3"
+          ],
+          "key_as_string": "libde265-0|1.0.15-1build3",
+          "doc_count": 20
+        },
+        {
+          "key": [
+            "libsoup-3.0-0",
+            "3.4.4-5ubuntu0.7"
+          ],
+          "key_as_string": "libsoup-3.0-0|3.4.4-5ubuntu0.7",
+          "doc_count": 20
+        },
+        {
+          "key": [
+            "libsoup-3.0-common",
+            "3.4.4-5ubuntu0.7"
+          ],
+          "key_as_string": "libsoup-3.0-common|3.4.4-5ubuntu0.7",
+          "doc_count": 20
+        },
+        {
+          "key": [
+            "libssl3t64",
+            "3.5.6-1~deb13u2"
+          ],
+          "key_as_string": "libssl3t64|3.5.6-1~deb13u2",
+          "doc_count": 20
+        },
+        {
+          "key": [
+            "openssl",
+            "3.5.6-1~deb13u2"
+          ],
+          "key_as_string": "openssl|3.5.6-1~deb13u2",
+          "doc_count": 20
+        },
+        {
+          "key": [
+            "openssl-provider-legacy",
+            "3.5.6-1~deb13u2"
+          ],
+          "key_as_string": "openssl-provider-legacy|3.5.6-1~deb13u2",
+          "doc_count": 20
+        },
+        {
+          "key": [
+            "GlobalProtect",
+            "6.2.2"
+          ],
+          "key_as_string": "GlobalProtect|6.2.2",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "amd64-microcode",
+            "3.20250311.1ubuntu0.24.04.1"
+          ],
+          "key_as_string": "amd64-microcode|3.20250311.1ubuntu0.24.04.1",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "binutils",
+            "2.42-4ubuntu2.8"
+          ],
+          "key_as_string": "binutils|2.42-4ubuntu2.8",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "binutils-common",
+            "2.42-4ubuntu2.8"
+          ],
+          "key_as_string": "binutils-common|2.42-4ubuntu2.8",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "binutils-x86-64-linux-gnu",
+            "2.42-4ubuntu2.8"
+          ],
+          "key_as_string": "binutils-x86-64-linux-gnu|2.42-4ubuntu2.8",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "jq",
+            "1.7.1-3ubuntu0.24.04.1"
+          ],
+          "key_as_string": "jq|1.7.1-3ubuntu0.24.04.1",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "libbinutils",
+            "2.42-4ubuntu2.8"
+          ],
+          "key_as_string": "libbinutils|2.42-4ubuntu2.8",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "libctf-nobfd0",
+            "2.42-4ubuntu2.8"
+          ],
+          "key_as_string": "libctf-nobfd0|2.42-4ubuntu2.8",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "libctf0",
+            "2.42-4ubuntu2.8"
+          ],
+          "key_as_string": "libctf0|2.42-4ubuntu2.8",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "libgprofng0",
+            "2.42-4ubuntu2.8"
+          ],
+          "key_as_string": "libgprofng0|2.42-4ubuntu2.8",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "libjq1",
+            "1.7.1-3ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libjq1|1.7.1-3ubuntu0.24.04.1",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "libsframe1",
+            "2.42-4ubuntu2.8"
+          ],
+          "key_as_string": "libsframe1|2.42-4ubuntu2.8",
+          "doc_count": 18
+        },
+        {
+          "key": [
+            "bind9-host",
+            "1:9.20.21-1~deb13u1"
+          ],
+          "key_as_string": "bind9-host|1:9.20.21-1~deb13u1",
+          "doc_count": 17
+        },
+        {
+          "key": [
+            "bind9-libs",
+            "1:9.20.21-1~deb13u1"
+          ],
+          "key_as_string": "bind9-libs|1:9.20.21-1~deb13u1",
+          "doc_count": 17
+        },
+        {
+          "key": [
+            "libpython3.12-minimal",
+            "3.12.3-1ubuntu0.12"
+          ],
+          "key_as_string": "libpython3.12-minimal|3.12.3-1ubuntu0.12",
+          "doc_count": 17
+        },
+        {
+          "key": [
+            "libpython3.12-stdlib",
+            "3.12.3-1ubuntu0.12"
+          ],
+          "key_as_string": "libpython3.12-stdlib|3.12.3-1ubuntu0.12",
+          "doc_count": 17
+        },
+        {
+          "key": [
+            "libpython3.12t64",
+            "3.12.3-1ubuntu0.12"
+          ],
+          "key_as_string": "libpython3.12t64|3.12.3-1ubuntu0.12",
+          "doc_count": 17
+        },
+        {
+          "key": [
+            "python3.12",
+            "3.12.3-1ubuntu0.12"
+          ],
+          "key_as_string": "python3.12|3.12.3-1ubuntu0.12",
+          "doc_count": 17
+        },
+        {
+          "key": [
+            "python3.12-minimal",
+            "3.12.3-1ubuntu0.12"
+          ],
+          "key_as_string": "python3.12-minimal|3.12.3-1ubuntu0.12",
+          "doc_count": 17
+        },
+        {
+          "key": [
+            "vim",
+            "2:9.1.0016-1ubuntu7.9"
+          ],
+          "key_as_string": "vim|2:9.1.0016-1ubuntu7.9",
+          "doc_count": 17
+        },
+        {
+          "key": [
+            "vim-runtime",
+            "2:9.1.0016-1ubuntu7.9"
+          ],
+          "key_as_string": "vim-runtime|2:9.1.0016-1ubuntu7.9",
+          "doc_count": 17
+        },
+        {
+          "key": [
+            "libc6",
+            "2.39-0ubuntu8.7"
+          ],
+          "key_as_string": "libc6|2.39-0ubuntu8.7",
+          "doc_count": 16
+        },
+        {
+          "key": [
+            "libevent-2.1-7t64",
+            "2.1.12-stable-10+b1"
+          ],
+          "key_as_string": "libevent-2.1-7t64|2.1.12-stable-10+b1",
+          "doc_count": 16
+        },
+        {
+          "key": [
+            "libexiv2-27",
+            "0.27.6-1build1"
+          ],
+          "key_as_string": "libexiv2-27|0.27.6-1build1",
+          "doc_count": 16
+        },
+        {
+          "key": [
+            "Oracle VirtualBox 7.2.12",
+            "7.2.12"
+          ],
+          "key_as_string": "Oracle VirtualBox 7.2.12|7.2.12",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "bsdextrautils",
+            "2.41-5"
+          ],
+          "key_as_string": "bsdextrautils|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "bsdutils",
+            "1:2.41-5"
+          ],
+          "key_as_string": "bsdutils|1:2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "cups",
+            "2.4.10-3+deb13u2"
+          ],
+          "key_as_string": "cups|2.4.10-3+deb13u2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "cups-client",
+            "2.4.10-3+deb13u2"
+          ],
+          "key_as_string": "cups-client|2.4.10-3+deb13u2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "cups-common",
+            "2.4.10-3+deb13u2"
+          ],
+          "key_as_string": "cups-common|2.4.10-3+deb13u2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "cups-core-drivers",
+            "2.4.10-3+deb13u2"
+          ],
+          "key_as_string": "cups-core-drivers|2.4.10-3+deb13u2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "cups-daemon",
+            "2.4.10-3+deb13u2"
+          ],
+          "key_as_string": "cups-daemon|2.4.10-3+deb13u2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "cups-ipp-utils",
+            "2.4.10-3+deb13u2"
+          ],
+          "key_as_string": "cups-ipp-utils|2.4.10-3+deb13u2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "cups-ppdc",
+            "2.4.10-3+deb13u2"
+          ],
+          "key_as_string": "cups-ppdc|2.4.10-3+deb13u2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "cups-server-common",
+            "2.4.10-3+deb13u2"
+          ],
+          "key_as_string": "cups-server-common|2.4.10-3+deb13u2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "eject",
+            "2.41-5"
+          ],
+          "key_as_string": "eject|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "fdisk",
+            "2.41-5"
+          ],
+          "key_as_string": "fdisk|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "gstreamer1.0-plugins-good",
+            "1.24.2-1ubuntu1.2"
+          ],
+          "key_as_string": "gstreamer1.0-plugins-good|1.24.2-1ubuntu1.2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "libblkid1",
+            "2.41-5"
+          ],
+          "key_as_string": "libblkid1|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "libfdisk1",
+            "2.41-5"
+          ],
+          "key_as_string": "libfdisk1|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "libgstreamer-plugins-good1.0-0",
+            "1.24.2-1ubuntu1.2"
+          ],
+          "key_as_string": "libgstreamer-plugins-good1.0-0|1.24.2-1ubuntu1.2",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "liblastlog2-2",
+            "2.41-5"
+          ],
+          "key_as_string": "liblastlog2-2|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "libmount1",
+            "2.41-5"
+          ],
+          "key_as_string": "libmount1|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "libntfs-3g89t64",
+            "1:2022.10.3-1.2ubuntu3"
+          ],
+          "key_as_string": "libntfs-3g89t64|1:2022.10.3-1.2ubuntu3",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "libsmartcols1",
+            "2.41-5"
+          ],
+          "key_as_string": "libsmartcols1|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "libssh-4",
+            "0.11.2-1+deb13u1"
+          ],
+          "key_as_string": "libssh-4|0.11.2-1+deb13u1",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "libuuid1",
+            "2.41-5"
+          ],
+          "key_as_string": "libuuid1|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "login",
+            "1:4.16.0-2+really2.41-5"
+          ],
+          "key_as_string": "login|1:4.16.0-2+really2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "mount",
+            "2.41-5"
+          ],
+          "key_as_string": "mount|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "ntfs-3g",
+            "1:2022.10.3-1.2ubuntu3"
+          ],
+          "key_as_string": "ntfs-3g|1:2022.10.3-1.2ubuntu3",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "pnpm",
+            "11.3.0"
+          ],
+          "key_as_string": "pnpm|11.3.0",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "util-linux",
+            "2.41-5"
+          ],
+          "key_as_string": "util-linux|2.41-5",
+          "doc_count": 15
+        },
+        {
+          "key": [
+            "jq",
+            "1.7.1-6+deb13u2"
+          ],
+          "key_as_string": "jq|1.7.1-6+deb13u2",
+          "doc_count": 14
+        },
+        {
+          "key": [
+            "libjq1",
+            "1.7.1-6+deb13u2"
+          ],
+          "key_as_string": "libjq1|1.7.1-6+deb13u2",
+          "doc_count": 14
+        },
+        {
+          "key": [
+            "rclone",
+            "1.60.1+dfsg-4"
+          ],
+          "key_as_string": "rclone|1.60.1+dfsg-4",
+          "doc_count": 14
+        },
+        {
+          "key": [
+            "Google Chrome",
+            "148.0.7778.168"
+          ],
+          "key_as_string": "Google Chrome|148.0.7778.168",
+          "doc_count": 13
+        },
+        {
+          "key": [
+            "libc-bin",
+            "2.39-0ubuntu8.7"
+          ],
+          "key_as_string": "libc-bin|2.39-0ubuntu8.7",
+          "doc_count": 13
+        },
+        {
+          "key": [
+            "locales",
+            "2.39-0ubuntu8.7"
+          ],
+          "key_as_string": "locales|2.39-0ubuntu8.7",
+          "doc_count": 13
+        },
+        {
+          "key": [
+            "rsync",
+            "3.4.1+ds1-5+deb13u1"
+          ],
+          "key_as_string": "rsync|3.4.1+ds1-5+deb13u1",
+          "doc_count": 13
+        },
+        {
+          "key": [
+            "avahi-daemon",
+            "0.8-13ubuntu6.1"
+          ],
+          "key_as_string": "avahi-daemon|0.8-13ubuntu6.1",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "cups",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "cups|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "cups-bsd",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "cups-bsd|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "cups-client",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "cups-client|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "cups-common",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "cups-common|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "cups-core-drivers",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "cups-core-drivers|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "cups-daemon",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "cups-daemon|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "cups-ipp-utils",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "cups-ipp-utils|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "cups-ppdc",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "cups-ppdc|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "cups-server-common",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "cups-server-common|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "libavahi-client3",
+            "0.8-13ubuntu6.1"
+          ],
+          "key_as_string": "libavahi-client3|0.8-13ubuntu6.1",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "libavahi-common-data",
+            "0.8-13ubuntu6.1"
+          ],
+          "key_as_string": "libavahi-common-data|0.8-13ubuntu6.1",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "libavahi-common3",
+            "0.8-13ubuntu6.1"
+          ],
+          "key_as_string": "libavahi-common3|0.8-13ubuntu6.1",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "libavahi-core7",
+            "0.8-13ubuntu6.1"
+          ],
+          "key_as_string": "libavahi-core7|0.8-13ubuntu6.1",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "libavahi-glib1",
+            "0.8-13ubuntu6.1"
+          ],
+          "key_as_string": "libavahi-glib1|0.8-13ubuntu6.1",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "libcups2t64",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "libcups2t64|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "libcupsimage2t64",
+            "2.4.7-1.2ubuntu7.9"
+          ],
+          "key_as_string": "libcupsimage2t64|2.4.7-1.2ubuntu7.9",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "libxml2",
+            "2.12.7+dfsg+really2.9.14-2.1+deb13u2"
+          ],
+          "key_as_string": "libxml2|2.12.7+dfsg+really2.9.14-2.1+deb13u2",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "openvpn",
+            "2.6.19-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "openvpn|2.6.19-0ubuntu0.24.04.1",
+          "doc_count": 12
+        },
+        {
+          "key": [
+            "curl",
+            "8.5.0-2ubuntu10.7"
+          ],
+          "key_as_string": "curl|8.5.0-2ubuntu10.7",
+          "doc_count": 11
+        },
+        {
+          "key": [
+            "libcurl3t64-gnutls",
+            "8.5.0-2ubuntu10.7"
+          ],
+          "key_as_string": "libcurl3t64-gnutls|8.5.0-2ubuntu10.7",
+          "doc_count": 11
+        },
+        {
+          "key": [
+            "libcurl4t64",
+            "8.5.0-2ubuntu10.7"
+          ],
+          "key_as_string": "libcurl4t64|8.5.0-2ubuntu10.7",
+          "doc_count": 11
+        },
+        {
+          "key": [
+            "xserver-common",
+            "2:21.1.16-1.3+deb13u2"
+          ],
+          "key_as_string": "xserver-common|2:21.1.16-1.3+deb13u2",
+          "doc_count": 11
+        },
+        {
+          "key": [
+            "xserver-xorg-core",
+            "2:21.1.16-1.3+deb13u2"
+          ],
+          "key_as_string": "xserver-xorg-core|2:21.1.16-1.3+deb13u2",
+          "doc_count": 11
+        },
+        {
+          "key": [
+            "xserver-xorg-legacy",
+            "2:21.1.16-1.3+deb13u2"
+          ],
+          "key_as_string": "xserver-xorg-legacy|2:21.1.16-1.3+deb13u2",
+          "doc_count": 11
+        },
+        {
+          "key": [
+            "openssh-client",
+            "1:10.0p1-7+deb13u2"
+          ],
+          "key_as_string": "openssh-client|1:10.0p1-7+deb13u2",
+          "doc_count": 10
+        },
+        {
+          "key": [
+            "openssh-server",
+            "1:10.0p1-7+deb13u2"
+          ],
+          "key_as_string": "openssh-server|1:10.0p1-7+deb13u2",
+          "doc_count": 10
+        },
+        {
+          "key": [
+            "openssh-sftp-server",
+            "1:10.0p1-7+deb13u2"
+          ],
+          "key_as_string": "openssh-sftp-server|1:10.0p1-7+deb13u2",
+          "doc_count": 10
+        },
+        {
+          "key": [
+            "pip",
+            "24.0"
+          ],
+          "key_as_string": "pip|24.0",
+          "doc_count": 10
+        },
+        {
+          "key": [
+            "util-linux-extra",
+            "2.41-5"
+          ],
+          "key_as_string": "util-linux-extra|2.41-5",
+          "doc_count": 10
+        },
+        {
+          "key": [
+            "util-linux-locales",
+            "2.41-5"
+          ],
+          "key_as_string": "util-linux-locales|2.41-5",
+          "doc_count": 10
+        },
+        {
+          "key": [
+            "bind9-dnsutils",
+            "1:9.20.23-1~deb13u1"
+          ],
+          "key_as_string": "bind9-dnsutils|1:9.20.23-1~deb13u1",
+          "doc_count": 9
+        },
+        {
+          "key": [
+            "bind9-host",
+            "1:9.20.23-1~deb13u1"
+          ],
+          "key_as_string": "bind9-host|1:9.20.23-1~deb13u1",
+          "doc_count": 9
+        },
+        {
+          "key": [
+            "bind9-libs",
+            "1:9.20.23-1~deb13u1"
+          ],
+          "key_as_string": "bind9-libs|1:9.20.23-1~deb13u1",
+          "doc_count": 9
+        },
+        {
+          "key": [
+            "libopenjp2-7",
+            "2.5.0-2ubuntu0.4"
+          ],
+          "key_as_string": "libopenjp2-7|2.5.0-2ubuntu0.4",
+          "doc_count": 9
+        },
+        {
+          "key": [
+            "libpng16-16t64",
+            "1.6.43-5ubuntu0.5"
+          ],
+          "key_as_string": "libpng16-16t64|1.6.43-5ubuntu0.5",
+          "doc_count": 9
+        },
+        {
+          "key": [
+            "busybox-initramfs",
+            "1:1.36.1-6ubuntu3.1"
+          ],
+          "key_as_string": "busybox-initramfs|1:1.36.1-6ubuntu3.1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "busybox-static",
+            "1:1.36.1-6ubuntu3.1"
+          ],
+          "key_as_string": "busybox-static|1:1.36.1-6ubuntu3.1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "caddy",
+            "2.6.2-12+b3"
+          ],
+          "key_as_string": "caddy|2.6.2-12+b3",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "curl",
+            "8.14.1-2+deb13u2"
+          ],
+          "key_as_string": "curl|8.14.1-2+deb13u2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "gir1.2-javascriptcoregtk-4.1",
+            "2.52.5-1~deb13u1"
+          ],
+          "key_as_string": "gir1.2-javascriptcoregtk-4.1|2.52.5-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "gir1.2-polkit-1.0",
+            "124-2ubuntu1.24.04.2"
+          ],
+          "key_as_string": "gir1.2-polkit-1.0|124-2ubuntu1.24.04.2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "gir1.2-webkit2-4.1",
+            "2.52.5-1~deb13u1"
+          ],
+          "key_as_string": "gir1.2-webkit2-4.1|2.52.5-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "gstreamer1.0-gtk3",
+            "1.26.2-1+deb13u1"
+          ],
+          "key_as_string": "gstreamer1.0-gtk3|1.26.2-1+deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "gstreamer1.0-plugins-bad",
+            "1.26.2-3+deb13u1"
+          ],
+          "key_as_string": "gstreamer1.0-plugins-bad|1.26.2-3+deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "gstreamer1.0-plugins-good",
+            "1.26.2-1+deb13u1"
+          ],
+          "key_as_string": "gstreamer1.0-plugins-good|1.26.2-1+deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libaom3",
+            "3.12.1-1"
+          ],
+          "key_as_string": "libaom3|3.12.1-1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libcurl3t64-gnutls",
+            "8.14.1-2+deb13u2"
+          ],
+          "key_as_string": "libcurl3t64-gnutls|8.14.1-2+deb13u2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libcurl4t64",
+            "8.14.1-2+deb13u2"
+          ],
+          "key_as_string": "libcurl4t64|8.14.1-2+deb13u2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libglib2.0-0t64",
+            "2.84.4-3~deb13u2"
+          ],
+          "key_as_string": "libglib2.0-0t64|2.84.4-3~deb13u2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libgstreamer-plugins-bad1.0-0",
+            "1.26.2-3+deb13u1"
+          ],
+          "key_as_string": "libgstreamer-plugins-bad1.0-0|1.26.2-3+deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libjavascriptcoregtk-4.1-0",
+            "2.52.5-1~deb13u1"
+          ],
+          "key_as_string": "libjavascriptcoregtk-4.1-0|2.52.5-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libjavascriptcoregtk-6.0-1",
+            "2.52.5-1~deb13u1"
+          ],
+          "key_as_string": "libjavascriptcoregtk-6.0-1|2.52.5-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libkpathsea6",
+            "2023.20230311.66589-9build3"
+          ],
+          "key_as_string": "libkpathsea6|2023.20230311.66589-9build3",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libmbedcrypto7t64",
+            "2.28.8-1"
+          ],
+          "key_as_string": "libmbedcrypto7t64|2.28.8-1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libnss-myhostname",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "libnss-myhostname|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libnss-resolve",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "libnss-resolve|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libopenexr-3-1-30",
+            "3.1.5-5.1build3"
+          ],
+          "key_as_string": "libopenexr-3-1-30|3.1.5-5.1build3",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libpam-systemd",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "libpam-systemd|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libpolkit-agent-1-0",
+            "124-2ubuntu1.24.04.2"
+          ],
+          "key_as_string": "libpolkit-agent-1-0|124-2ubuntu1.24.04.2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libpolkit-gobject-1-0",
+            "124-2ubuntu1.24.04.2"
+          ],
+          "key_as_string": "libpolkit-gobject-1-0|124-2ubuntu1.24.04.2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libprotobuf32t64",
+            "3.21.12-11"
+          ],
+          "key_as_string": "libprotobuf32t64|3.21.12-11",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libssh2-1t64",
+            "1.11.1-1"
+          ],
+          "key_as_string": "libssh2-1t64|1.11.1-1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libsynctex2",
+            "2023.20230311.66589-9build3"
+          ],
+          "key_as_string": "libsynctex2|2023.20230311.66589-9build3",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libsystemd-shared",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "libsystemd-shared|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libsystemd0",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "libsystemd0|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libudev1",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "libudev1|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libwebkit2gtk-4.1-0",
+            "2.52.5-1~deb13u1"
+          ],
+          "key_as_string": "libwebkit2gtk-4.1-0|2.52.5-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "libwebkitgtk-6.0-4",
+            "2.52.5-1~deb13u1"
+          ],
+          "key_as_string": "libwebkitgtk-6.0-4|2.52.5-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "pkexec",
+            "124-2ubuntu1.24.04.2"
+          ],
+          "key_as_string": "pkexec|124-2ubuntu1.24.04.2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "policykit-1",
+            "124-2ubuntu1.24.04.2"
+          ],
+          "key_as_string": "policykit-1|124-2ubuntu1.24.04.2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "polkitd",
+            "124-2ubuntu1.24.04.2"
+          ],
+          "key_as_string": "polkitd|124-2ubuntu1.24.04.2",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "snapd",
+            "2.73+ubuntu24.04"
+          ],
+          "key_as_string": "snapd|2.73+ubuntu24.04",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "systemd",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "systemd|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "systemd-resolved",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "systemd-resolved|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "systemd-sysv",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "systemd-sysv|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "systemd-timesyncd",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "systemd-timesyncd|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "udev",
+            "257.9-1~deb13u1"
+          ],
+          "key_as_string": "udev|257.9-1~deb13u1",
+          "doc_count": 8
+        },
+        {
+          "key": [
+            "gir1.2-packagekitglib-1.0",
+            "1.2.8-2ubuntu1.4"
+          ],
+          "key_as_string": "gir1.2-packagekitglib-1.0|1.2.8-2ubuntu1.4",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "gstreamer1.0-packagekit",
+            "1.2.8-2ubuntu1.4"
+          ],
+          "key_as_string": "gstreamer1.0-packagekit|1.2.8-2ubuntu1.4",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "heif-gdk-pixbuf",
+            "1.17.6-1ubuntu4.2"
+          ],
+          "key_as_string": "heif-gdk-pixbuf|1.17.6-1ubuntu4.2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "heif-thumbnailer",
+            "1.17.6-1ubuntu4.2"
+          ],
+          "key_as_string": "heif-thumbnailer|1.17.6-1ubuntu4.2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libc-bin",
+            "2.41-12+deb13u2"
+          ],
+          "key_as_string": "libc-bin|2.41-12+deb13u2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libc-dev-bin",
+            "2.39-0ubuntu8.7"
+          ],
+          "key_as_string": "libc-dev-bin|2.39-0ubuntu8.7",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libc-devtools",
+            "2.39-0ubuntu8.7"
+          ],
+          "key_as_string": "libc-devtools|2.39-0ubuntu8.7",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libc-l10n",
+            "2.41-12+deb13u2"
+          ],
+          "key_as_string": "libc-l10n|2.41-12+deb13u2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libc6",
+            "2.41-12+deb13u2"
+          ],
+          "key_as_string": "libc6|2.41-12+deb13u2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libexif12",
+            "0.6.24-1build2"
+          ],
+          "key_as_string": "libexif12|0.6.24-1build2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libgphoto2-6t64",
+            "2.5.31-2.1ubuntu1"
+          ],
+          "key_as_string": "libgphoto2-6t64|2.5.31-2.1ubuntu1",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libgphoto2-l10n",
+            "2.5.31-2.1ubuntu1"
+          ],
+          "key_as_string": "libgphoto2-l10n|2.5.31-2.1ubuntu1",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libgphoto2-port12t64",
+            "2.5.31-2.1ubuntu1"
+          ],
+          "key_as_string": "libgphoto2-port12t64|2.5.31-2.1ubuntu1",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libheif-plugin-aomdec",
+            "1.17.6-1ubuntu4.2"
+          ],
+          "key_as_string": "libheif-plugin-aomdec|1.17.6-1ubuntu4.2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libheif-plugin-aomenc",
+            "1.17.6-1ubuntu4.2"
+          ],
+          "key_as_string": "libheif-plugin-aomenc|1.17.6-1ubuntu4.2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libheif-plugin-libde265",
+            "1.17.6-1ubuntu4.2"
+          ],
+          "key_as_string": "libheif-plugin-libde265|1.17.6-1ubuntu4.2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libheif1",
+            "1.17.6-1ubuntu4.2"
+          ],
+          "key_as_string": "libheif1|1.17.6-1ubuntu4.2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libmbedcrypto16",
+            "3.6.5-0.1~deb13u1"
+          ],
+          "key_as_string": "libmbedcrypto16|3.6.5-0.1~deb13u1",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libnss-systemd",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "libnss-systemd|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libpackagekit-glib2-18",
+            "1.2.8-2ubuntu1.4"
+          ],
+          "key_as_string": "libpackagekit-glib2-18|1.2.8-2ubuntu1.4",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libpam-systemd",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "libpam-systemd|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libraw23t64",
+            "0.21.4-2"
+          ],
+          "key_as_string": "libraw23t64|0.21.4-2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libsystemd-shared",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "libsystemd-shared|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libsystemd0",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "libsystemd0|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "libudev1",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "libudev1|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "locales",
+            "2.41-12+deb13u2"
+          ],
+          "key_as_string": "locales|2.41-12+deb13u2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "packagekit",
+            "1.2.8-2ubuntu1.4"
+          ],
+          "key_as_string": "packagekit|1.2.8-2ubuntu1.4",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "packagekit-tools",
+            "1.2.8-2ubuntu1.4"
+          ],
+          "key_as_string": "packagekit-tools|1.2.8-2ubuntu1.4",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "python3-jwt",
+            "2.10.1-2"
+          ],
+          "key_as_string": "python3-jwt|2.10.1-2",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "systemd",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "systemd|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "systemd-oomd",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "systemd-oomd|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "systemd-resolved",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "systemd-resolved|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "systemd-sysv",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "systemd-sysv|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "systemd-timesyncd",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "systemd-timesyncd|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "udev",
+            "255.4-1ubuntu8.12"
+          ],
+          "key_as_string": "udev|255.4-1ubuntu8.12",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "wget",
+            "1.21.4-1ubuntu4.1"
+          ],
+          "key_as_string": "wget|1.21.4-1ubuntu4.1",
+          "doc_count": 7
+        },
+        {
+          "key": [
+            "Notepad++ (32-bit x86)",
+            "8.4.7"
+          ],
+          "key_as_string": "Notepad++ (32-bit x86)|8.4.7",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "WinRAR 6.00 (64-bit)",
+            "6.00.0"
+          ],
+          "key_as_string": "WinRAR 6.00 (64-bit)|6.00.0",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "WinRAR 6.11 (64-bit)",
+            "6.11.0"
+          ],
+          "key_as_string": "WinRAR 6.11 (64-bit)|6.11.0",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "curl",
+            "8.14.1-2+deb13u3"
+          ],
+          "key_as_string": "curl|8.14.1-2+deb13u3",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "fonts-opensymbol",
+            "4:102.12+LibO25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "fonts-opensymbol|4:102.12+LibO25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "gvfs",
+            "1.54.4-0ubuntu1~24.04.1"
+          ],
+          "key_as_string": "gvfs|1.54.4-0ubuntu1~24.04.1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "gvfs-backends",
+            "1.54.4-0ubuntu1~24.04.1"
+          ],
+          "key_as_string": "gvfs-backends|1.54.4-0ubuntu1~24.04.1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "gvfs-common",
+            "1.54.4-0ubuntu1~24.04.1"
+          ],
+          "key_as_string": "gvfs-common|1.54.4-0ubuntu1~24.04.1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "gvfs-daemons",
+            "1.54.4-0ubuntu1~24.04.1"
+          ],
+          "key_as_string": "gvfs-daemons|1.54.4-0ubuntu1~24.04.1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "gvfs-fuse",
+            "1.54.4-0ubuntu1~24.04.1"
+          ],
+          "key_as_string": "gvfs-fuse|1.54.4-0ubuntu1~24.04.1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "gvfs-libs",
+            "1.54.4-0ubuntu1~24.04.1"
+          ],
+          "key_as_string": "gvfs-libs|1.54.4-0ubuntu1~24.04.1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libcurl3t64-gnutls",
+            "8.14.1-2+deb13u3"
+          ],
+          "key_as_string": "libcurl3t64-gnutls|8.14.1-2+deb13u3",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libcurl4t64",
+            "8.14.1-2+deb13u3"
+          ],
+          "key_as_string": "libcurl4t64|8.14.1-2+deb13u3",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libelf1t64",
+            "0.190-1.1ubuntu0.1"
+          ],
+          "key_as_string": "libelf1t64|0.190-1.1ubuntu0.1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libgif7",
+            "5.2.2-1ubuntu1"
+          ],
+          "key_as_string": "libgif7|5.2.2-1ubuntu1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libldb2",
+            "2:2.11.0+samba4.22.8+dfsg-0+deb13u2"
+          ],
+          "key_as_string": "libldb2|2:2.11.0+samba4.22.8+dfsg-0+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libpython3.13",
+            "3.13.5-2+deb13u2"
+          ],
+          "key_as_string": "libpython3.13|3.13.5-2+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libpython3.13-minimal",
+            "3.13.5-2+deb13u2"
+          ],
+          "key_as_string": "libpython3.13-minimal|3.13.5-2+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libpython3.13-stdlib",
+            "3.13.5-2+deb13u2"
+          ],
+          "key_as_string": "libpython3.13-stdlib|3.13.5-2+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libraw23t64",
+            "0.21.2-2.1ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libraw23t64|0.21.2-2.1ubuntu0.24.04.1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-base-core",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-base-core|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-calc",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-calc|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-common",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-common|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-core",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-core|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-draw",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-draw|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-gtk3",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-gtk3|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-help-common",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-help-common|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-help-en-us",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-help-en-us|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-impress",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-impress|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-math",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-math|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-style-colibre",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-style-colibre|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-uiconfig-calc",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-uiconfig-calc|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-uiconfig-common",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-uiconfig-common|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-uiconfig-draw",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-uiconfig-draw|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-uiconfig-impress",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-uiconfig-impress|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-uiconfig-math",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-uiconfig-math|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-uiconfig-writer",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-uiconfig-writer|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libreoffice-writer",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libreoffice-writer|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libsmbclient0",
+            "2:4.22.8+dfsg-0+deb13u2"
+          ],
+          "key_as_string": "libsmbclient0|2:4.22.8+dfsg-0+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libsndfile1",
+            "1.2.2-1ubuntu5.24.04.1"
+          ],
+          "key_as_string": "libsndfile1|1.2.2-1ubuntu5.24.04.1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libtalloc2",
+            "2:2.4.3+samba4.22.8+dfsg-0+deb13u2"
+          ],
+          "key_as_string": "libtalloc2|2:2.4.3+samba4.22.8+dfsg-0+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libtdb1",
+            "2:1.4.13+samba4.22.8+dfsg-0+deb13u2"
+          ],
+          "key_as_string": "libtdb1|2:1.4.13+samba4.22.8+dfsg-0+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libtevent0t64",
+            "2:0.16.2+samba4.22.8+dfsg-0+deb13u2"
+          ],
+          "key_as_string": "libtevent0t64|2:0.16.2+samba4.22.8+dfsg-0+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libtiff6",
+            "4.5.1+git230720-4ubuntu2.4"
+          ],
+          "key_as_string": "libtiff6|4.5.1+git230720-4ubuntu2.4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libuno-cppu3t64",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libuno-cppu3t64|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libuno-cppuhelpergcc3-3t64",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libuno-cppuhelpergcc3-3t64|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libuno-purpenvhelpergcc3-3t64",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libuno-purpenvhelpergcc3-3t64|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libuno-sal3t64",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libuno-sal3t64|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libuno-salhelpergcc3-3t64",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "libuno-salhelpergcc3-3t64|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libwbclient0",
+            "2:4.22.8+dfsg-0+deb13u2"
+          ],
+          "key_as_string": "libwbclient0|2:4.22.8+dfsg-0+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "libxml-parser-perl",
+            "2.47-1build3"
+          ],
+          "key_as_string": "libxml-parser-perl|2.47-1build3",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "python3-uno",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "python3-uno|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "python3.13",
+            "3.13.5-2+deb13u2"
+          ],
+          "key_as_string": "python3.13|3.13.5-2+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "python3.13-minimal",
+            "3.13.5-2+deb13u2"
+          ],
+          "key_as_string": "python3.13-minimal|3.13.5-2+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "runc",
+            "1.1.15+ds1-2+b4"
+          ],
+          "key_as_string": "runc|1.1.15+ds1-2+b4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "samba-libs",
+            "2:4.22.8+dfsg-0+deb13u2"
+          ],
+          "key_as_string": "samba-libs|2:4.22.8+dfsg-0+deb13u2",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "tar",
+            "1.35+dfsg-3build1"
+          ],
+          "key_as_string": "tar|1.35+dfsg-3build1",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "uno-libs-private",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "uno-libs-private|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "ure",
+            "4:25.2.3-2+deb13u4"
+          ],
+          "key_as_string": "ure|4:25.2.3-2+deb13u4",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "yt-dlp",
+            "2024.4.9"
+          ],
+          "key_as_string": "yt-dlp|2024.4.9",
+          "doc_count": 6
+        },
+        {
+          "key": [
+            "avahi-utils",
+            "0.8-13ubuntu6.1"
+          ],
+          "key_as_string": "avahi-utils|0.8-13ubuntu6.1",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "gir1.2-gst-plugins-bad-1.0",
+            "1.26.2-3+deb13u2"
+          ],
+          "key_as_string": "gir1.2-gst-plugins-bad-1.0|1.26.2-3+deb13u2",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "gstreamer1.0-gtk3",
+            "1.26.2-1+deb13u2"
+          ],
+          "key_as_string": "gstreamer1.0-gtk3|1.26.2-1+deb13u2",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "gstreamer1.0-plugins-bad",
+            "1.26.2-3+deb13u2"
+          ],
+          "key_as_string": "gstreamer1.0-plugins-bad|1.26.2-3+deb13u2",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "gstreamer1.0-plugins-good",
+            "1.26.2-1+deb13u2"
+          ],
+          "key_as_string": "gstreamer1.0-plugins-good|1.26.2-1+deb13u2",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "inetutils-telnet",
+            "2:2.5-3ubuntu4.1"
+          ],
+          "key_as_string": "inetutils-telnet|2:2.5-3ubuntu4.1",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libaprutil1-dbd-sqlite3",
+            "1.6.3-3+b1"
+          ],
+          "key_as_string": "libaprutil1-dbd-sqlite3|1.6.3-3+b1",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libaprutil1-ldap",
+            "1.6.3-3+b1"
+          ],
+          "key_as_string": "libaprutil1-ldap|1.6.3-3+b1",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libaprutil1t64",
+            "1.6.3-3+b1"
+          ],
+          "key_as_string": "libaprutil1t64|1.6.3-3+b1",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libgcrypt20",
+            "1.10.3-2build1"
+          ],
+          "key_as_string": "libgcrypt20|1.10.3-2build1",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libgstreamer-plugins-bad1.0-0",
+            "1.26.2-3+deb13u2"
+          ],
+          "key_as_string": "libgstreamer-plugins-bad1.0-0|1.26.2-3+deb13u2",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libipa-hbac0t64",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "libipa-hbac0t64|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libnss-sss",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "libnss-sss|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libpam-sss",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "libpam-sss|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libpoppler-cpp0t64",
+            "24.02.0-1ubuntu9.8"
+          ],
+          "key_as_string": "libpoppler-cpp0t64|24.02.0-1ubuntu9.8",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libpoppler-glib8t64",
+            "24.02.0-1ubuntu9.8"
+          ],
+          "key_as_string": "libpoppler-glib8t64|24.02.0-1ubuntu9.8",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libpoppler134",
+            "24.02.0-1ubuntu9.8"
+          ],
+          "key_as_string": "libpoppler134|24.02.0-1ubuntu9.8",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libsss-certmap0",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "libsss-certmap0|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libsss-idmap0",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "libsss-idmap0|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libsss-nss-idmap0",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "libsss-nss-idmap0|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libzvbi-common",
+            "0.2.42-2"
+          ],
+          "key_as_string": "libzvbi-common|0.2.42-2",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "libzvbi0t64",
+            "0.2.42-2"
+          ],
+          "key_as_string": "libzvbi0t64|0.2.42-2",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "poppler-utils",
+            "24.02.0-1ubuntu9.8"
+          ],
+          "key_as_string": "poppler-utils|24.02.0-1ubuntu9.8",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "python3-sss",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "python3-sss|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "sssd",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "sssd|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "sssd-ad",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "sssd-ad|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "sssd-ad-common",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "sssd-ad-common|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "sssd-common",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "sssd-common|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "sssd-ipa",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "sssd-ipa|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "sssd-krb5",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "sssd-krb5|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "sssd-krb5-common",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "sssd-krb5-common|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "sssd-ldap",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "sssd-ldap|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "sssd-proxy",
+            "2.9.4-1.1ubuntu6.3"
+          ],
+          "key_as_string": "sssd-proxy|2.9.4-1.1ubuntu6.3",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "telnet",
+            "0.17+2.5-3ubuntu4.1"
+          ],
+          "key_as_string": "telnet|0.17+2.5-3ubuntu4.1",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "uuid-runtime",
+            "2.41-5"
+          ],
+          "key_as_string": "uuid-runtime|2.41-5",
+          "doc_count": 5
+        },
+        {
+          "key": [
+            "gir1.2-nm-1.0",
+            "1.46.0-1ubuntu2.5"
+          ],
+          "key_as_string": "gir1.2-nm-1.0|1.46.0-1ubuntu2.5",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "gstreamer1.0-gtk3",
+            "1.24.2-1ubuntu1.2"
+          ],
+          "key_as_string": "gstreamer1.0-gtk3|1.24.2-1ubuntu1.2",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libcairo-gobject2",
+            "1.18.0-3build1"
+          ],
+          "key_as_string": "libcairo-gobject2|1.18.0-3build1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libcairo-gobject2",
+            "1.18.4-1+b1"
+          ],
+          "key_as_string": "libcairo-gobject2|1.18.4-1+b1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libcairo-script-interpreter2",
+            "1.18.0-3build1"
+          ],
+          "key_as_string": "libcairo-script-interpreter2|1.18.0-3build1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libcairo2",
+            "1.18.0-3build1"
+          ],
+          "key_as_string": "libcairo2|1.18.0-3build1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libcairo2",
+            "1.18.4-1+b1"
+          ],
+          "key_as_string": "libcairo2|1.18.4-1+b1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libcjson1",
+            "1.7.17-1"
+          ],
+          "key_as_string": "libcjson1|1.7.17-1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libdebuginfod-common",
+            "0.190-1.1ubuntu0.1"
+          ],
+          "key_as_string": "libdebuginfod-common|0.190-1.1ubuntu0.1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libdebuginfod1t64",
+            "0.190-1.1ubuntu0.1"
+          ],
+          "key_as_string": "libdebuginfod1t64|0.190-1.1ubuntu0.1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libdw1t64",
+            "0.190-1.1ubuntu0.1"
+          ],
+          "key_as_string": "libdw1t64|0.190-1.1ubuntu0.1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libgif7",
+            "5.2.2-1+b1"
+          ],
+          "key_as_string": "libgif7|5.2.2-1+b1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libgssapi-krb5-2",
+            "1.21.3-5"
+          ],
+          "key_as_string": "libgssapi-krb5-2|1.21.3-5",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libk5crypto3",
+            "1.21.3-5"
+          ],
+          "key_as_string": "libk5crypto3|1.21.3-5",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libkrb5-3",
+            "1.21.3-5"
+          ],
+          "key_as_string": "libkrb5-3|1.21.3-5",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libkrb5support0",
+            "1.21.3-5"
+          ],
+          "key_as_string": "libkrb5support0|1.21.3-5",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "liblzma5",
+            "5.6.1+really5.4.5-1ubuntu0.2"
+          ],
+          "key_as_string": "liblzma5|5.6.1+really5.4.5-1ubuntu0.2",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libnghttp2-14",
+            "1.59.0-1ubuntu0.2"
+          ],
+          "key_as_string": "libnghttp2-14|1.59.0-1ubuntu0.2",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libnm0",
+            "1.46.0-1ubuntu2.5"
+          ],
+          "key_as_string": "libnm0|1.46.0-1ubuntu2.5",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libqt5webengine-data",
+            "5.15.16+dfsg-3"
+          ],
+          "key_as_string": "libqt5webengine-data|5.15.16+dfsg-3",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libqt5webengine5",
+            "5.15.16+dfsg-3"
+          ],
+          "key_as_string": "libqt5webengine5|5.15.16+dfsg-3",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libqt5webenginecore5",
+            "5.15.16+dfsg-3"
+          ],
+          "key_as_string": "libqt5webenginecore5|5.15.16+dfsg-3",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libqt5webenginewidgets5",
+            "5.15.16+dfsg-3"
+          ],
+          "key_as_string": "libqt5webenginewidgets5|5.15.16+dfsg-3",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libsqlite3-0",
+            "3.45.1-1ubuntu2.5"
+          ],
+          "key_as_string": "libsqlite3-0|3.45.1-1ubuntu2.5",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libsrt1.5-gnutls",
+            "1.5.4-1"
+          ],
+          "key_as_string": "libsrt1.5-gnutls|1.5.4-1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "libxslt1.1",
+            "1.1.39-0exp1ubuntu0.24.04.3"
+          ],
+          "key_as_string": "libxslt1.1|1.1.39-0exp1ubuntu0.24.04.3",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "nano",
+            "8.4-1"
+          ],
+          "key_as_string": "nano|8.4-1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "network-manager",
+            "1.46.0-1ubuntu2.5"
+          ],
+          "key_as_string": "network-manager|1.46.0-1ubuntu2.5",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "network-manager-config-connectivity-ubuntu",
+            "1.46.0-1ubuntu2.5"
+          ],
+          "key_as_string": "network-manager-config-connectivity-ubuntu|1.46.0-1ubuntu2.5",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "patch",
+            "2.7.6-7build3"
+          ],
+          "key_as_string": "patch|2.7.6-7build3",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "python3-protobuf",
+            "3.21.12-11"
+          ],
+          "key_as_string": "python3-protobuf|3.21.12-11",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "python3-urllib3",
+            "2.3.0-3+deb13u1"
+          ],
+          "key_as_string": "python3-urllib3|2.3.0-3+deb13u1",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "qml-module-qtwebengine",
+            "5.15.16+dfsg-3"
+          ],
+          "key_as_string": "qml-module-qtwebengine|5.15.16+dfsg-3",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "wpasupplicant",
+            "2:2.10-21ubuntu0.4"
+          ],
+          "key_as_string": "wpasupplicant|2:2.10-21ubuntu0.4",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "xdg-utils",
+            "1.1.3-4.1ubuntu3"
+          ],
+          "key_as_string": "xdg-utils|1.1.3-4.1ubuntu3",
+          "doc_count": 4
+        },
+        {
+          "key": [
+            "7zip",
+            "23.01+dfsg-11"
+          ],
+          "key_as_string": "7zip|23.01+dfsg-11",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "dpkg",
+            "1.22.6ubuntu6.5"
+          ],
+          "key_as_string": "dpkg|1.22.6ubuntu6.5",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "evince",
+            "46.3.1-0ubuntu1"
+          ],
+          "key_as_string": "evince|46.3.1-0ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "evince-common",
+            "46.3.1-0ubuntu1"
+          ],
+          "key_as_string": "evince-common|46.3.1-0ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "gir1.2-gdkpixbuf-2.0",
+            "2.42.10+dfsg-3ubuntu3.2"
+          ],
+          "key_as_string": "gir1.2-gdkpixbuf-2.0|2.42.10+dfsg-3ubuntu3.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "gstreamer1.0-alsa",
+            "1.24.2-1ubuntu0.3"
+          ],
+          "key_as_string": "gstreamer1.0-alsa|1.24.2-1ubuntu0.3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "gstreamer1.0-gl",
+            "1.24.2-1ubuntu0.3"
+          ],
+          "key_as_string": "gstreamer1.0-gl|1.24.2-1ubuntu0.3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "gstreamer1.0-plugins-base",
+            "1.24.2-1ubuntu0.3"
+          ],
+          "key_as_string": "gstreamer1.0-plugins-base|1.24.2-1ubuntu0.3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "gstreamer1.0-plugins-base-apps",
+            "1.24.2-1ubuntu0.3"
+          ],
+          "key_as_string": "gstreamer1.0-plugins-base-apps|1.24.2-1ubuntu0.3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "gstreamer1.0-x",
+            "1.24.2-1ubuntu0.3"
+          ],
+          "key_as_string": "gstreamer1.0-x|1.24.2-1ubuntu0.3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "krb5-locales",
+            "1.20.1-6ubuntu2.6"
+          ],
+          "key_as_string": "krb5-locales|1.20.1-6ubuntu2.6",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libavcodec61",
+            "7:7.1.4-0+deb13u1"
+          ],
+          "key_as_string": "libavcodec61|7:7.1.4-0+deb13u1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libavfilter10",
+            "7:7.1.4-0+deb13u1"
+          ],
+          "key_as_string": "libavfilter10|7:7.1.4-0+deb13u1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libavformat61",
+            "7:7.1.4-0+deb13u1"
+          ],
+          "key_as_string": "libavformat61|7:7.1.4-0+deb13u1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libavutil59",
+            "7:7.1.4-0+deb13u1"
+          ],
+          "key_as_string": "libavutil59|7:7.1.4-0+deb13u1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libc-bin",
+            "2.41-12+deb13u3"
+          ],
+          "key_as_string": "libc-bin|2.41-12+deb13u3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libc-l10n",
+            "2.41-12+deb13u3"
+          ],
+          "key_as_string": "libc-l10n|2.41-12+deb13u3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libc6",
+            "2.41-12+deb13u3"
+          ],
+          "key_as_string": "libc6|2.41-12+deb13u3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libcaca0",
+            "0.99.beta20-4ubuntu0.1"
+          ],
+          "key_as_string": "libcaca0|0.99.beta20-4ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libcairo-script-interpreter2",
+            "1.18.4-1+b1"
+          ],
+          "key_as_string": "libcairo-script-interpreter2|1.18.4-1+b1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libcap2",
+            "1:2.66-5ubuntu2.2"
+          ],
+          "key_as_string": "libcap2|1:2.66-5ubuntu2.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libcap2-bin",
+            "1:2.66-5ubuntu2.2"
+          ],
+          "key_as_string": "libcap2-bin|1:2.66-5ubuntu2.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libdpkg-perl",
+            "1.22.6ubuntu6.5"
+          ],
+          "key_as_string": "libdpkg-perl|1.22.6ubuntu6.5",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libeditorconfig0",
+            "0.12.7-0.1"
+          ],
+          "key_as_string": "libeditorconfig0|0.12.7-0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libevdocument3-4t64",
+            "46.3.1-0ubuntu1"
+          ],
+          "key_as_string": "libevdocument3-4t64|46.3.1-0ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libevview3-3t64",
+            "46.3.1-0ubuntu1"
+          ],
+          "key_as_string": "libevview3-3t64|46.3.1-0ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libexpat1",
+            "2.6.1-2ubuntu0.4"
+          ],
+          "key_as_string": "libexpat1|2.6.1-2ubuntu0.4",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libfreetype6",
+            "2.13.2+dfsg-1build3"
+          ],
+          "key_as_string": "libfreetype6|2.13.2+dfsg-1build3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libgdk-pixbuf-2.0-0",
+            "2.42.10+dfsg-3ubuntu3.2"
+          ],
+          "key_as_string": "libgdk-pixbuf-2.0-0|2.42.10+dfsg-3ubuntu3.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libgdk-pixbuf2.0-bin",
+            "2.42.10+dfsg-3ubuntu3.2"
+          ],
+          "key_as_string": "libgdk-pixbuf2.0-bin|2.42.10+dfsg-3ubuntu3.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libgdk-pixbuf2.0-common",
+            "2.42.10+dfsg-3ubuntu3.2"
+          ],
+          "key_as_string": "libgdk-pixbuf2.0-common|2.42.10+dfsg-3ubuntu3.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libgssapi-krb5-2",
+            "1.20.1-6ubuntu2.6"
+          ],
+          "key_as_string": "libgssapi-krb5-2|1.20.1-6ubuntu2.6",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libgstreamer-gl1.0-0",
+            "1.24.2-1ubuntu0.3"
+          ],
+          "key_as_string": "libgstreamer-gl1.0-0|1.24.2-1ubuntu0.3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libgstreamer-plugins-base1.0-0",
+            "1.24.2-1ubuntu0.3"
+          ],
+          "key_as_string": "libgstreamer-plugins-base1.0-0|1.24.2-1ubuntu0.3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libhtp2",
+            "1:0.5.46-1ubuntu2"
+          ],
+          "key_as_string": "libhtp2|1:0.5.46-1ubuntu2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libhttp-daemon-perl",
+            "6.16-1"
+          ],
+          "key_as_string": "libhttp-daemon-perl|6.16-1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libicu74",
+            "74.2-1ubuntu3.1"
+          ],
+          "key_as_string": "libicu74|74.2-1ubuntu3.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libjbig2dec0",
+            "0.20-1build3"
+          ],
+          "key_as_string": "libjbig2dec0|0.20-1build3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libk5crypto3",
+            "1.20.1-6ubuntu2.6"
+          ],
+          "key_as_string": "libk5crypto3|1.20.1-6ubuntu2.6",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libkrb5-3",
+            "1.20.1-6ubuntu2.6"
+          ],
+          "key_as_string": "libkrb5-3|1.20.1-6ubuntu2.6",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libkrb5support0",
+            "1.20.1-6ubuntu2.6"
+          ],
+          "key_as_string": "libkrb5support0|1.20.1-6ubuntu2.6",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "liblcms2-2",
+            "2.14-2build1"
+          ],
+          "key_as_string": "liblcms2-2|2.14-2build1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "liblcms2-utils",
+            "2.14-2build1"
+          ],
+          "key_as_string": "liblcms2-utils|2.14-2build1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libopenjp2-7",
+            "2.5.3-2.1~deb13u2"
+          ],
+          "key_as_string": "libopenjp2-7|2.5.3-2.1~deb13u2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libpam-cap",
+            "1:2.66-5ubuntu2.2"
+          ],
+          "key_as_string": "libpam-cap|1:2.66-5ubuntu2.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libperl5.38t64",
+            "5.38.2-3.2ubuntu0.2"
+          ],
+          "key_as_string": "libperl5.38t64|5.38.2-3.2ubuntu0.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libpostproc58",
+            "7:7.1.4-0+deb13u1"
+          ],
+          "key_as_string": "libpostproc58|7:7.1.4-0+deb13u1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5core5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5core5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5dbus5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5dbus5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5gui5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5gui5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5network5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5network5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5printsupport5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5printsupport5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5qml5",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "libqt5qml5|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5qmlmodels5",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "libqt5qmlmodels5|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5qmlworkerscript5",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "libqt5qmlworkerscript5|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5quick5",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "libqt5quick5|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5quickwidgets5",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "libqt5quickwidgets5|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5sql5-sqlite",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5sql5-sqlite|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5sql5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5sql5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5widgets5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5widgets5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libqt5xml5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5xml5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libssh-4",
+            "0.10.6-2ubuntu0.3"
+          ],
+          "key_as_string": "libssh-4|0.10.6-2ubuntu0.3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libswresample5",
+            "7:7.1.4-0+deb13u1"
+          ],
+          "key_as_string": "libswresample5|7:7.1.4-0+deb13u1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libswscale8",
+            "7:7.1.4-0+deb13u1"
+          ],
+          "key_as_string": "libswscale8|7:7.1.4-0+deb13u1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libvpl2",
+            "2023.3.0-1build1"
+          ],
+          "key_as_string": "libvpl2|2023.3.0-1build1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libxfont2",
+            "1:2.0.6-1+b3"
+          ],
+          "key_as_string": "libxfont2|1:2.0.6-1+b3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libxfont2",
+            "1:2.0.6-1build1"
+          ],
+          "key_as_string": "libxfont2|1:2.0.6-1build1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "libxpm4",
+            "1:3.5.17-1build2"
+          ],
+          "key_as_string": "libxpm4|1:3.5.17-1build2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "locales",
+            "2.41-12+deb13u3"
+          ],
+          "key_as_string": "locales|2.41-12+deb13u3",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "perl",
+            "5.38.2-3.2ubuntu0.2"
+          ],
+          "key_as_string": "perl|5.38.2-3.2ubuntu0.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "perl-base",
+            "5.38.2-3.2ubuntu0.2"
+          ],
+          "key_as_string": "perl-base|5.38.2-3.2ubuntu0.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "perl-modules-5.38",
+            "5.38.2-3.2ubuntu0.2"
+          ],
+          "key_as_string": "perl-modules-5.38|5.38.2-3.2ubuntu0.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "python3-cryptography",
+            "41.0.7-4ubuntu0.1"
+          ],
+          "key_as_string": "python3-cryptography|41.0.7-4ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "python3-jwt",
+            "2.7.0-1"
+          ],
+          "key_as_string": "python3-jwt|2.7.0-1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "qemu-utils",
+            "1:10.0.8+ds-0+deb13u1+b1"
+          ],
+          "key_as_string": "qemu-utils|1:10.0.8+ds-0+deb13u1+b1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "qml-module-qt-labs-folderlistmodel",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "qml-module-qt-labs-folderlistmodel|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "qml-module-qt-labs-settings",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "qml-module-qt-labs-settings|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "qml-module-qtqml",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "qml-module-qtqml|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "qml-module-qtqml-models2",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "qml-module-qtqml-models2|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "qml-module-qtquick-layouts",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "qml-module-qtquick-layouts|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "qml-module-qtquick-window2",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "qml-module-qtquick-window2|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "qml-module-qtquick2",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "qml-module-qtquick2|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "qt5-gtk-platformtheme",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "qt5-gtk-platformtheme|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "sed",
+            "4.9-2build1"
+          ],
+          "key_as_string": "sed|4.9-2build1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "sudo",
+            "1.9.15p5-3ubuntu5.24.04.1"
+          ],
+          "key_as_string": "sudo|1.9.15p5-3ubuntu5.24.04.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "ubuntu-pro-client",
+            "37.1ubuntu0~24.04"
+          ],
+          "key_as_string": "ubuntu-pro-client|37.1ubuntu0~24.04",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "ubuntu-pro-client-l10n",
+            "37.1ubuntu0~24.04"
+          ],
+          "key_as_string": "ubuntu-pro-client-l10n|37.1ubuntu0~24.04",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "xdg-dbus-proxy",
+            "0.1.5-1ubuntu0.1"
+          ],
+          "key_as_string": "xdg-dbus-proxy|0.1.5-1ubuntu0.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "xdg-desktop-portal",
+            "1.18.4-1ubuntu2.24.04.1"
+          ],
+          "key_as_string": "xdg-desktop-portal|1.18.4-1ubuntu2.24.04.1",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "xz-utils",
+            "5.6.1+really5.4.5-1ubuntu0.2"
+          ],
+          "key_as_string": "xz-utils|5.6.1+really5.4.5-1ubuntu0.2",
+          "doc_count": 3
+        },
+        {
+          "key": [
+            "Jinja2",
+            "3.1.6"
+          ],
+          "key_as_string": "Jinja2|3.1.6",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "Microsoft ASP.NET Core 8.0.20 Shared Framework (x64)",
+            "8.0.20.25420"
+          ],
+          "key_as_string": "Microsoft ASP.NET Core 8.0.20 Shared Framework (x64)|8.0.20.25420",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "Microsoft Visual Studio 2010 Tools for Office Runtime (x64)",
+            "10.0.50903"
+          ],
+          "key_as_string": "Microsoft Visual Studio 2010 Tools for Office Runtime (x64)|10.0.50903",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "Microsoft Visual Studio 2010 Tools for Office Runtime (x64)",
+            "10.0.50908"
+          ],
+          "key_as_string": "Microsoft Visual Studio 2010 Tools for Office Runtime (x64)|10.0.50908",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "Microsoft Visual Studio 2010 Tools for Office Runtime (x64) Language Pack - ESN",
+            "10.0.50903"
+          ],
+          "key_as_string": "Microsoft Visual Studio 2010 Tools for Office Runtime (x64) Language Pack - ESN|10.0.50903",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "accountsservice",
+            "23.13.9-2ubuntu6"
+          ],
+          "key_as_string": "accountsservice|23.13.9-2ubuntu6",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "bsdextrautils",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "bsdextrautils|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "bsdutils",
+            "1:2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "bsdutils|1:2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "cpio",
+            "2.15+dfsg-1ubuntu2"
+          ],
+          "key_as_string": "cpio|2.15+dfsg-1ubuntu2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "docker-cli",
+            "26.1.5+dfsg1-9+b12"
+          ],
+          "key_as_string": "docker-cli|26.1.5+dfsg1-9+b12",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "docker.io",
+            "26.1.5+dfsg1-9+b12"
+          ],
+          "key_as_string": "docker.io|26.1.5+dfsg1-9+b12",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "eject",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "eject|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "fdisk",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "fdisk|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gdm3",
+            "46.2-1ubuntu1~24.04.6"
+          ],
+          "key_as_string": "gdm3|46.2-1ubuntu1~24.04.6",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gdm3",
+            "48.0-2"
+          ],
+          "key_as_string": "gdm3|48.0-2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gir1.2-accountsservice-1.0",
+            "23.13.9-2ubuntu6"
+          ],
+          "key_as_string": "gir1.2-accountsservice-1.0|23.13.9-2ubuntu6",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gir1.2-gdm-1.0",
+            "46.2-1ubuntu1~24.04.6"
+          ],
+          "key_as_string": "gir1.2-gdm-1.0|46.2-1ubuntu1~24.04.6",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gir1.2-gdm-1.0",
+            "48.0-2"
+          ],
+          "key_as_string": "gir1.2-gdm-1.0|48.0-2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gir1.2-gst-plugins-base-1.0",
+            "1.26.2-1+deb13u1"
+          ],
+          "key_as_string": "gir1.2-gst-plugins-base-1.0|1.26.2-1+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gir1.2-harfbuzz-0.0",
+            "8.3.0-2build2"
+          ],
+          "key_as_string": "gir1.2-harfbuzz-0.0|8.3.0-2build2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "git",
+            "1:2.43.0-1ubuntu7.3"
+          ],
+          "key_as_string": "git|1:2.43.0-1ubuntu7.3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "git-man",
+            "1:2.43.0-1ubuntu7.3"
+          ],
+          "key_as_string": "git-man|1:2.43.0-1ubuntu7.3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gnome-font-viewer",
+            "46.0-1build1"
+          ],
+          "key_as_string": "gnome-font-viewer|46.0-1build1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gnome-remote-desktop",
+            "46.3-0ubuntu1.2"
+          ],
+          "key_as_string": "gnome-remote-desktop|46.3-0ubuntu1.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gstreamer1.0-gl",
+            "1.26.2-1+deb13u1"
+          ],
+          "key_as_string": "gstreamer1.0-gl|1.26.2-1+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gstreamer1.0-gtk3",
+            "1.26.2-1"
+          ],
+          "key_as_string": "gstreamer1.0-gtk3|1.26.2-1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gstreamer1.0-pipewire",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "gstreamer1.0-pipewire|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gstreamer1.0-plugins-base",
+            "1.26.2-1+deb13u1"
+          ],
+          "key_as_string": "gstreamer1.0-plugins-base|1.26.2-1+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gstreamer1.0-plugins-good",
+            "1.26.2-1"
+          ],
+          "key_as_string": "gstreamer1.0-plugins-good|1.26.2-1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gstreamer1.0-x",
+            "1.26.2-1+deb13u1"
+          ],
+          "key_as_string": "gstreamer1.0-x|1.26.2-1+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "gzip",
+            "1.12-1ubuntu3.1"
+          ],
+          "key_as_string": "gzip|1.12-1ubuntu3.1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "hplip",
+            "3.23.12+dfsg0-0ubuntu5"
+          ],
+          "key_as_string": "hplip|3.23.12+dfsg0-0ubuntu5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "hplip-data",
+            "3.23.12+dfsg0-0ubuntu5"
+          ],
+          "key_as_string": "hplip-data|3.23.12+dfsg0-0ubuntu5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libaccountsservice0",
+            "23.13.9-2ubuntu6"
+          ],
+          "key_as_string": "libaccountsservice0|23.13.9-2ubuntu6",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libao-common",
+            "1.2.2+20180113-1.1ubuntu4"
+          ],
+          "key_as_string": "libao-common|1.2.2+20180113-1.1ubuntu4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libao4",
+            "1.2.2+20180113-1.1ubuntu4"
+          ],
+          "key_as_string": "libao4|1.2.2+20180113-1.1ubuntu4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libarchive13t64",
+            "3.7.4-4+deb13u1"
+          ],
+          "key_as_string": "libarchive13t64|3.7.4-4+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libblkid1",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "libblkid1|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libbpf1",
+            "1:1.3.0-2build2"
+          ],
+          "key_as_string": "libbpf1|1:1.3.0-2build2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libclang-cpp18",
+            "1:18.1.3-1ubuntu1"
+          ],
+          "key_as_string": "libclang-cpp18|1:18.1.3-1ubuntu1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libclang1-18",
+            "1:18.1.3-1ubuntu1"
+          ],
+          "key_as_string": "libclang1-18|1:18.1.3-1ubuntu1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libefiboot1t64",
+            "38-3.1build1"
+          ],
+          "key_as_string": "libefiboot1t64|38-3.1build1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libefivar1t64",
+            "38-3.1build1"
+          ],
+          "key_as_string": "libefivar1t64|38-3.1build1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libfdisk1",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "libfdisk1|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libgcrypt20",
+            "1.11.0-7"
+          ],
+          "key_as_string": "libgcrypt20|1.11.0-7",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libgdm1",
+            "46.2-1ubuntu1~24.04.6"
+          ],
+          "key_as_string": "libgdm1|46.2-1ubuntu1~24.04.6",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libgdm1",
+            "48.0-2"
+          ],
+          "key_as_string": "libgdm1|48.0-2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libgstreamer-gl1.0-0",
+            "1.26.2-1+deb13u1"
+          ],
+          "key_as_string": "libgstreamer-gl1.0-0|1.26.2-1+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libgstreamer-plugins-base1.0-0",
+            "1.26.2-1+deb13u1"
+          ],
+          "key_as_string": "libgstreamer-plugins-base1.0-0|1.26.2-1+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libharfbuzz-gobject0",
+            "8.3.0-2build2"
+          ],
+          "key_as_string": "libharfbuzz-gobject0|8.3.0-2build2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libharfbuzz-icu0",
+            "8.3.0-2build2"
+          ],
+          "key_as_string": "libharfbuzz-icu0|8.3.0-2build2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libharfbuzz0b",
+            "8.3.0-2build2"
+          ],
+          "key_as_string": "libharfbuzz0b|8.3.0-2build2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libhpmud0",
+            "3.23.12+dfsg0-0ubuntu5"
+          ],
+          "key_as_string": "libhpmud0|3.23.12+dfsg0-0ubuntu5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libjxl0.11",
+            "0.11.2-0.1~deb13u2"
+          ],
+          "key_as_string": "libjxl0.11|0.11.2-0.1~deb13u2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libllvm18",
+            "1:18.1.3-1ubuntu1"
+          ],
+          "key_as_string": "libllvm18|1:18.1.3-1ubuntu1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "liblmdb0",
+            "0.9.31-1build1"
+          ],
+          "key_as_string": "liblmdb0|0.9.31-1build1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libmount1",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "libmount1|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libnghttp2-14",
+            "1.64.0-1.1"
+          ],
+          "key_as_string": "libnghttp2-14|1.64.0-1.1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libntfs-3g89t64",
+            "1:2022.10.3-5+deb13u1"
+          ],
+          "key_as_string": "libntfs-3g89t64|1:2022.10.3-5+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpcre3",
+            "2:8.39-15build1"
+          ],
+          "key_as_string": "libpcre3|2:8.39-15build1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpipewire-0.3-0t64",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "libpipewire-0.3-0t64|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpipewire-0.3-common",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "libpipewire-0.3-common|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpipewire-0.3-modules",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "libpipewire-0.3-modules|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpixman-1-0",
+            "0.42.2-1build1"
+          ],
+          "key_as_string": "libpixman-1-0|0.42.2-1build1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpng16-16t64",
+            "1.6.48-1+deb13u4"
+          ],
+          "key_as_string": "libpng16-16t64|1.6.48-1+deb13u4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler-cpp2",
+            "25.03.0-5+deb13u2"
+          ],
+          "key_as_string": "libpoppler-cpp2|25.03.0-5+deb13u2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler-cpp2",
+            "25.03.0-5+deb13u3"
+          ],
+          "key_as_string": "libpoppler-cpp2|25.03.0-5+deb13u3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler-cpp2",
+            "25.03.0-5+deb13u4"
+          ],
+          "key_as_string": "libpoppler-cpp2|25.03.0-5+deb13u4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler-glib8t64",
+            "25.03.0-5+deb13u2"
+          ],
+          "key_as_string": "libpoppler-glib8t64|25.03.0-5+deb13u2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler-glib8t64",
+            "25.03.0-5+deb13u3"
+          ],
+          "key_as_string": "libpoppler-glib8t64|25.03.0-5+deb13u3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler-glib8t64",
+            "25.03.0-5+deb13u4"
+          ],
+          "key_as_string": "libpoppler-glib8t64|25.03.0-5+deb13u4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler-qt5-1t64",
+            "24.02.0-1ubuntu9.8"
+          ],
+          "key_as_string": "libpoppler-qt5-1t64|24.02.0-1ubuntu9.8",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler147",
+            "25.03.0-5+deb13u2"
+          ],
+          "key_as_string": "libpoppler147|25.03.0-5+deb13u2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler147",
+            "25.03.0-5+deb13u3"
+          ],
+          "key_as_string": "libpoppler147|25.03.0-5+deb13u3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpoppler147",
+            "25.03.0-5+deb13u4"
+          ],
+          "key_as_string": "libpoppler147|25.03.0-5+deb13u4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libprotobuf32t64",
+            "3.21.12-8.2ubuntu0.3"
+          ],
+          "key_as_string": "libprotobuf32t64|3.21.12-8.2ubuntu0.3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpython3.12-minimal",
+            "3.12.3-1ubuntu0.11"
+          ],
+          "key_as_string": "libpython3.12-minimal|3.12.3-1ubuntu0.11",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpython3.12-stdlib",
+            "3.12.3-1ubuntu0.11"
+          ],
+          "key_as_string": "libpython3.12-stdlib|3.12.3-1ubuntu0.11",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpython3.12t64",
+            "3.12.3-1ubuntu0.11"
+          ],
+          "key_as_string": "libpython3.12t64|3.12.3-1ubuntu0.11",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpython3.13-minimal",
+            "3.13.5-2+deb13u4"
+          ],
+          "key_as_string": "libpython3.13-minimal|3.13.5-2+deb13u4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libpython3.13-stdlib",
+            "3.13.5-2+deb13u4"
+          ],
+          "key_as_string": "libpython3.13-stdlib|3.13.5-2+deb13u4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libqt5quickparticles5",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "libqt5quickparticles5|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libsane-hpaio",
+            "3.23.12+dfsg0-0ubuntu5"
+          ],
+          "key_as_string": "libsane-hpaio|3.23.12+dfsg0-0ubuntu5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libsmartcols1",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "libsmartcols1|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libspa-0.2-bluetooth",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "libspa-0.2-bluetooth|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libspa-0.2-modules",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "libspa-0.2-modules|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libtasn1-6",
+            "4.20.0-2"
+          ],
+          "key_as_string": "libtasn1-6|4.20.0-2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libtiff6",
+            "4.7.0-3+deb13u2"
+          ],
+          "key_as_string": "libtiff6|4.7.0-3+deb13u2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libtiff6",
+            "4.7.0-3+deb13u3"
+          ],
+          "key_as_string": "libtiff6|4.7.0-3+deb13u3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libudisks2-0",
+            "2.10.1-12.1+deb13u1"
+          ],
+          "key_as_string": "libudisks2-0|2.10.1-12.1+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libuuid1",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "libuuid1|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "libwavpack1",
+            "5.6.0-1build1"
+          ],
+          "key_as_string": "libwavpack1|5.6.0-1build1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "login",
+            "1:4.13+dfsg1-4ubuntu3.2"
+          ],
+          "key_as_string": "login|1:4.13+dfsg1-4ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "mount",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "mount|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "nano",
+            "7.2-2ubuntu0.1"
+          ],
+          "key_as_string": "nano|7.2-2ubuntu0.1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "ntfs-3g",
+            "1:2022.10.3-5+deb13u1"
+          ],
+          "key_as_string": "ntfs-3g|1:2022.10.3-5+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "ovmf",
+            "2024.02-2ubuntu0.7"
+          ],
+          "key_as_string": "ovmf|2024.02-2ubuntu0.7",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "passwd",
+            "1:4.13+dfsg1-4ubuntu3.2"
+          ],
+          "key_as_string": "passwd|1:4.13+dfsg1-4ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "pipewire",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "pipewire|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "pipewire-alsa",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "pipewire-alsa|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "pipewire-audio",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "pipewire-audio|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "pipewire-bin",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "pipewire-bin|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "pipewire-pulse",
+            "1.0.5-1ubuntu3.2"
+          ],
+          "key_as_string": "pipewire-pulse|1.0.5-1ubuntu3.2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "pm2",
+            "6.0.14"
+          ],
+          "key_as_string": "pm2|6.0.14",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "poppler-utils",
+            "25.03.0-5+deb13u2"
+          ],
+          "key_as_string": "poppler-utils|25.03.0-5+deb13u2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "poppler-utils",
+            "25.03.0-5+deb13u3"
+          ],
+          "key_as_string": "poppler-utils|25.03.0-5+deb13u3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "poppler-utils",
+            "25.03.0-5+deb13u4"
+          ],
+          "key_as_string": "poppler-utils|25.03.0-5+deb13u4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "postfix",
+            "3.8.6-1build2"
+          ],
+          "key_as_string": "postfix|3.8.6-1build2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "printer-driver-hpcups",
+            "3.23.12+dfsg0-0ubuntu5"
+          ],
+          "key_as_string": "printer-driver-hpcups|3.23.12+dfsg0-0ubuntu5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "printer-driver-postscript-hp",
+            "3.23.12+dfsg0-0ubuntu5"
+          ],
+          "key_as_string": "printer-driver-postscript-hp|3.23.12+dfsg0-0ubuntu5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "python3-idna",
+            "3.10-1"
+          ],
+          "key_as_string": "python3-idna|3.10-1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "python3-pil",
+            "10.2.0-1ubuntu1"
+          ],
+          "key_as_string": "python3-pil|10.2.0-1ubuntu1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "python3.12",
+            "3.12.3-1ubuntu0.11"
+          ],
+          "key_as_string": "python3.12|3.12.3-1ubuntu0.11",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "python3.12-minimal",
+            "3.12.3-1ubuntu0.11"
+          ],
+          "key_as_string": "python3.12-minimal|3.12.3-1ubuntu0.11",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "python3.13",
+            "3.13.5-2+deb13u4"
+          ],
+          "key_as_string": "python3.13|3.13.5-2+deb13u4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "python3.13-minimal",
+            "3.13.5-2+deb13u4"
+          ],
+          "key_as_string": "python3.13-minimal|3.13.5-2+deb13u4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "qml-module-qtquick-particles2",
+            "5.15.13+dfsg-1ubuntu0.1"
+          ],
+          "key_as_string": "qml-module-qtquick-particles2|5.15.13+dfsg-1ubuntu0.1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "rfkill",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "rfkill|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "rsyslog",
+            "8.2312.0-3ubuntu9.1"
+          ],
+          "key_as_string": "rsyslog|8.2312.0-3ubuntu9.1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "sed",
+            "4.9-2"
+          ],
+          "key_as_string": "sed|4.9-2",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "sudo",
+            "1.9.16p2-3+deb13u1"
+          ],
+          "key_as_string": "sudo|1.9.16p2-3+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "udisks2",
+            "2.10.1-12.1+deb13u1"
+          ],
+          "key_as_string": "udisks2|2.10.1-12.1+deb13u1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "util-linux",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "util-linux|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "uuid-runtime",
+            "2.39.3-9ubuntu6.4"
+          ],
+          "key_as_string": "uuid-runtime|2.39.3-9ubuntu6.4",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "xserver-common",
+            "2:21.1.12-1ubuntu1.5"
+          ],
+          "key_as_string": "xserver-common|2:21.1.12-1ubuntu1.5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "xserver-common",
+            "2:21.1.16-1.3+deb13u3"
+          ],
+          "key_as_string": "xserver-common|2:21.1.16-1.3+deb13u3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "xserver-xephyr",
+            "2:21.1.12-1ubuntu1.5"
+          ],
+          "key_as_string": "xserver-xephyr|2:21.1.12-1ubuntu1.5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "xserver-xephyr",
+            "2:21.1.16-1.3+deb13u3"
+          ],
+          "key_as_string": "xserver-xephyr|2:21.1.16-1.3+deb13u3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "xserver-xorg-core",
+            "2:21.1.12-1ubuntu1.5"
+          ],
+          "key_as_string": "xserver-xorg-core|2:21.1.12-1ubuntu1.5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "xserver-xorg-core",
+            "2:21.1.16-1.3+deb13u3"
+          ],
+          "key_as_string": "xserver-xorg-core|2:21.1.16-1.3+deb13u3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "xserver-xorg-legacy",
+            "2:21.1.12-1ubuntu1.5"
+          ],
+          "key_as_string": "xserver-xorg-legacy|2:21.1.12-1ubuntu1.5",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "xserver-xorg-legacy",
+            "2:21.1.16-1.3+deb13u3"
+          ],
+          "key_as_string": "xserver-xorg-legacy|2:21.1.16-1.3+deb13u3",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "xserver-xorg-video-nouveau",
+            "1:1.0.17-2ubuntu0.1"
+          ],
+          "key_as_string": "xserver-xorg-video-nouveau|1:1.0.17-2ubuntu0.1",
+          "doc_count": 2
+        },
+        {
+          "key": [
+            "WhatsApp",
+            "2.2616.100.0"
+          ],
+          "key_as_string": "WhatsApp|2.2616.100.0",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "WhatsApp",
+            "2.2620.102.0"
+          ],
+          "key_as_string": "WhatsApp|2.2620.102.0",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "WhatsApp",
+            "2.2632.100.0"
+          ],
+          "key_as_string": "WhatsApp|2.2632.100.0",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "atril",
+            "1.26.2-4"
+          ],
+          "key_as_string": "atril|1.26.2-4",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "atril-common",
+            "1.26.2-4"
+          ],
+          "key_as_string": "atril-common|1.26.2-4",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "caca-utils",
+            "0.99.beta20-4ubuntu0.1"
+          ],
+          "key_as_string": "caca-utils|0.99.beta20-4ubuntu0.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "containerd",
+            "1.7.24~ds1-6+deb13u1"
+          ],
+          "key_as_string": "containerd|1.7.24~ds1-6+deb13u1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "gstreamer1.0-alsa",
+            "1.26.2-1+deb13u1"
+          ],
+          "key_as_string": "gstreamer1.0-alsa|1.26.2-1+deb13u1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libasound2-data",
+            "1.2.11-1ubuntu0.2"
+          ],
+          "key_as_string": "libasound2-data|1.2.11-1ubuntu0.2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libasound2t64",
+            "1.2.11-1ubuntu0.2"
+          ],
+          "key_as_string": "libasound2t64|1.2.11-1ubuntu0.2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libatopology2t64",
+            "1.2.11-1ubuntu0.2"
+          ],
+          "key_as_string": "libatopology2t64|1.2.11-1ubuntu0.2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libatrildocument3t64",
+            "1.26.2-4"
+          ],
+          "key_as_string": "libatrildocument3t64|1.26.2-4",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libatrilview3t64",
+            "1.26.2-4"
+          ],
+          "key_as_string": "libatrilview3t64|1.26.2-4",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libc-dev-bin",
+            "2.41-12+deb13u3"
+          ],
+          "key_as_string": "libc-dev-bin|2.41-12+deb13u3",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libc6-dev",
+            "2.41-12+deb13u3"
+          ],
+          "key_as_string": "libc6-dev|2.41-12+deb13u3",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libcaca0",
+            "0.99.beta20-5"
+          ],
+          "key_as_string": "libcaca0|0.99.beta20-5",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libegl-mesa0",
+            "25.0.7-2"
+          ],
+          "key_as_string": "libegl-mesa0|25.0.7-2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libegl-mesa0",
+            "25.2.8-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libegl-mesa0|25.2.8-0ubuntu0.24.04.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libexpat1",
+            "2.8.2-1~deb13u1"
+          ],
+          "key_as_string": "libexpat1|2.8.2-1~deb13u1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libgbm1",
+            "25.0.7-2"
+          ],
+          "key_as_string": "libgbm1|25.0.7-2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libgbm1",
+            "25.2.8-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libgbm1|25.2.8-0ubuntu0.24.04.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libgl1-mesa-dri",
+            "25.0.7-2"
+          ],
+          "key_as_string": "libgl1-mesa-dri|25.0.7-2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libgl1-mesa-dri",
+            "25.2.8-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libgl1-mesa-dri|25.2.8-0ubuntu0.24.04.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libglx-mesa0",
+            "25.0.7-2"
+          ],
+          "key_as_string": "libglx-mesa0|25.0.7-2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libglx-mesa0",
+            "25.2.8-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libglx-mesa0|25.2.8-0ubuntu0.24.04.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libgraphite2-3",
+            "1.3.14-2+b1"
+          ],
+          "key_as_string": "libgraphite2-3|1.3.14-2+b1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libgraphite2-3",
+            "1.3.14-2build1"
+          ],
+          "key_as_string": "libgraphite2-3|1.3.14-2build1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libgstreamer-plugins-bad1.0-0",
+            "1.24.2-1ubuntu4"
+          ],
+          "key_as_string": "libgstreamer-plugins-bad1.0-0|1.24.2-1ubuntu4",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libharfbuzz-subset0",
+            "8.3.0-2build2"
+          ],
+          "key_as_string": "libharfbuzz-subset0|8.3.0-2build2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libhtml-parser-perl",
+            "3.81-1build3"
+          ],
+          "key_as_string": "libhtml-parser-perl|3.81-1build3",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libhtml-parser-perl",
+            "3.83-1+b2"
+          ],
+          "key_as_string": "libhtml-parser-perl|3.83-1+b2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libhttp-date-perl",
+            "6.06-1"
+          ],
+          "key_as_string": "libhttp-date-perl|6.06-1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libidn12",
+            "1.42-1build1"
+          ],
+          "key_as_string": "libidn12|1.42-1build1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libjxl-gdk-pixbuf",
+            "0.11.2-0.1~deb13u2"
+          ],
+          "key_as_string": "libjxl-gdk-pixbuf|0.11.2-0.1~deb13u2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libllvm19",
+            "1:19.1.1-1ubuntu1~24.04.2"
+          ],
+          "key_as_string": "libllvm19|1:19.1.1-1ubuntu1~24.04.2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libncurses6",
+            "6.4+20240113-1ubuntu2"
+          ],
+          "key_as_string": "libncurses6|6.4+20240113-1ubuntu2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libncursesw6",
+            "6.4+20240113-1ubuntu2"
+          ],
+          "key_as_string": "libncursesw6|6.4+20240113-1ubuntu2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libnfs14",
+            "5.0.2-1build1"
+          ],
+          "key_as_string": "libnfs14|5.0.2-1build1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libnss3",
+            "2:3.110-1+deb13u2"
+          ],
+          "key_as_string": "libnss3|2:3.110-1+deb13u2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libnss3",
+            "2:3.98-1ubuntu0.1"
+          ],
+          "key_as_string": "libnss3|2:3.98-1ubuntu0.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libpam-modules",
+            "1.5.3-5ubuntu5.5"
+          ],
+          "key_as_string": "libpam-modules|1.5.3-5ubuntu5.5",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libpam-modules-bin",
+            "1.5.3-5ubuntu5.5"
+          ],
+          "key_as_string": "libpam-modules-bin|1.5.3-5ubuntu5.5",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libpam-runtime",
+            "1.5.3-5ubuntu5.5"
+          ],
+          "key_as_string": "libpam-runtime|1.5.3-5ubuntu5.5",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libpam0g",
+            "1.5.3-5ubuntu5.5"
+          ],
+          "key_as_string": "libpam0g|1.5.3-5ubuntu5.5",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libprotobuf-lite32t64",
+            "3.21.12-8.2ubuntu0.3"
+          ],
+          "key_as_string": "libprotobuf-lite32t64|3.21.12-8.2ubuntu0.3",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libpython3.13",
+            "3.13.5-2+deb13u4"
+          ],
+          "key_as_string": "libpython3.13|3.13.5-2+deb13u4",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libqt5concurrent5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5concurrent5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libqt5opengl5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5opengl5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libqt5test5t64",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "libqt5test5t64|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libslirp0",
+            "4.7.0-1ubuntu3"
+          ],
+          "key_as_string": "libslirp0|4.7.0-1ubuntu3",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libssh-gcrypt-4",
+            "0.10.6-2ubuntu0.3"
+          ],
+          "key_as_string": "libssh-gcrypt-4|0.10.6-2ubuntu0.3",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libssh2-1t64",
+            "1.11.0-4.1build2"
+          ],
+          "key_as_string": "libssh2-1t64|1.11.0-4.1build2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libsubid4",
+            "1:4.13+dfsg1-4ubuntu3.2"
+          ],
+          "key_as_string": "libsubid4|1:4.13+dfsg1-4ubuntu3.2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libtinfo6",
+            "6.4+20240113-1ubuntu2"
+          ],
+          "key_as_string": "libtinfo6|6.4+20240113-1ubuntu2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libvlc-bin",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "libvlc-bin|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libvlc5",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "libvlc5|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libvlccore9",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "libvlccore9|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libwww-perl",
+            "6.76-1"
+          ],
+          "key_as_string": "libwww-perl|6.76-1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libx264-164",
+            "2:0.164.3108+git31e19f9-1"
+          ],
+          "key_as_string": "libx264-164|2:0.164.3108+git31e19f9-1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libxatracker2",
+            "25.0.7-2"
+          ],
+          "key_as_string": "libxatracker2|25.0.7-2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libxml2",
+            "2.9.14+dfsg-1.3ubuntu3.7"
+          ],
+          "key_as_string": "libxml2|2.9.14+dfsg-1.3ubuntu3.7",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "libyelp0",
+            "42.2-1ubuntu0.24.04.1"
+          ],
+          "key_as_string": "libyelp0|42.2-1ubuntu0.24.04.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "locales-all",
+            "2.41-12+deb13u3"
+          ],
+          "key_as_string": "locales-all|2.41-12+deb13u3",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "mesa-libgallium",
+            "25.0.7-2"
+          ],
+          "key_as_string": "mesa-libgallium|25.0.7-2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "mesa-libgallium",
+            "25.2.8-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "mesa-libgallium|25.2.8-0ubuntu0.24.04.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "mesa-va-drivers",
+            "25.0.7-2"
+          ],
+          "key_as_string": "mesa-va-drivers|25.0.7-2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "mesa-vdpau-drivers",
+            "25.0.7-2"
+          ],
+          "key_as_string": "mesa-vdpau-drivers|25.0.7-2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "mesa-vulkan-drivers",
+            "25.0.7-2"
+          ],
+          "key_as_string": "mesa-vulkan-drivers|25.0.7-2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "mesa-vulkan-drivers",
+            "25.2.8-0ubuntu0.24.04.1"
+          ],
+          "key_as_string": "mesa-vulkan-drivers|25.2.8-0ubuntu0.24.04.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "ncurses-base",
+            "6.4+20240113-1ubuntu2"
+          ],
+          "key_as_string": "ncurses-base|6.4+20240113-1ubuntu2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "ncurses-bin",
+            "6.4+20240113-1ubuntu2"
+          ],
+          "key_as_string": "ncurses-bin|6.4+20240113-1ubuntu2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "ncurses-term",
+            "6.4+20240113-1ubuntu2"
+          ],
+          "key_as_string": "ncurses-term|6.4+20240113-1ubuntu2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "python3-httplib2",
+            "0.20.4-3"
+          ],
+          "key_as_string": "python3-httplib2|0.20.4-3",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "python3-idna",
+            "3.6-2ubuntu0.1"
+          ],
+          "key_as_string": "python3-idna|3.6-2ubuntu0.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "python3-urllib3",
+            "2.0.7-1ubuntu0.6"
+          ],
+          "key_as_string": "python3-urllib3|2.0.7-1ubuntu0.6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "qt5-qmake",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "qt5-qmake|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "qt5-qmake-bin",
+            "5.15.13+dfsg-1ubuntu1"
+          ],
+          "key_as_string": "qt5-qmake-bin|5.15.13+dfsg-1ubuntu1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "setuptools",
+            "79.0.1"
+          ],
+          "key_as_string": "setuptools|79.0.1",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "uidmap",
+            "1:4.13+dfsg1-4ubuntu3.2"
+          ],
+          "key_as_string": "uidmap|1:4.13+dfsg1-4ubuntu3.2",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-bin",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-bin|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-data",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-data|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-l10n",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-l10n|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-access-extra",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-access-extra|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-base",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-base|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-notify",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-notify|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-qt",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-qt|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-samba",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-samba|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-skins2",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-skins2|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-svg",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-svg|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-video-output",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-video-output|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-video-splitter",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-video-splitter|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "vlc-plugin-visualization",
+            "3.0.20-3build6"
+          ],
+          "key_as_string": "vlc-plugin-visualization|3.0.20-3build6",
+          "doc_count": 1
+        },
+        {
+          "key": [
+            "yelp",
+            "42.2-1ubuntu0.24.04.1"
+          ],
+          "key_as_string": "yelp|42.2-1ubuntu0.24.04.1",
+          "doc_count": 1
+        }
+      ]
+    },
+    "por_severidad": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "High",
+          "doc_count": 12158
+        },
+        {
+          "key": "Medium",
+          "doc_count": 10295
+        },
+        {
+          "key": "-",
+          "doc_count": 7287
+        },
+        {
+          "key": "Critical",
+          "doc_count": 2492
+        },
+        {
+          "key": "Low",
+          "doc_count": 484
+        },
+        {
+          "key": "None",
+          "doc_count": 2
+        }
+      ]
+    },
+    "paquetes_distintos": {
+      "value": 554
+    }
+  }
+}
