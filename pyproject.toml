@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling==1.28.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vulnfold"
+version = "0.1.0"
+description = "Collapse Wazuh vulnerability findings into a ranked patch plan."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+authors = [{ name = "vulnfold contributors" }]
+keywords = ["wazuh", "vulnerability", "remediation", "patch-management"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Security",
+]
+dependencies = [
+    "httpx==0.28.1",
+    "pydantic==2.13.5",
+    "typer==0.27.2",
+    "rich==15.0.0",
+    "PyYAML==6.0.3",
+]
+
+[project.scripts]
+vulnfold = "vulnfold.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "pytest-cov==7.1.0",
+    "respx==0.23.1",
+    "mypy==2.3.1",
+    "types-PyYAML==6.0.12.20260815",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vulnfold"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"mappings" = "vulnfold/mappings"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+branch = true
+source = ["vulnfold"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src", "tests"]
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]

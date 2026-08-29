@@ -1,0 +1,15 @@
+# Field mapping for Wazuh 4.x vulnerability state indices.
+#
+# Every schema dependency of vulnfold lives in this directory. Porting to
+# another Wazuh release means adding a sibling file, never editing code.
+version: "4.x"
+index_pattern: "wazuh-states-vulnerabilities-*"
+fields:
+  package_name: "package.name"
+  package_version: "package.version"
+  cve_id: "vulnerability.id"
+  severity: "vulnerability.severity"
+  agent_id: "agent.id"
+  agent_name: "agent.name"
+severity_order: ["Critical", "High", "Medium", "Low"]
+severity_unknown: ["-", "None", ""]
