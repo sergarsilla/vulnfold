@@ -484,3 +484,66 @@ def test_no_evidence_file_is_written_unless_asked(
     runner.invoke(app, [*BASE_ARGUMENTS, "--format", "json"], env=WIDE_TERMINAL)
 
     assert list(tmp_path.iterdir()) == []
+
+
+@respx.mock
+def test_the_register_is_shown_by_default(
+    fake_indexer: FakeIndexer,
+    indexer_password: str,
+) -> None:
+    respx.route().mock(side_effect=fake_indexer)
+
+    result = runner.invoke(app, [*BASE_ARGUMENTS, "--top", "3"], env=WIDE_TERMINAL)
+
+    assert result.exit_code == 0
+    assert "No vendor fix available" in result.stdout
+
+
+@respx.mock
+def test_no_unfixable_suppresses_the_register(
+    fake_indexer: FakeIndexer,
+    indexer_password: str,
+) -> None:
+    respx.route().mock(side_effect=fake_indexer)
+
+    result = runner.invoke(
+        app, [*BASE_ARGUMENTS, "--top", "3", "--no-unfixable"], env=WIDE_TERMINAL
+    )
+
+    assert result.exit_code == 0
+    assert "No vendor fix available" not in result.stdout
+    assert "linux-oracle" not in result.stdout
+
+
+@respx.mock
+def test_no_unfixable_never_shortens_the_json_contract(
+    fake_indexer: FakeIndexer,
+    indexer_password: str,
+) -> None:
+    respx.route().mock(side_effect=fake_indexer)
+
+    result = runner.invoke(
+        app,
+        [*BASE_ARGUMENTS, "--format", "json", "--no-unfixable"],
+        env=WIDE_TERMINAL,
+    )
+
+    assert json.loads(result.stdout)["unfixable"] != []
+
+
+@respx.mock
+def test_min_severity_filters_both_tables(
+    fake_indexer: FakeIndexer,
+    indexer_password: str,
+) -> None:
+    """SPEC-02 section 8: it stays a display filter, in the register too."""
+    respx.route().mock(side_effect=fake_indexer)
+
+    result = runner.invoke(
+        app, [*BASE_ARGUMENTS, "--format", "json", "--min-severity", "Critical"],
+        env=WIDE_TERMINAL,
+    )
+    plan = json.loads(result.stdout)
+
+    assert result.exit_code == 0
+    assert 0 < len(plan["unfixable"]) < 359

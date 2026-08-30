@@ -86,8 +86,12 @@ def scan(
     ] = None,
     min_severity: Annotated[
         str | None,
-        typer.Option("--min-severity", help="List only actions relevant at this severity or above."),
+        typer.Option("--min-severity", help="List only rows relevant at this severity or above."),
     ] = None,
+    no_unfixable: Annotated[
+        bool,
+        typer.Option("--no-unfixable", help="Suppress the register of findings with no fix."),
+    ] = False,
     timeout: Annotated[
         float, typer.Option("--timeout", min=0.1, help="Per-request timeout in seconds.")
     ] = DEFAULT_TIMEOUT_SECONDS,
@@ -129,7 +133,7 @@ def scan(
         _stderr.print(f"[red]error[/red] {exc}")
         raise typer.Exit(code=1) from exc
 
-    _write(plan, output_format, top)
+    _write(plan, output_format, top, show_unfixable=not no_unfixable)
 
 
 def _read_fleet(
@@ -216,11 +220,21 @@ def _resolve_password(password_env: str, password: str | None) -> str:
     return value
 
 
-def _write(plan: PatchPlan, output_format: OutputFormat, top: int) -> None:
-    """Write the plan, keeping machine formats free of terminal decoration."""
+def _write(
+    plan: PatchPlan,
+    output_format: OutputFormat,
+    top: int,
+    *,
+    show_unfixable: bool,
+) -> None:
+    """Write the plan, keeping machine formats free of terminal decoration.
+
+    ``--no-unfixable`` is a display choice, so it shortens the two reports a
+    human reads and never the JSON contract, which always carries both lists.
+    """
     if output_format is OutputFormat.JSON:
         typer.echo(render_json(plan))
     elif output_format is OutputFormat.MARKDOWN:
-        typer.echo(render_markdown(plan, top))
+        typer.echo(render_markdown(plan, top, show_unfixable=show_unfixable))
     else:
-        _stdout.print(build_table_view(plan, top))
+        _stdout.print(build_table_view(plan, top, show_unfixable=show_unfixable))
