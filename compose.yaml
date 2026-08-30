@@ -5,6 +5,13 @@
 # (gitignored, delivered by CI as a managed file); for a local run, export the
 # variables in your shell instead.
 #
+# Values in .env are LITERAL. Compose does not undo shell escaping, so a
+# password written the way `printf %q` would write it — say `abc\*def` — reaches
+# the container with the backslashes still in it and authentication fails with
+# HTTP 401. Copy secrets raw, with no quoting and no backslashes. A literal `$`
+# is the one exception and must be doubled to `$$`, because Compose interpolates
+# it.
+#
 # .env keys:
 #   VULNFOLD_URL           indexer base URL including port
 #   VULNFOLD_USER          account with read access to the state index
