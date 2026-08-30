@@ -1,10 +1,11 @@
 #!/bin/sh
 # Privileged deployment hook: takes no arguments and makes no decisions, so the
-# CI account can be granted this one fixed command via sudo.
+# CI account can be granted this one fixed command via sudo instead of docker
+# group membership (root-equivalent on this host).
 #
-# vulnfold is a command, not a service: there is nothing to restart. The hook
-# rebuilds the virtualenv from the tree Jenkins just rsynced and verifies the
-# entry point still runs.
+# vulnfold is a command, not a service: there is nothing to start or restart.
+# The hook builds the image from the tree Jenkins just rsynced and verifies the
+# entry point runs, so a broken build fails here rather than at the next scan.
 #
 # Install manually as root; the copy in the source tree is inert until then:
 #   install -o root -g root -m 755 deploy/vulnfold-deploy.sh \
@@ -15,16 +16,16 @@
 set -eu
 
 APP_DIR=/opt/vulnfold
-VENV="$APP_DIR/.venv"
 
 cd "$APP_DIR"
 
-[ -x "$VENV/bin/python" ] || python3 -m venv "$VENV"
+# Must match the image's non-root uid, or evidence files are unwritable.
+install -d -o 10001 -g 10001 -m 755 "$APP_DIR/evidence"
 
-"$VENV/bin/pip" install --quiet --upgrade pip
-"$VENV/bin/pip" install --quiet --no-cache-dir .
+docker compose build scan
 
-# The venv stays root-owned: the CI account delivers the source but must not be
-# able to alter what actually executes.
-"$VENV/bin/vulnfold" --help >/dev/null
-echo "vulnfold deployed: $("$VENV/bin/vulnfold" scan --help >/dev/null 2>&1 && echo ok)"
+# Proves the wheel installed and the entry point resolves. --help touches no
+# network and needs no credentials, so it is safe to run unconditionally.
+docker compose run --rm --no-deps scan --help >/dev/null
+
+echo "vulnfold deployed: image built and entry point verified"

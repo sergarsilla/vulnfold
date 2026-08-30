@@ -1,27 +1,32 @@
-# One-shot scan. `docker compose run --rm scan` runs it; there is no long-lived
-# service here, which is why no `restart` policy is set.
+# One-shot scan. `docker compose run --rm scan` runs it; nothing here is a
+# long-lived service, which is why no `restart` policy is set.
 #
-# Credentials come from the environment, never from this file. Put
-# VULNFOLD_PASSWORD in a .env beside this file (already gitignored) or export it
-# in the shell that invokes compose.
+# Credentials never live in this file. The deployment installs a .env beside it
+# (gitignored, delivered by CI as a managed file); for a local run, export the
+# variables in your shell instead.
 
 services:
   scan:
     build: .
     image: vulnfold:0.1.0
-    environment:
-      # Passed through from the host; compose fails loudly if it is unset.
-      VULNFOLD_PASSWORD: ${VULNFOLD_PASSWORD:?set VULNFOLD_PASSWORD}
+    # required:false so `docker compose build` works on a checkout with no .env,
+    # which is what the deployment hook does before any secret is present.
+    env_file:
+      - path: .env
+        required: false
     # The tool only reads. Denying writes to the container filesystem makes that
-    # property enforceable from outside the code, not just asserted by it.
+    # property enforceable from outside the code, not merely asserted by it.
     read_only: true
     cap_drop: ["ALL"]
     security_opt: ["no-new-privileges:true"]
-    # Evidence files land on the host. Drop this mount if --evidence is unused.
+    # Evidence files land on the host. The directory must be writable by uid
+    # 10001; the deployment hook creates it with that owner.
     volumes:
       - ./evidence:/home/vulnfold/evidence
+    # Defaults keep the file parseable when nothing is set; vulnfold itself
+    # reports a missing or unreachable indexer far better than compose would.
     command:
       - scan
-      - --url=${VULNFOLD_URL:?set VULNFOLD_URL}
+      - --url=${VULNFOLD_URL:-}
       - --user=${VULNFOLD_USER:-readonly}
       - --format=markdown
