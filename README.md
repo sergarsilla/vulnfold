@@ -4,12 +4,18 @@ Collapse Wazuh vulnerability-detection noise into an actionable patch plan.
 
 vulnfold is not a finding deduplicator. It answers one question:
 
-> These 7 upgrades across these 12 hosts eliminate 23,309 of your 32,718
-> findings and 1,800 of your 2,492 criticals.
+> These 7 upgrades eliminate 7,727 of the 13,664 findings you can actually fix,
+> and 920 of the 1,322 criticals among them.
 
-On a real 15-agent deployment, 32,718 active findings collapse to 554 distinct
-packages — a 59:1 ratio — and the seven largest `(package, version)` buckets,
-all Linux kernels, account for 71.2% of everything.
+It answers a second one first, because the first answer is worthless without it:
+**how much of this can be fixed at all.** On a real 15-agent deployment, 32,718
+active findings split 13,664 fixable (41.8%) against 19,039 the vendor confirms
+affected with no published fix (58.2%). The largest single row in that fleet —
+4,226 findings, 358 criticals — has no upgrade to recommend. A plan that ranks
+it first is wrong.
+
+The fixable half collapses to 453 distinct packages, and the largest rows in
+the fleet are all Linux kernels: one `apt upgrade` and a reboot each.
 
 ## How it works
 
@@ -55,13 +61,15 @@ Options:
                          [default: wazuh-4.x]
   --format [table|json|markdown]
                          Output format.  [default: table]
-  --top INTEGER          Actions listed in table and markdown.  [default: 20]
+  --top INTEGER          Rows listed per table in table and markdown.
+                         [default: 20]
   --rank-by [criticals|findings]
                          Order actions by criticals or by findings.
                          [default: criticals]
   --group-kernels        Merge each kernel package's versions.
   --evidence PATH        Write the complete run to this JSON file.
-  --min-severity TEXT    List only actions relevant at this severity or above.
+  --min-severity TEXT    List only rows relevant at this severity or above.
+  --no-unfixable         Suppress the register of findings with no fix.
   --timeout FLOAT        Per-request timeout in seconds.  [default: 30.0]
   --insecure             Disable TLS certificate verification.
 ```
@@ -72,9 +80,11 @@ Options:
 vulnfold scan --url ... --user ... --format json | jq .collapse_ratio
 ```
 
-`collapse_ratio` is findings per distinct package. `coverage_curve` always
-describes the complete ranked plan, even when `--min-severity` shortens the
-listed actions, so "the first N actions" keeps one meaning between runs.
+`collapse_ratio` is fixable findings per distinct fixable package.
+`coverage_curve` always describes the complete ranked plan, even when
+`--min-severity` shortens the listed actions, so "the first N actions" keeps one
+meaning between runs. **Every percentage the tool prints is over the fixable
+findings**, except the fixable/no-fix split itself.
 
 ## Two claims, two curves
 
@@ -86,17 +96,47 @@ headline claims are printed whichever ordering is active.
 The header also separates the two ways findings compress:
 
 ```
-32,718 findings → 744 actions across 554 packages (ratio 59:1)
-Each action clears 44.0 findings: 40.1 CVEs per package version × 1.10 hosts carrying it.
-First 7 by findings: 23,309 findings (71.2%), on 7 hosts.
-First 7 by criticals: 1,775 criticals (71.2%), on 7 hosts.
+32,718 findings → 13,664 fixable (41.8%) · 19,039 with no vendor fix (58.2%)
+Criticals: 2,492 → 1,322 fixable · 1,170 with no vendor fix
+
+13,664 fixable findings → 560 actions across 453 packages (ratio 30:1)
+Each action clears 24.4 findings: 19.7 CVEs per package version × 1.24 hosts carrying it.
+First 7 by findings: 7,727 of the 13,664 fixable findings (56.5%), on 7 hosts.
+First 7 by criticals: 920 of the 1,322 fixable criticals (69.6%), on 7 hosts.
 ```
 
 A package version carrying thousands of CVEs on one host compresses exactly as
 hard as one package repeated across a thousand hosts, and the remediation work
-is nothing alike. `1.10 hosts carrying it` says this fleet collapses through CVE
+is nothing alike. `1.24 hosts carrying it` says this fleet collapses through CVE
 volume, not through fleet duplication. Reading the ratio alone would suggest the
 opposite.
+
+## Findings with no vendor fix
+
+`vulnerability.scanner.condition` tells you whether a fix exists. `Package less
+than X` names the version to upgrade to; `Package default status` means the
+vendor's own tracker lists the package as affected and has published nothing.
+
+On the measured fleet that second class is 58.2% of findings and 1,170
+criticals. vulnfold reports it as a **separate register**, printed after the
+plan, headed with what it is and what to do about it:
+
+```
+No vendor fix available — 19,039 findings, 1,170 critical
+
+These packages are confirmed affected by their vendor with no fixed version
+published. They cannot be remediated by patching today and require documented
+risk acceptance.
+```
+
+These are not false positives — Wazuh sources them from the Canonical and
+Debian security trackers — so they are never suppressed. `--no-unfixable` hides
+the register on screen; it never shortens the JSON or the evidence file.
+
+A finding whose condition the mapping does not recognise appears in **neither**
+list and raises `unrecognized_fixability` naming the strings it saw. That is a
+gap in the mapping's vocabulary, not a third class of finding, and folding it
+into "no fix" would hide the gap.
 
 ## Evidence
 
@@ -105,9 +145,10 @@ vulnfold scan --url ... --user ... --evidence scan-2026-08-30.json
 ```
 
 Writes a complete, self-describing record of the run: timestamp, indexer, index
-pattern, mapping version, fleet totals, both coverage curves and the full ranked
-action list. `--min-severity` never shortens it. The schema is a stable contract
-documented in [docs/evidence-schema.md](docs/evidence-schema.md).
+pattern, mapping version, fleet totals, the fixability split, both coverage
+curves, the full ranked action list and the full register. Neither
+`--min-severity` nor `--no-unfixable` shortens it. The schema is a stable
+contract documented in [docs/evidence-schema.md](docs/evidence-schema.md).
 
 Wazuh ships self-signed certificates by default. `--insecure` disables
 certificate verification and says so on stderr; verification is on otherwise.
@@ -127,9 +168,16 @@ fields:
   severity: "vulnerability.severity"
   agent_id: "agent.id"
   agent_name: "agent.name"
+  scanner_condition: "vulnerability.scanner.condition"
 severity_order: ["Critical", "High", "Medium", "Low"]
 severity_unknown: ["-", "None", ""]
+fixability:
+  no_fix_values: ["Package default status"]
+  fixed_version_prefix: "Package less than "
 ```
+
+The fixability markers are vocabulary, not code: a Wazuh release that rewords
+them is a YAML change.
 
 Pass a file directly with `--mapping ./mappings/wazuh-5.x.yaml`.
 

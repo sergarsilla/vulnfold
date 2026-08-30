@@ -71,7 +71,7 @@ def scan(
         OutputFormat, typer.Option("--format", help="Output format.")
     ] = OutputFormat.TABLE,
     top: Annotated[
-        int, typer.Option("--top", min=1, help="Actions listed in table and markdown.")
+        int, typer.Option("--top", min=1, help="Rows listed per table in table and markdown.")
     ] = DEFAULT_TOP_ACTIONS,
     rank_by: Annotated[
         RankBy, typer.Option("--rank-by", help="Order actions by criticals or by findings.")
