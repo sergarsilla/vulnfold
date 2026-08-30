@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 import respx
-from conftest import INDEXER_URL, FakeIndexer
+from conftest import INDEXER_URL, MEASURED_ACTIONS, FakeIndexer
 from typer.testing import CliRunner
 
 from vulnfold.cli import app
@@ -50,7 +50,7 @@ def test_json_output_is_the_only_thing_on_stdout(
     result = runner.invoke(app, [*BASE_ARGUMENTS, "--format", "json"], env=WIDE_TERMINAL)
 
     assert result.exit_code == 0
-    assert json.loads(result.stdout)["collapse_ratio"] == 59.06
+    assert json.loads(result.stdout)["collapse_ratio"] == 30.16
 
 
 @respx.mock
@@ -73,7 +73,7 @@ def test_json_output_can_be_piped_through_jq(
         check=True,
     )
 
-    assert piped.stdout.strip() == "59.06"
+    assert piped.stdout.strip() == "30.16"
 
 
 @respx.mock
@@ -89,7 +89,10 @@ def test_markdown_output_opens_with_the_impact_line(
 
     assert result.exit_code == 0
     assert "# vulnfold patch plan" in result.stdout
-    assert "First 7 by findings: 23,309 findings (71.2%), on 7 hosts." in result.stdout
+    assert (
+        "First 7 by findings: 7,727 of the 13,664 fixable findings (56.5%), on 7 hosts."
+        in result.stdout
+    )
 
 
 @respx.mock
@@ -102,7 +105,11 @@ def test_table_is_the_default_format(
     result = runner.invoke(app, [*BASE_ARGUMENTS, "--top", "7"], env=WIDE_TERMINAL)
 
     assert result.exit_code == 0
-    assert "32,718 findings → 744 actions across 554 packages (ratio 59:1)" in result.stdout
+    assert "32,718 findings → 13,664 fixable (41.8%)" in result.stdout
+    assert (
+        "13,664 fixable findings → 560 actions across 453 packages (ratio 30:1)"
+        in result.stdout
+    )
     assert "linux-image-6.14.0-37-generic" in result.stdout
 
 
@@ -114,9 +121,12 @@ def test_top_limits_the_listed_actions(
     respx.route().mock(side_effect=fake_indexer)
 
     result = runner.invoke(app, [*BASE_ARGUMENTS, "--top", "3"], env=WIDE_TERMINAL)
+    plan_section = result.stdout.split("No vendor fix available")[0]
 
-    assert "linux-image-cloud-amd64" in result.stdout
-    assert "linux-oracle" not in result.stdout
+    assert "linux-image-cloud-amd64" in plan_section
+    # It has no published fix, so it is in the register, never in the plan.
+    assert "linux-oracle" not in plan_section
+    assert "linux-oracle" in result.stdout
 
 
 @respx.mock
@@ -147,7 +157,7 @@ def test_min_severity_shortens_the_listed_actions(
     plan = json.loads(result.stdout)
 
     assert result.exit_code == 0
-    assert len(plan["actions"]) < 744
+    assert len(plan["actions"]) < MEASURED_ACTIONS
     assert plan["total_findings"] == 32_718
 
 
@@ -383,7 +393,7 @@ def test_evidence_records_the_run(
     assert record["index_pattern"] == "wazuh-states-vulnerabilities-*"
     assert record["mapping_version"] == "4.x"
     assert record["total_findings"] == 32_718
-    assert len(record["actions"]) == 744
+    assert len(record["actions"]) == MEASURED_ACTIONS
 
 
 @respx.mock
@@ -420,8 +430,8 @@ def test_evidence_is_never_shortened_by_a_display_filter(
     )
     record = json.loads(destination.read_text())
 
-    assert len(json.loads(result.stdout)["actions"]) < 744
-    assert len(record["actions"]) == 744
+    assert len(json.loads(result.stdout)["actions"]) < MEASURED_ACTIONS
+    assert len(record["actions"]) == MEASURED_ACTIONS
     assert record["min_severity"] == "Critical"
 
 

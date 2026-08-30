@@ -52,6 +52,7 @@ class WarningCode(str, Enum):
     AGENT_TERMS_TRUNCATED = "agent_terms_truncated"
     UNRECOGNIZED_SEVERITY = "unrecognized_severity"
     GROUPED_CVE_COUNT_IS_LOWER_BOUND = "grouped_cve_count_is_lower_bound"
+    UNRECOGNIZED_FIXABILITY = "unrecognized_fixability"
 
 
 class ScanWarning(BaseModel):
@@ -194,7 +195,35 @@ class IndexerSnapshot(BaseModel):
 
 
 class RemediationAction(BaseModel):
-    """One upgrade a human can perform, with the noise it removes."""
+    """One upgrade a human can perform, with the noise it removes.
+
+    ``target_version`` is required. Only findings whose vendor has published a
+    fixed version become actions, so an action that cannot name what to upgrade
+    to is a contract violation rather than a missing detail.
+    """
+
+    package_name: str
+    current_version: str
+    target_version: str
+    affected_agents: list[str]
+    agent_count: int
+    finding_count: int
+    cve_count: int
+    severity_breakdown: dict[str, int]
+    critical_count: int
+    high_count: int
+    unknown_severity_count: int
+    is_kernel: bool
+
+
+class UnfixableEntry(BaseModel):
+    """One ``(package, version)`` the vendor confirms affected with no fix.
+
+    These are not false positives and not low-severity leftovers: the fleet
+    carries 1,170 criticals in this class. They cannot be remediated by
+    patching today, so they belong in a register requiring documented risk
+    acceptance, never in a plan of upgrades to perform.
+    """
 
     package_name: str
     current_version: str
@@ -245,16 +274,36 @@ class CollapseSources(BaseModel):
 
 
 class PatchPlan(BaseModel):
-    """The ranked remediation plan for one fleet.
+    """The ranked remediation plan for one fleet, and what it cannot cover.
 
     Serialized form is a stable contract; fields are added, never repurposed.
+
+    The plan is a partition, not a filter. ``actions`` covers only findings the
+    vendor has published a fix for; ``unfixable`` carries the confirmed-affected
+    remainder. Findings whose condition the mapping did not recognise appear in
+    neither, only in ``unknown_fixability_findings`` and a warning, because they
+    are a mapping defect rather than a third class of finding.
+
+    Every figure derived from ``actions`` — ``collapse_ratio``,
+    ``collapse_sources`` and all three coverage curves — is taken over the
+    fixable set. ``total_findings`` and the other ``total_*`` fields keep their
+    original fleet-wide meaning, so the only percentages over them are the
+    fixable/no-fix split itself.
     """
 
     total_findings: int
+    total_criticals: int
     total_agents: int
     total_distinct_cves: int
     total_distinct_packages: int
+    fixable_findings: int
+    fixable_criticals: int
+    fixable_distinct_packages: int
+    no_fix_findings: int
+    no_fix_criticals: int
+    unknown_fixability_findings: int
     actions: list[RemediationAction]
+    unfixable: list[UnfixableEntry]
     collapse_ratio: float
     collapse_sources: CollapseSources
     rank_by: RankBy

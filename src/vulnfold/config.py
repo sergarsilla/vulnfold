@@ -44,6 +44,10 @@ UNKNOWN_VERSION = "unknown"
 #: Key used in ``severity_breakdown`` for findings carrying no usable severity.
 UNKNOWN_SEVERITY = "unknown"
 
+#: Distinct condition strings quoted when the mapping recognises none of them.
+#: Enough to see the pattern, few enough to keep the warning readable.
+UNKNOWN_FIXABILITY_EXAMPLES = 3
+
 #: Package-name globs that identify a kernel. Kernels dominate the finding
 #: count and are remediated as one upgrade plus a reboot (CONTEXT.md, section 2).
 KERNEL_PACKAGE_PATTERNS: tuple[str, ...] = (

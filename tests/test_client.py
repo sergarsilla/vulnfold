@@ -10,7 +10,7 @@ import pytest
 import respx
 from conftest import (
     INDEX_PATTERN,
-    MEASURED_ACTIONS,
+    MEASURED_BUCKETS,
     MEASURED_FINDINGS,
     FakeIndexer,
 )
@@ -107,14 +107,19 @@ def test_composite_pagination_walks_every_page(
     mapping: FieldMapping,
     composite_pages: list[dict[str, Any]],
 ) -> None:
-    """SPEC-01 section 9, criterion 4: three pages of buckets, then the end."""
+    """SPEC-01 section 9, criterion 4, on the fleet the condition source fans out.
+
+    Adding the condition as a third composite source nearly doubled the bucket
+    count, so the recorded walk spans six pages plus the terminating empty one.
+    Pagination is exercised by the real fleet now, not only in theory.
+    """
     indexer = FakeIndexer(composite_pages)
     respx.route().mock(side_effect=indexer)
 
     with IndexerClient(scan_config, mapping) as client:
         snapshot = client.fetch_snapshot()
 
-    assert len(snapshot.buckets) == MEASURED_ACTIONS
+    assert len(snapshot.buckets) == MEASURED_BUCKETS
     assert len(indexer.search_bodies) == len(composite_pages)
 
 

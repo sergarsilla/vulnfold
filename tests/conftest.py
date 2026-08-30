@@ -1,7 +1,8 @@
 """Shared fixtures and factories.
 
-The measured constants below are the figures SPEC-01 section 9 accepts against,
-taken from the recorded Wazuh 4.14.7 response in ``fixtures/wazuh_sample.json``.
+The measured constants below are the figures SPEC-01 section 9 and SPEC-02
+sections 0 and 10 accept against, taken from the recorded Wazuh 4.14.7
+composite walk in ``fixtures/wazuh_composite_sample.json``.
 """
 
 from __future__ import annotations
@@ -21,13 +22,30 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 COMPOSITE_FIXTURE = FIXTURES / "aggregation_response.json"
 
 MEASURED_FINDINGS = 32_718
+MEASURED_CRITICALS = 2_492
 MEASURED_AGENTS = 15
 MEASURED_DISTINCT_CVES = 5_950
 MEASURED_DISTINCT_PACKAGES = 554
-MEASURED_ACTIONS = 744
-MEASURED_COLLAPSE_RATIO = 59.06
-MEASURED_TOP_SEVEN_FINDINGS = 23_309
-MEASURED_TOP_SEVEN_PERCENTAGE = 71.2
+MEASURED_BUCKETS = 1_426
+
+#: The fixability split, measured on 2026-08-30 (SPEC-02 section 0). The
+#: unknown class is one condition string, "Package equal to 7.2.12", that the
+#: 4.x mapping's vocabulary does not cover.
+MEASURED_FIXABLE_FINDINGS = 13_664
+MEASURED_FIXABLE_CRITICALS = 1_322
+MEASURED_FIXABLE_PACKAGES = 453
+MEASURED_NO_FIX_FINDINGS = 19_039
+MEASURED_NO_FIX_CRITICALS = 1_170
+MEASURED_UNKNOWN_FINDINGS = 15
+
+MEASURED_ACTIONS = 560
+MEASURED_UNFIXABLE_ENTRIES = 359
+MEASURED_COLLAPSE_RATIO = 30.16
+
+#: The row SPEC-02 was written to get out of the patch plan: 4,226 findings and
+#: 358 criticals on hosts whose apt candidate version equals the installed one.
+DEFECT_PACKAGE = "linux-oracle"
+DEFECT_VERSION = "6.17.0-1020.20"
 
 INDEXER_URL = "https://indexer.example.test:9200"
 INDEX_PATTERN = "wazuh-states-vulnerabilities-*"

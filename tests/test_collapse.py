@@ -4,14 +4,23 @@ from __future__ import annotations
 
 import pytest
 from conftest import (
+    DEFECT_PACKAGE,
+    DEFECT_VERSION,
     MEASURED_ACTIONS,
     MEASURED_AGENTS,
     MEASURED_COLLAPSE_RATIO,
+    MEASURED_CRITICALS,
     MEASURED_DISTINCT_CVES,
     MEASURED_DISTINCT_PACKAGES,
     MEASURED_FINDINGS,
-    MEASURED_TOP_SEVEN_FINDINGS,
-    MEASURED_TOP_SEVEN_PERCENTAGE,
+    MEASURED_FIXABLE_CRITICALS,
+    MEASURED_FIXABLE_FINDINGS,
+    MEASURED_FIXABLE_PACKAGES,
+    MEASURED_NO_FIX_CRITICALS,
+    MEASURED_NO_FIX_FINDINGS,
+    MEASURED_UNFIXABLE_ENTRIES,
+    MEASURED_UNKNOWN_FINDINGS,
+    NO_FIX_CONDITION,
     make_bucket,
     make_snapshot,
 )
@@ -20,6 +29,7 @@ from vulnfold.collapse import (
     build_coverage_curve,
     build_patch_plan,
     collapse_findings_to_actions,
+    collapse_findings_to_unfixable,
     filter_by_min_severity,
     group_kernel_actions,
     is_kernel_package,
@@ -27,7 +37,15 @@ from vulnfold.collapse import (
 )
 from vulnfold.config import UNKNOWN_SEVERITY
 from vulnfold.errors import ConfigurationError
-from vulnfold.models import FieldMapping, IndexerSnapshot, RankBy, WarningCode
+from vulnfold.models import (
+    FieldMapping,
+    Fixability,
+    IndexerSnapshot,
+    RankBy,
+    RemediationAction,
+    UnfixableEntry,
+    WarningCode,
+)
 
 # ---------------------------------------------------------------------------
 # The recorded fleet (SPEC-01 section 9, criterion 2)
@@ -46,7 +64,7 @@ def test_plan_reports_the_measured_fleet_totals(
     assert plan.total_distinct_packages == MEASURED_DISTINCT_PACKAGES
 
 
-def test_plan_produces_one_action_per_package_version(
+def test_plan_produces_one_action_per_fixable_package_version(
     real_snapshot: IndexerSnapshot,
     mapping: FieldMapping,
 ) -> None:
@@ -58,56 +76,347 @@ def test_plan_produces_one_action_per_package_version(
     )
 
 
-def test_collapse_ratio_is_findings_per_distinct_package(
+def test_collapse_ratio_is_fixable_findings_per_distinct_fixable_package(
     real_snapshot: IndexerSnapshot,
     mapping: FieldMapping,
 ) -> None:
     plan = build_patch_plan(real_snapshot, mapping)
 
     assert plan.collapse_ratio == MEASURED_COLLAPSE_RATIO
-    assert round(plan.collapse_ratio) == 59
+    assert plan.fixable_distinct_packages == MEASURED_FIXABLE_PACKAGES
 
 
-def test_first_seven_actions_eliminate_seventy_one_percent_of_findings(
+def test_the_largest_rows_of_the_recorded_fleet_are_all_kernels(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    """CONTEXT.md section 2: kernels dominate, whether or not a fix exists."""
+    plan = build_patch_plan(real_snapshot, mapping)
+    rows: list[RemediationAction | UnfixableEntry] = [*plan.actions, *plan.unfixable]
+    rows.sort(key=lambda row: -row.finding_count)
+
+    assert all(row.is_kernel for row in rows[:7])
+
+
+def test_recorded_fleet_reconciles_with_only_the_expected_warnings(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    """Nothing about the fleet is anomalous; both warnings are structural."""
+    plan = build_patch_plan(real_snapshot, mapping)
+
+    assert [warning.code for warning in plan.warnings] == [
+        WarningCode.UNRECOGNIZED_FIXABILITY,
+        WarningCode.GROUPED_CVE_COUNT_IS_LOWER_BOUND,
+    ]
+
+
+def test_severity_totals_across_both_lists_match_the_recorded_distribution(
     real_snapshot: IndexerSnapshot,
     mapping: FieldMapping,
 ) -> None:
     plan = build_patch_plan(real_snapshot, mapping)
+    rows: list[RemediationAction | UnfixableEntry] = [*plan.actions, *plan.unfixable]
+    # The findings of unrecognised fixability are in neither list, so they are
+    # the exact shortfall against the recorded fleet distribution.
+    excluded = [
+        bucket for bucket in real_snapshot.buckets if bucket.fixability is Fixability.UNKNOWN
+    ]
+    withheld = {
+        severity: sum(bucket.severity_counts.get(severity, 0) for bucket in excluded)
+        for severity in mapping.severity_order
+    }
+    unrated_withheld = sum(bucket.finding_count for bucket in excluded) - sum(withheld.values())
 
-    seventh = plan.coverage_curve[6]
-
-    assert seventh.cumulative_findings == MEASURED_TOP_SEVEN_FINDINGS
-    assert abs(seventh.findings_percentage - MEASURED_TOP_SEVEN_PERCENTAGE) <= 0.1
-
-
-def test_first_seven_actions_are_all_kernels(
-    real_snapshot: IndexerSnapshot,
-    mapping: FieldMapping,
-) -> None:
-    plan = build_patch_plan(real_snapshot, mapping)
-
-    assert all(action.is_kernel for action in plan.actions[:7])
-
-
-def test_recorded_fleet_reconciles_without_warnings(
-    real_snapshot: IndexerSnapshot,
-    mapping: FieldMapping,
-) -> None:
-    plan = build_patch_plan(real_snapshot, mapping)
-
-    assert plan.warnings == []
-
-
-def test_severity_totals_across_the_plan_match_the_recorded_distribution(
-    real_snapshot: IndexerSnapshot,
-    mapping: FieldMapping,
-) -> None:
-    plan = build_patch_plan(real_snapshot, mapping)
-
-    assert sum(action.critical_count for action in plan.actions) == 2_492
-    assert sum(action.high_count for action in plan.actions) == 12_158
+    assert sum(row.critical_count for row in rows) == MEASURED_CRITICALS - withheld["Critical"]
+    assert sum(row.high_count for row in rows) == 12_158 - withheld["High"]
     # 7,287 findings carry "-" and 2 carry "None"; neither is a severity.
-    assert sum(action.unknown_severity_count for action in plan.actions) == 7_289
+    assert sum(row.unknown_severity_count for row in rows) == 7_289 - unrated_withheld
+
+
+# ---------------------------------------------------------------------------
+# The fixability partition (SPEC-02 sections 0 and 6)
+# ---------------------------------------------------------------------------
+
+
+def test_plan_reproduces_the_measured_fixability_split(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-02 section 10, criterion 2."""
+    plan = build_patch_plan(real_snapshot, mapping)
+
+    assert plan.fixable_findings == MEASURED_FIXABLE_FINDINGS
+    assert plan.no_fix_findings == MEASURED_NO_FIX_FINDINGS
+    assert plan.fixable_criticals == MEASURED_FIXABLE_CRITICALS
+    assert plan.no_fix_criticals == MEASURED_NO_FIX_CRITICALS
+    assert plan.unknown_fixability_findings == MEASURED_UNKNOWN_FINDINGS
+
+
+def test_the_three_classes_account_for_every_recorded_finding(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    plan = build_patch_plan(real_snapshot, mapping)
+
+    assert (
+        plan.fixable_findings + plan.no_fix_findings + plan.unknown_fixability_findings
+        == MEASURED_FINDINGS
+    )
+    assert plan.total_criticals == MEASURED_CRITICALS
+
+
+def test_linux_oracle_is_in_the_register_and_nowhere_in_the_patch_plan(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-02 section 10, criterion 3: the defect that motivated the spec.
+
+    Every one of these 4,226 findings is "Package default status": the vendor
+    confirms the package affected and has published nothing to upgrade to. The
+    plan used to rank it first.
+    """
+    plan = build_patch_plan(real_snapshot, mapping)
+
+    assert not [action for action in plan.actions if action.package_name == DEFECT_PACKAGE]
+    registered = [entry for entry in plan.unfixable if entry.package_name == DEFECT_PACKAGE]
+    assert [(entry.current_version, entry.finding_count) for entry in registered] == [
+        (DEFECT_VERSION, 4_226)
+    ]
+
+
+def test_every_action_in_the_recorded_plan_names_a_target_version(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-02 section 10, criterion 4, asserted over the whole plan."""
+    plan = build_patch_plan(real_snapshot, mapping)
+
+    assert plan.actions
+    assert all(action.target_version for action in plan.actions)
+
+
+def test_every_grouped_action_still_names_a_target_version(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    plan = build_patch_plan(real_snapshot, mapping, group_kernels=True)
+
+    assert all(action.target_version for action in plan.actions)
+
+
+def test_the_register_carries_one_entry_per_no_fix_package_version(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    plan = build_patch_plan(real_snapshot, mapping)
+
+    assert len(plan.unfixable) == MEASURED_UNFIXABLE_ENTRIES
+    assert sum(entry.finding_count for entry in plan.unfixable) == MEASURED_NO_FIX_FINDINGS
+
+
+def test_coverage_percentages_are_taken_over_the_fixable_findings(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-02 section 10, criterion 7, at the model layer."""
+    plan = build_patch_plan(real_snapshot, mapping)
+
+    last = plan.coverage_by_findings[-1]
+
+    assert last.cumulative_findings == MEASURED_FIXABLE_FINDINGS
+    assert last.findings_percentage == 100.0
+    assert plan.coverage_by_criticals[-1].cumulative_criticals == MEASURED_FIXABLE_CRITICALS
+
+
+def test_a_bucket_belongs_to_exactly_one_of_the_two_lists(mapping: FieldMapping) -> None:
+    snapshot = make_snapshot(
+        [
+            make_bucket(package="openssl", version="3.0.2-1", findings=10),
+            make_bucket(package="curl", version="8.5.0", findings=4, condition=NO_FIX_CONDITION),
+        ]
+    )
+
+    plan = build_patch_plan(snapshot, mapping)
+
+    assert [action.package_name for action in plan.actions] == ["openssl"]
+    assert [entry.package_name for entry in plan.unfixable] == ["curl"]
+
+
+def test_one_package_version_can_be_partly_fixable_and_partly_not(
+    mapping: FieldMapping,
+) -> None:
+    """Both rows are real: some of its CVEs have a fix and some have none."""
+    snapshot = make_snapshot(
+        [
+            make_bucket(package="openssl", version="3.0.2-1", findings=10),
+            make_bucket(
+                package="openssl", version="3.0.2-1", findings=4, condition=NO_FIX_CONDITION
+            ),
+        ]
+    )
+
+    plan = build_patch_plan(snapshot, mapping)
+
+    assert plan.fixable_findings == 10
+    assert plan.no_fix_findings == 4
+    assert [action.finding_count for action in plan.actions] == [10]
+    assert [entry.finding_count for entry in plan.unfixable] == [4]
+
+
+def test_an_unrecognised_condition_is_excluded_from_both_lists_and_warned_about(
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-02 section 10, criterion 5."""
+    snapshot = make_snapshot(
+        [
+            make_bucket(package="openssl", version="3.0.2-1", findings=10),
+            make_bucket(package="curl", version="8.5.0", findings=4, condition=None),
+        ]
+    )
+
+    plan = build_patch_plan(snapshot, mapping)
+
+    assert [action.package_name for action in plan.actions] == ["openssl"]
+    assert plan.unfixable == []
+    assert plan.unknown_fixability_findings == 4
+    assert WarningCode.UNRECOGNIZED_FIXABILITY in {warning.code for warning in plan.warnings}
+
+
+def test_the_unrecognised_fixability_warning_quotes_the_condition_strings(
+    mapping: FieldMapping,
+) -> None:
+    snapshot = make_snapshot(
+        [
+            make_bucket(package=name, findings=2, condition=f"Package equal to {name}")
+            for name in ("a", "b", "c", "d")
+        ]
+    )
+
+    plan = build_patch_plan(snapshot, mapping)
+    warning = next(
+        warning
+        for warning in plan.warnings
+        if warning.code is WarningCode.UNRECOGNIZED_FIXABILITY
+    )
+
+    assert warning.detail["findings"] == 8
+    assert warning.detail["buckets"] == 4
+    # Three examples at most, so the warning stays readable.
+    assert str(warning.detail["examples"]).count("Package equal to") == 3
+
+
+def test_an_unrecognised_condition_is_never_treated_as_no_fix(
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-02 section 11: absorbing it would destroy the mapping signal."""
+    snapshot = make_snapshot([make_bucket(findings=6, condition="Package equal to 7.2.12")])
+
+    plan = build_patch_plan(snapshot, mapping)
+
+    assert plan.no_fix_findings == 0
+    assert plan.unknown_fixability_findings == 6
+
+
+def test_conditions_naming_several_targets_merge_into_one_action(
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-02 section 4: one upgrade clears every outstanding fix."""
+    snapshot = make_snapshot(
+        [
+            make_bucket(version="6.12.74-2", findings=3, condition="Package less than 6.12.100-1"),
+            make_bucket(version="6.12.74-2", findings=5, condition="Package less than 6.12.85-1"),
+        ]
+    )
+
+    plan = build_patch_plan(snapshot, mapping)
+
+    assert len(plan.actions) == 1
+    assert plan.actions[0].finding_count == 8
+    assert plan.actions[0].target_version == "6.12.100-1"
+
+
+def test_merging_conditions_warns_that_the_cve_count_is_no_longer_exact(
+    mapping: FieldMapping,
+) -> None:
+    snapshot = make_snapshot(
+        [
+            make_bucket(findings=3, cves=3, condition="Package less than 1.2"),
+            make_bucket(findings=5, cves=5, condition="Package less than 1.3"),
+        ]
+    )
+
+    plan = build_patch_plan(snapshot, mapping)
+
+    assert plan.actions[0].cve_count == 8
+    assert WarningCode.GROUPED_CVE_COUNT_IS_LOWER_BOUND in {
+        warning.code for warning in plan.warnings
+    }
+
+
+def test_a_kernel_with_a_fix_is_never_merged_with_one_without(
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-02 section 6: kernel grouping applies within each class."""
+    snapshot = make_snapshot(
+        [
+            make_bucket(package="linux-oracle", version="6.17.0-1020.20", findings=7),
+            make_bucket(
+                package="linux-oracle",
+                version="6.17.0-1020.20",
+                findings=9,
+                condition=NO_FIX_CONDITION,
+            ),
+        ]
+    )
+
+    plan = build_patch_plan(snapshot, mapping, group_kernels=True)
+
+    assert [action.finding_count for action in plan.actions] == [7]
+    assert [entry.finding_count for entry in plan.unfixable] == [9]
+
+
+def test_the_register_is_ranked_by_criticals_whatever_rank_by_says(
+    mapping: FieldMapping,
+) -> None:
+    snapshot = make_snapshot(
+        [
+            make_bucket(
+                package="noisy",
+                findings=100,
+                severity={"High": 100},
+                condition=NO_FIX_CONDITION,
+            ),
+            make_bucket(
+                package="severe",
+                findings=10,
+                severity={"Critical": 10},
+                condition=NO_FIX_CONDITION,
+            ),
+        ]
+    )
+
+    by_findings = build_patch_plan(snapshot, mapping, rank_by=RankBy.FINDINGS)
+
+    assert [entry.package_name for entry in by_findings.unfixable] == ["severe", "noisy"]
+
+
+def test_collapse_helpers_split_the_snapshot_without_ranking_it(
+    mapping: FieldMapping,
+) -> None:
+    snapshot = make_snapshot(
+        [
+            make_bucket(package="openssl", findings=10),
+            make_bucket(package="curl", findings=4, condition=NO_FIX_CONDITION),
+        ]
+    )
+
+    assert [action.package_name for action in collapse_findings_to_actions(snapshot, mapping)] == [
+        "openssl"
+    ]
+    assert [
+        entry.package_name for entry in collapse_findings_to_unfixable(snapshot, mapping)
+    ] == ["curl"]
 
 
 # ---------------------------------------------------------------------------
@@ -379,7 +688,7 @@ def test_group_kernels_shrinks_the_recorded_fleet(
 
     assert len(plan.actions) < MEASURED_ACTIONS
     assert plan.total_findings == MEASURED_FINDINGS
-    assert plan.coverage_curve[-1].cumulative_findings == MEASURED_FINDINGS
+    assert plan.coverage_curve[-1].cumulative_findings == MEASURED_FIXABLE_FINDINGS
 
 
 # ---------------------------------------------------------------------------

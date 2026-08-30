@@ -15,29 +15,51 @@ from rich.table import Table
 from rich.text import Text
 
 from vulnfold.config import UNKNOWN_SEVERITY
-from vulnfold.models import EvidenceRecord, PatchPlan, RemediationAction
+from vulnfold.models import EvidenceRecord, PatchPlan, RemediationAction, UnfixableEntry
 
 NOTHING_TO_REMEDIATE = "Nothing to remediate."
+NOTHING_UNFIXABLE = "Every finding has a published fix."
 KERNEL_MARK = "yes"
 
-#: Package is the column a reader acts on, so it keeps its full width and
-#: Version gives way. A truncated package name is unusable — "linux-..." names
-#: no upgrade — while a truncated version still identifies which upgrade is
-#: meant, and the untruncated string is always in the JSON and Markdown output.
+UNFIXABLE_EXPLANATION = (
+    "These packages are confirmed affected by their vendor with no fixed "
+    "version published. They cannot be remediated by patching today and "
+    "require documented risk acceptance."
+)
+
+#: Package and Target are the two columns a reader acts on, so they keep their
+#: full width and Version gives way. A truncated package name is unusable —
+#: "linux-..." names no upgrade — while a truncated *current* version still
+#: identifies which upgrade is meant, and the untruncated string is always in
+#: the JSON and Markdown output. Protection order, most protected first:
+#: Package, Target, Critical, Findings, Hosts, Version, everything else.
 VERSION_MAX_WIDTH = 14
-_LEFT_ALIGNED = ("Package", "Version")
+_LEFT_ALIGNED = ("Package", "Version", "Target")
+_PINNED_TO_CONTENT = ("Package", "Target")
 
 _ACTION_COLUMNS = (
     "#",
     "Package",
     "Version",
+    "Target",
     "Hosts",
     "Findings",
-    "% total",
+    "% fixable",
     "CVEs",
     "Critical",
     "High",
     "Unrated",
+    "Kernel",
+)
+
+_UNFIXABLE_COLUMNS = (
+    "Package",
+    "Version",
+    "Hosts",
+    "Findings",
+    "CVEs",
+    "Critical",
+    "High",
     "Kernel",
 )
 
@@ -53,24 +75,40 @@ class OutputFormat(str, Enum):
 def impact_lines(plan: PatchPlan, top: int) -> list[str]:
     """Build the headline that opens the table and markdown reports.
 
+    The first two lines split the fleet on whether a fix exists at all; they
+    carry the only percentages in the whole report taken over the fleet total.
+    Everything after them is about the fixable half, and says so, because a
+    coverage figure quoted over findings no upgrade can clear is the defect
+    SPEC-02 exists to remove.
+
     Args:
         plan: Plan to summarise.
         top: How many leading actions the report is about to show.
 
     Returns:
-        The collapse, where that collapse comes from, and both product claims:
-        what the leading actions remove ordered by findings, and ordered by
-        criticals. Both are always shown, whichever ordering is active, because
-        each is a claim the tool makes and they need not agree.
+        The fixability split, the collapse of the fixable half, where that
+        collapse comes from, and both product claims: what the leading actions
+        remove ordered by findings, and ordered by criticals. Both are always
+        shown, whichever ordering is active, because each is a claim the tool
+        makes and they need not agree.
     """
     action_count = len(plan.coverage_curve)
+    split = [
+        f"{plan.total_findings:,} findings → {plan.fixable_findings:,} fixable "
+        f"({_share(plan.fixable_findings, plan.total_findings):.1f}%) · "
+        f"{plan.no_fix_findings:,} with no vendor fix "
+        f"({_share(plan.no_fix_findings, plan.total_findings):.1f}%)",
+        f"Criticals: {plan.total_criticals:,} → {plan.fixable_criticals:,} fixable "
+        f"· {plan.no_fix_criticals:,} with no vendor fix",
+        "",
+    ]
     headline = (
-        f"{plan.total_findings:,} findings → {action_count:,} actions "
-        f"across {plan.total_distinct_packages:,} packages "
+        f"{plan.fixable_findings:,} fixable findings → {action_count:,} actions "
+        f"across {plan.fixable_distinct_packages:,} packages "
         f"(ratio {plan.collapse_ratio:.0f}:1)"
     )
     if not plan.coverage_curve:
-        return [headline, NOTHING_TO_REMEDIATE]
+        return [*split, headline, NOTHING_TO_REMEDIATE]
 
     sources = plan.collapse_sources
     leading = min(top, action_count)
@@ -78,15 +116,26 @@ def impact_lines(plan: PatchPlan, top: int) -> list[str]:
     by_criticals = plan.coverage_by_criticals[leading - 1]
 
     return [
+        *split,
         headline,
         f"Each action clears {sources.findings_per_action:.1f} findings: "
         f"{sources.cves_per_action:.1f} CVEs per package version "
         f"× {sources.hosts_per_action:.2f} hosts carrying it.",
-        f"First {leading} by findings: {by_findings.cumulative_findings:,} findings "
+        f"First {leading} by findings: {by_findings.cumulative_findings:,} of the "
+        f"{plan.fixable_findings:,} fixable findings "
         f"({by_findings.findings_percentage:.1f}%), on {_hosts(by_findings.cumulative_agents)}.",
-        f"First {leading} by criticals: {by_criticals.cumulative_criticals:,} criticals "
+        f"First {leading} by criticals: {by_criticals.cumulative_criticals:,} of the "
+        f"{plan.fixable_criticals:,} fixable criticals "
         f"({by_criticals.criticals_percentage:.1f}%), on {_hosts(by_criticals.cumulative_agents)}.",
     ]
+
+
+def unfixable_heading(plan: PatchPlan) -> str:
+    """Name the register and what it totals."""
+    return (
+        f"No vendor fix available — {plan.no_fix_findings:,} findings, "
+        f"{plan.no_fix_criticals:,} critical"
+    )
 
 
 def _hosts(count: int) -> str:
@@ -177,19 +226,20 @@ def render_json(plan: PatchPlan) -> str:
     return plan.model_dump_json(indent=2)
 
 
-def render_markdown(plan: PatchPlan, top: int) -> str:
+def render_markdown(plan: PatchPlan, top: int, *, show_unfixable: bool = True) -> str:
     """Write the plan as a report that can be pasted into a ticket.
 
     Args:
         plan: Plan to render.
-        top: Maximum number of actions to list.
+        top: Maximum number of rows to list in each table.
+        show_unfixable: Include the register of findings with no vendor fix.
 
     Returns:
         A Markdown document.
     """
     listed = plan.actions[:top]
     lines = ["# vulnfold patch plan", ""]
-    lines += [f"**{line}**" for line in impact_lines(plan, top)]
+    lines += [f"**{line}**" if line else "" for line in impact_lines(plan, top)]
     lines += [
         "",
         f"{plan.total_agents:,} agents · {plan.total_distinct_cves:,} distinct CVEs "
@@ -201,15 +251,22 @@ def render_markdown(plan: PatchPlan, top: int) -> str:
     if not listed:
         lines += ["", NOTHING_TO_REMEDIATE]
     else:
-        lines += [
-            "",
-            "| " + " | ".join(_ACTION_COLUMNS) + " |",
-            "|" + "|".join("---" for _ in _ACTION_COLUMNS) + "|",
-        ]
-        lines += [
-            "| " + " | ".join(_action_cells(action, rank, plan.total_findings)) + " |"
-            for rank, action in enumerate(listed, start=1)
-        ]
+        lines += _markdown_table(
+            _ACTION_COLUMNS,
+            [
+                _action_cells(action, rank, plan.fixable_findings)
+                for rank, action in enumerate(listed, start=1)
+            ],
+        )
+
+    if show_unfixable:
+        register = plan.unfixable[:top]
+        lines += ["", f"## {unfixable_heading(plan)}", "", UNFIXABLE_EXPLANATION]
+        lines += (
+            _markdown_table(_UNFIXABLE_COLUMNS, [_entry_cells(entry) for entry in register])
+            if register
+            else ["", NOTHING_UNFIXABLE]
+        )
 
     if plan.warnings:
         lines += ["", "## Warnings", ""]
@@ -218,39 +275,43 @@ def render_markdown(plan: PatchPlan, top: int) -> str:
     return "\n".join(lines) + "\n"
 
 
-def build_table_view(plan: PatchPlan, top: int) -> RenderableType:
+def _markdown_table(columns: tuple[str, ...], rows: list[list[str]]) -> list[str]:
+    return [
+        "",
+        "| " + " | ".join(columns) + " |",
+        "|" + "|".join("---" for _ in columns) + "|",
+        *["| " + " | ".join(row) + " |" for row in rows],
+    ]
+
+
+def build_table_view(plan: PatchPlan, top: int, *, show_unfixable: bool = True) -> RenderableType:
     """Build the terminal view of the plan.
 
     Args:
         plan: Plan to render.
-        top: Maximum number of actions to list.
+        top: Maximum number of rows to list in each table.
+        show_unfixable: Include the register of findings with no vendor fix.
 
     Returns:
-        A rich renderable: the impact lines, the action table, then warnings.
+        A rich renderable: the impact lines, the action table, the register,
+        then warnings.
     """
     listed = plan.actions[:top]
     header = Text("\n".join(impact_lines(plan, top)), style="bold")
 
-    # Pin Package to the width its content actually needs: rich shrinks the
-    # widest flexible column first, which would otherwise make the one column
-    # a reader has to act on the first to lose characters.
-    package_width = max((len(action.package_name) for action in listed), default=0)
-
-    table = Table(title=None, header_style="bold", expand=False)
-    for column in _ACTION_COLUMNS:
-        table.add_column(
-            column,
-            justify="left" if column in _LEFT_ALIGNED else "right",
-            no_wrap=True,
-            overflow="ellipsis",
-            min_width=package_width if column == "Package" else None,
-            max_width=VERSION_MAX_WIDTH if column == "Version" else None,
-        )
+    widths = {
+        "Package": max((len(action.package_name) for action in listed), default=0),
+        "Target": max((len(action.target_version) for action in listed), default=0),
+    }
+    table = _table(_ACTION_COLUMNS, widths)
     for rank, action in enumerate(listed, start=1):
-        table.add_row(*_action_cells(action, rank, plan.total_findings))
+        table.add_row(*_action_cells(action, rank, plan.fixable_findings))
 
     parts: list[RenderableType] = [header, ""]
     parts.append(table if listed else Text(NOTHING_TO_REMEDIATE))
+
+    if show_unfixable:
+        parts += _register_view(plan, top)
     if plan.warnings:
         parts.append("")
         parts.append(
@@ -264,19 +325,74 @@ def build_table_view(plan: PatchPlan, top: int) -> RenderableType:
     return Group(*parts)
 
 
-def _action_cells(action: RemediationAction, rank: int, total_findings: int) -> list[str]:
+def _register_view(plan: PatchPlan, top: int) -> list[RenderableType]:
+    register = plan.unfixable[:top]
+    parts: list[RenderableType] = [
+        "",
+        Text(unfixable_heading(plan), style="bold"),
+        Text(UNFIXABLE_EXPLANATION),
+        "",
+    ]
+    if not register:
+        parts.append(Text(NOTHING_UNFIXABLE))
+        return parts
+
+    widths = {"Package": max(len(entry.package_name) for entry in register)}
+    table = _table(_UNFIXABLE_COLUMNS, widths)
+    for entry in register:
+        table.add_row(*_entry_cells(entry))
+    parts.append(table)
+    return parts
+
+
+def _table(columns: tuple[str, ...], pinned_widths: dict[str, int]) -> Table:
+    """Build a table whose most-protected columns cannot lose characters.
+
+    rich shrinks the widest flexible column first, which would otherwise take
+    characters from the columns a reader has to act on. Pinning those to the
+    width their content needs, and capping the current version instead, makes
+    Version the first column to give way.
+    """
+    table = Table(title=None, header_style="bold", expand=False)
+    for column in columns:
+        table.add_column(
+            column,
+            justify="left" if column in _LEFT_ALIGNED else "right",
+            no_wrap=True,
+            overflow="ellipsis",
+            min_width=pinned_widths.get(column) if column in _PINNED_TO_CONTENT else None,
+            max_width=VERSION_MAX_WIDTH if column == "Version" else None,
+        )
+    return table
+
+
+def _action_cells(action: RemediationAction, rank: int, fixable_findings: int) -> list[str]:
     return [
         str(rank),
         action.package_name,
         action.current_version,
+        action.target_version,
         f"{action.agent_count:,}",
         f"{action.finding_count:,}",
-        f"{_share(action.finding_count, total_findings):.1f}%",
+        f"{_share(action.finding_count, fixable_findings):.1f}%",
         f"{action.cve_count:,}",
         f"{action.critical_count:,}",
         f"{action.high_count:,}",
         f"{action.severity_breakdown.get(UNKNOWN_SEVERITY, 0):,}",
         KERNEL_MARK if action.is_kernel else "",
+    ]
+
+
+def _entry_cells(entry: UnfixableEntry) -> list[str]:
+    return [
+        entry.package_name,
+        entry.current_version,
+        f"{entry.agent_count:,}",
+        f"{entry.finding_count:,}",
+        f"{entry.cve_count:,}",
+        f"{entry.critical_count:,}",
+        f"{entry.high_count:,}",
+        KERNEL_MARK if entry.is_kernel else "",
     ]
 
 
