@@ -15,7 +15,7 @@ import pytest
 
 from vulnfold.config import ScanConfig
 from vulnfold.mapping import load_mapping, parse_composite_page, parse_totals
-from vulnfold.models import FieldMapping, IndexerSnapshot, PackageBucket
+from vulnfold.models import FieldMapping, Fixability, IndexerSnapshot, PackageBucket
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 COMPOSITE_FIXTURE = FIXTURES / "aggregation_response.json"
@@ -33,6 +33,13 @@ INDEXER_URL = "https://indexer.example.test:9200"
 INDEX_PATTERN = "wazuh-states-vulnerabilities-*"
 
 DEFAULT_AGENT = "001"
+
+#: Fixability vocabulary as shipped, so a hand-built bucket is classified by
+#: exactly the rules production uses and the marker strings stay in the YAML.
+FIXABILITY_RULES = load_mapping("wazuh-4.x").fixability
+DEFAULT_TARGET_VERSION = "3.0.2-2"
+FIXABLE_CONDITION = f"{FIXABILITY_RULES.fixed_version_prefix}{DEFAULT_TARGET_VERSION}"
+NO_FIX_CONDITION = FIXABILITY_RULES.no_fix_values[0]
 
 
 @pytest.fixture(scope="session")
@@ -86,8 +93,14 @@ def make_bucket(
     agent_cardinality: int | None = None,
     severity: dict[str, int] | None = None,
     cves: int | None = None,
+    condition: str | None = FIXABLE_CONDITION,
 ) -> PackageBucket:
-    """Build one bucket, defaulting every field a test does not care about."""
+    """Build one bucket, defaulting every field a test does not care about.
+
+    ``condition`` is classified by the shipped rules, exactly as the parser
+    classifies a real one, so a test bucket can never carry a fixability its
+    condition string does not imply.
+    """
     agent_counts = agents if agents is not None else {DEFAULT_AGENT: findings}
     return PackageBucket(
         package_name=package,
@@ -99,6 +112,9 @@ def make_bucket(
         ),
         severity_counts=severity if severity is not None else {"High": findings},
         cve_count=cves if cves is not None else findings,
+        fixability=FIXABILITY_RULES.classify(condition) if condition else Fixability.UNKNOWN,
+        target_version=FIXABILITY_RULES.target_version(condition) if condition else None,
+        scanner_condition=condition,
     )
 
 

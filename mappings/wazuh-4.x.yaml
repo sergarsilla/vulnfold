@@ -11,5 +11,15 @@ fields:
   severity: "vulnerability.severity"
   agent_id: "agent.id"
   agent_name: "agent.name"
+  scanner_condition: "vulnerability.scanner.condition"
 severity_order: ["Critical", "High", "Medium", "Low"]
 severity_unknown: ["-", "None", ""]
+
+# How the condition string classifies a finding. A future Wazuh release may
+# reword these markers, so they are vocabulary, not code.
+fixability:
+  # Exact value (case-insensitive) meaning "affected, no fixed version exists".
+  no_fix_values: ["Package default status"]
+  # Prefix (case-insensitive) introducing a target version; the remainder of
+  # the string after this prefix is the version to upgrade to.
+  fixed_version_prefix: "Package less than "

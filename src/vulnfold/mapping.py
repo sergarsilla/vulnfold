@@ -24,7 +24,7 @@ from vulnfold.config import (
     UNKNOWN_VERSION,
 )
 from vulnfold.errors import AggregationError, MappingError
-from vulnfold.models import FieldMapping, PackageBucket
+from vulnfold.models import FieldMapping, Fixability, PackageBucket
 
 #: Names vulnfold gives its own aggregations. These are query labels, not
 #: schema fields, so they are fixed here rather than in ``mappings/``.
@@ -38,6 +38,7 @@ TOTAL_CVES_AGG: Final = "total_cves"
 TOTAL_PACKAGES_AGG: Final = "total_packages"
 PACKAGE_SOURCE: Final = "pkg"
 VERSION_SOURCE: Final = "ver"
+CONDITION_SOURCE: Final = "cond"
 
 CompositeKey = dict[str, str | None]
 
@@ -121,7 +122,7 @@ def build_composite_query(
     page_size: int,
     after_key: Mapping[str, str | None] | None = None,
 ) -> dict[str, object]:
-    """Build one page of the ``(package, version)`` composite aggregation.
+    """Build one page of the ``(package, version, condition)`` composite aggregation.
 
     Args:
         mapping: Field mapping that supplies every field name in the body.
@@ -139,6 +140,13 @@ def build_composite_query(
             # Findings whose package version is absent must be grouped, not
             # dropped; without missing_bucket the composite skips them silently.
             {VERSION_SOURCE: {"terms": {"field": fields.package_version, "missing_bucket": True}}},
+            # Likewise for the condition: a finding carrying none is reported as
+            # unrecognised fixability, which is a mapping defect worth seeing.
+            {
+                CONDITION_SOURCE: {
+                    "terms": {"field": fields.scanner_condition, "missing_bucket": True}
+                }
+            },
         ],
     }
     if after_key is not None:
@@ -206,7 +214,7 @@ def parse_composite_page(
 
     Args:
         response: Decoded ``_search`` body for one composite page.
-        mapping: Mapping in force, used only to name the aggregation source.
+        mapping: Mapping in force, supplying the fixability vocabulary.
 
     Returns:
         The page's buckets and the ``after_key`` that follows it, if any.
@@ -218,7 +226,7 @@ def parse_composite_page(
     actions = _require_mapping(_get(aggregations, ACTIONS_AGG), ACTIONS_AGG)
     raw_buckets = _require_list(_get(actions, "buckets"), f"{ACTIONS_AGG}.buckets")
 
-    buckets = [_parse_bucket(raw, index) for index, raw in enumerate(raw_buckets)]
+    buckets = [_parse_bucket(raw, index, mapping) for index, raw in enumerate(raw_buckets)]
     after_key = _parse_after_key(actions)
     return CompositePage(buckets=buckets, after_key=after_key)
 
@@ -231,15 +239,17 @@ def _parse_after_key(actions: Mapping[str, object]) -> CompositeKey | None:
     return {name: _optional_key_string(value) for name, value in key.items()}
 
 
-def _parse_bucket(raw: object, index: int) -> PackageBucket:
+def _parse_bucket(raw: object, index: int, mapping: FieldMapping) -> PackageBucket:
     path = f"{ACTIONS_AGG}.buckets[{index}]"
     bucket = _require_mapping(raw, path)
     key = _require_mapping(_get(bucket, "key", path), f"{path}.key")
 
     version = _optional_key_string(key.get(VERSION_SOURCE))
+    condition = _optional_key_string(key.get(CONDITION_SOURCE))
     agents = _require_mapping(_get(bucket, AGENTS_AGG, path), f"{path}.{AGENTS_AGG}")
     severity = _require_mapping(_get(bucket, SEVERITY_AGG, path), f"{path}.{SEVERITY_AGG}")
 
+    rules = mapping.fixability
     return PackageBucket(
         package_name=_key_string(key.get(PACKAGE_SOURCE), f"{path}.key.{PACKAGE_SOURCE}"),
         package_version=version if version else UNKNOWN_VERSION,
@@ -248,6 +258,9 @@ def _parse_bucket(raw: object, index: int) -> PackageBucket:
         agent_cardinality=_cardinality(bucket, AGENT_CARDINALITY_AGG, path),
         severity_counts=_terms_counts(severity, f"{path}.{SEVERITY_AGG}"),
         cve_count=_cardinality(bucket, CVES_AGG, path),
+        fixability=rules.classify(condition) if condition else Fixability.UNKNOWN,
+        target_version=rules.target_version(condition) if condition else None,
+        scanner_condition=condition,
     )
 
 

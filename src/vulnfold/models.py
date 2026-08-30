@@ -26,6 +26,21 @@ class RankBy(str, Enum):
     FINDINGS = "findings"
 
 
+class Fixability(str, Enum):
+    """Whether a finding can be remediated by upgrading the package today.
+
+    The distinction is not severity and not confidence. ``NO_FIX`` findings are
+    real, vendor-confirmed vulnerabilities; the vendor has simply published no
+    fixed version, so no upgrade exists to recommend. ``UNKNOWN`` is not a third
+    finding class: it means the mapping did not recognise the condition string
+    this deployment emitted, which is a defect in the mapping.
+    """
+
+    FIXABLE = "fixable"
+    NO_FIX = "no_fix"
+    UNKNOWN = "unknown"
+
+
 class WarningCode(str, Enum):
     """Stable identifiers for the conditions a scan can report.
 
@@ -58,6 +73,58 @@ class MappingFields(BaseModel):
     severity: str
     agent_id: str
     agent_name: str
+    scanner_condition: str
+
+
+class FixabilityRules(BaseModel):
+    """How a scanner condition string classifies a finding.
+
+    The strings live in ``mappings/`` rather than in code because they are the
+    detector's vocabulary, not vulnfold's: a future Wazuh release may reword
+    them, and rewording them must not require a code change (decision D1).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    no_fix_values: list[str]
+    fixed_version_prefix: str
+
+    def classify(self, raw: str) -> Fixability:
+        """Decide which fixability class a condition string denotes.
+
+        Args:
+            raw: Condition exactly as the document carried it.
+
+        Returns:
+            The class it denotes. Anything the mapping does not recognise is
+            :attr:`Fixability.UNKNOWN`, never folded into ``NO_FIX``: absorbing
+            it would destroy the signal that the mapping is wrong against this
+            deployment's schema.
+        """
+        folded = raw.strip().casefold()
+        if any(value.strip().casefold() == folded for value in self.no_fix_values):
+            return Fixability.NO_FIX
+        if self.target_version(raw) is not None:
+            return Fixability.FIXABLE
+        return Fixability.UNKNOWN
+
+    def target_version(self, raw: str) -> str | None:
+        """Read the version to upgrade to out of a condition string.
+
+        Args:
+            raw: Condition exactly as the document carried it.
+
+        Returns:
+            The remainder after the fixed-version prefix, or ``None`` when the
+            condition introduces no version. Matching ignores case and
+            surrounding whitespace, for the same reason
+            :meth:`FieldMapping.canonical_severity` does.
+        """
+        prefix = self.fixed_version_prefix.strip()
+        condition = raw.strip()
+        if condition[: len(prefix)].casefold() != prefix.casefold():
+            return None
+        return condition[len(prefix) :].strip() or None
 
 
 class FieldMapping(BaseModel):
@@ -70,6 +137,7 @@ class FieldMapping(BaseModel):
     fields: MappingFields
     severity_order: list[str] = Field(min_length=1)
     severity_unknown: list[str]
+    fixability: FixabilityRules
 
     def canonical_severity(self, raw: str) -> str | None:
         """Resolve a raw severity string to its canonical spelling.
@@ -95,7 +163,13 @@ class FieldMapping(BaseModel):
 
 
 class PackageBucket(BaseModel):
-    """One ``(package, version)`` bucket as the indexer returned it."""
+    """One ``(package, version, condition)`` bucket as the indexer returned it.
+
+    ``scanner_condition`` is kept alongside the class derived from it so an
+    unrecognised condition can be reported verbatim. A reader who has to fix a
+    mapping needs the string the deployment actually emitted, not the fact that
+    it failed to match.
+    """
 
     package_name: str
     package_version: str
@@ -104,6 +178,9 @@ class PackageBucket(BaseModel):
     agent_cardinality: int
     severity_counts: dict[str, int]
     cve_count: int
+    fixability: Fixability
+    target_version: str | None
+    scanner_condition: str | None
 
 
 class IndexerSnapshot(BaseModel):

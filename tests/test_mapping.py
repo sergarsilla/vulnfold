@@ -17,7 +17,7 @@ from vulnfold.mapping import (
     parse_count,
     parse_totals,
 )
-from vulnfold.models import FieldMapping
+from vulnfold.models import FieldMapping, Fixability
 
 ALTERNATE_MAPPING = """
 version: "5.x"
@@ -29,8 +29,12 @@ fields:
   severity: "threat.rating"
   agent_id: "endpoint.uid"
   agent_name: "endpoint.label"
+  scanner_condition: "threat.remedy_state"
 severity_order: ["Severe", "Elevated", "Moderate", "Minor"]
 severity_unknown: ["n/a", ""]
+fixability:
+  no_fix_values: ["no remedy published"]
+  fixed_version_prefix: "fixed in "
 """
 
 
@@ -129,6 +133,7 @@ def test_swapping_the_mapping_retargets_every_query_field(
         "threat.cve",
         "threat.rating",
         "endpoint.uid",
+        "threat.remedy_state",
     }
     back_translated = _substitute(
         alternate_body,
@@ -138,6 +143,7 @@ def test_swapping_the_mapping_retargets_every_query_field(
             "threat.cve": mapping.fields.cve_id,
             "threat.rating": mapping.fields.severity,
             "endpoint.uid": mapping.fields.agent_id,
+            "threat.remedy_state": mapping.fields.scanner_condition,
         },
     )
 
@@ -159,6 +165,16 @@ def test_composite_query_groups_documents_that_carry_no_version(
     sources = body["aggs"]["actions"]["composite"]["sources"]  # type: ignore[index]
 
     assert sources[1]["ver"]["terms"]["missing_bucket"] is True
+
+
+def test_composite_query_groups_documents_that_carry_no_condition(
+    mapping: FieldMapping,
+) -> None:
+    body = build_composite_query(mapping, page_size=10)
+    sources = body["aggs"]["actions"]["composite"]["sources"]  # type: ignore[index]
+
+    assert sources[2]["cond"]["terms"]["field"] == "vulnerability.scanner.condition"
+    assert sources[2]["cond"]["terms"]["missing_bucket"] is True
 
 
 def test_composite_query_requests_fleet_totals_only_on_the_first_page(
@@ -283,3 +299,98 @@ def test_a_value_the_mapping_never_heard_of_is_not_an_explicit_placeholder(
 ) -> None:
     assert mapping.canonical_severity("Catastrophic") is None
     assert mapping.is_explicitly_unknown("Catastrophic") is False
+
+
+def _condition_response(condition: str | None) -> dict[str, Any]:
+    """One composite bucket carrying exactly the condition under test."""
+    return {
+        "aggregations": {
+            "actions": {
+                "buckets": [
+                    {
+                        "key": {"pkg": "openssl", "ver": "3.0.2-1", "cond": condition},
+                        "doc_count": 4,
+                        "agents": {"buckets": [{"key": "001", "doc_count": 4}]},
+                        "agent_cardinality": {"value": 1},
+                        "severity": {"buckets": [{"key": "High", "doc_count": 4}]},
+                        "cves": {"value": 4},
+                    }
+                ]
+            }
+        }
+    }
+
+
+def test_classify_recognises_the_no_fix_marker(mapping: FieldMapping) -> None:
+    assert mapping.fixability.classify("Package default status") is Fixability.NO_FIX
+
+
+def test_classify_ignores_case_and_surrounding_whitespace(mapping: FieldMapping) -> None:
+    assert mapping.fixability.classify("  package DEFAULT status ") is Fixability.NO_FIX
+    assert mapping.fixability.classify("  PACKAGE LESS THAN 1.2 ") is Fixability.FIXABLE
+
+
+def test_classify_recognises_a_condition_naming_a_fixed_version(
+    mapping: FieldMapping,
+) -> None:
+    assert mapping.fixability.classify("Package less than 6.12.100-1") is Fixability.FIXABLE
+
+
+def test_classify_reports_an_unrecognised_condition_as_unknown(mapping: FieldMapping) -> None:
+    assert mapping.fixability.classify("Package equal to 7.2.12") is Fixability.UNKNOWN
+
+
+def test_a_fixed_version_prefix_naming_no_version_is_unknown(mapping: FieldMapping) -> None:
+    assert mapping.fixability.classify("Package less than   ") is Fixability.UNKNOWN
+    assert mapping.fixability.target_version("Package less than   ") is None
+
+
+def test_target_version_is_the_remainder_after_the_prefix(mapping: FieldMapping) -> None:
+    assert mapping.fixability.target_version("Package less than 6.12.100-1") == "6.12.100-1"
+    assert mapping.fixability.target_version("  Package less than  6.12.100-1  ") == "6.12.100-1"
+
+
+def test_a_no_fix_condition_names_no_target_version(mapping: FieldMapping) -> None:
+    assert mapping.fixability.target_version("Package default status") is None
+
+
+def test_swapping_the_mapping_retargets_the_fixability_vocabulary(
+    mapping: FieldMapping,
+    alternate_mapping: FieldMapping,
+) -> None:
+    """SPEC-01 section 9, criterion 6, extended to SPEC-02's vocabulary."""
+    rules = alternate_mapping.fixability
+
+    assert rules.classify("no remedy published") is Fixability.NO_FIX
+    assert rules.classify("fixed in 9.1") is Fixability.FIXABLE
+    assert rules.target_version("fixed in 9.1") == "9.1"
+    # The Wazuh 4.x wording means nothing under this deployment's vocabulary.
+    assert mapping.fixability.classify("fixed in 9.1") is Fixability.UNKNOWN
+    assert rules.classify("Package default status") is Fixability.UNKNOWN
+
+
+def test_parse_composite_page_classifies_a_bucket_from_its_condition(
+    mapping: FieldMapping,
+) -> None:
+    page = parse_composite_page(_condition_response("Package less than 3.0.2-2"), mapping)
+
+    assert page.buckets[0].fixability is Fixability.FIXABLE
+    assert page.buckets[0].target_version == "3.0.2-2"
+    assert page.buckets[0].scanner_condition == "Package less than 3.0.2-2"
+
+
+def test_parse_composite_page_reads_a_no_fix_bucket(mapping: FieldMapping) -> None:
+    page = parse_composite_page(_condition_response("Package default status"), mapping)
+
+    assert page.buckets[0].fixability is Fixability.NO_FIX
+    assert page.buckets[0].target_version is None
+
+
+def test_parse_composite_page_reports_a_bucket_with_no_condition_as_unknown(
+    mapping: FieldMapping,
+) -> None:
+    page = parse_composite_page(_condition_response(None), mapping)
+
+    assert page.buckets[0].fixability is Fixability.UNKNOWN
+    assert page.buckets[0].target_version is None
+    assert page.buckets[0].scanner_condition is None
