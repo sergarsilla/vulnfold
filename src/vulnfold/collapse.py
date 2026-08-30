@@ -742,12 +742,13 @@ def _grouped_cve_count_warning(merged_count: int) -> ScanWarning:
 
 def _merged_condition_warning(merged_count: int) -> ScanWarning:
     return ScanWarning(
-        code=WarningCode.GROUPED_CVE_COUNT_IS_LOWER_BOUND,
+        code=WarningCode.MERGED_CVE_COUNT_IS_UPPER_BOUND,
         message=(
             f"{merged_count} row(s) were merged across scanner conditions, "
             f"because one installed version can have several outstanding fixed "
             f"versions. Their CVE counts are sums of per-condition "
-            f"cardinalities, not exact counts."
+            f"cardinalities, so they are upper bounds: the sets are usually "
+            f"disjoint, but overlap when vendors disagree about one version."
         ),
         detail={"merged_conditions": merged_count},
     )

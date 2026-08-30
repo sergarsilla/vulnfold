@@ -130,7 +130,7 @@ One remediation a human can perform, ordered by `rank_by`.
 | `affected_agents` | array of string | Agent ids, sorted. |
 | `agent_count` | integer | Length of `affected_agents`. |
 | `finding_count` | integer | Findings this action clears. |
-| `cve_count` | integer | Distinct CVEs. **Not always an exact cardinality**: where an installed version was merged across several scanner conditions the per-condition cardinalities are summed, and for a merged kernel action the largest constituent is used because a union cannot be recovered from per-version cardinalities. Either case raises `grouped_cve_count_is_lower_bound`. |
+| `cve_count` | integer | Distinct CVEs. **Not always an exact cardinality**, and the two inexact cases err in opposite directions, so they carry different warning codes. Merging an installed version across several scanner conditions **sums** the per-condition cardinalities, which can only overstate: `merged_cve_count_is_upper_bound`. A merged kernel action takes the **largest** constituent, because a union cannot be recovered from per-version cardinalities, which can only understate: `grouped_cve_count_is_lower_bound`. |
 | `severity_breakdown` | object | Count per severity, plus `unknown`. Every severity the mapping declares is present, including zeros. |
 | `critical_count` | integer | Findings at the mapping's most severe level. |
 | `high_count` | integer | Findings at the second most severe level. |
@@ -198,7 +198,8 @@ Each array has exactly one entry per action in the complete plan.
 | `agent_terms_truncated` | An action affects more agents than the indexer listed, so its agent list is incomplete. |
 | `unrecognized_severity` | A severity value the mapping does not declare was seen. Those findings are counted as unknown. |
 | `unrecognized_fixability` | A scanner condition the mapping's `fixability` vocabulary does not cover was seen. Those findings appear in neither `actions` nor `unfixable`. `detail.examples` quotes up to three of the strings, which is what a reader needs to extend the mapping. It is a mapping gap, not a class of finding. |
-| `grouped_cve_count_is_lower_bound` | A `cve_count` in this record is no longer an exact cardinality. Raised once for merging across scanner conditions (`detail.merged_conditions`) and once for `--group-kernels` merging versions (`detail.merged_rows`), so it can appear **twice** in one record. |
+| `merged_cve_count_is_upper_bound` | A `cve_count` in this record **overstates** the true distinct count. Raised when an installed version was merged across scanner conditions (`detail.merged_conditions`), which sums cardinalities over sets that are usually disjoint but overlap when vendors disagree about one version. |
+| `grouped_cve_count_is_lower_bound` | A `cve_count` in this record **understates** the true distinct count. Raised when `--group-kernels` merged versions (`detail.merged_rows`) and the largest constituent cardinality was used in place of a union that cannot be recovered. |
 
 An empty `warnings` array means the scan reconciled cleanly.
 
@@ -316,8 +317,8 @@ real record of the recorded lab fleet, not an invented one:
       }
     },
     {
-      "code": "grouped_cve_count_is_lower_bound",
-      "message": "506 row(s) were merged across scanner conditions, because one installed version can have several outstanding fixed versions. Their CVE counts are sums of per-condition cardinalities, not exact counts.",
+      "code": "merged_cve_count_is_upper_bound",
+      "message": "506 row(s) were merged across scanner conditions, because one installed version can have several outstanding fixed versions. Their CVE counts are sums of per-condition cardinalities, so they are upper bounds: the sets are usually disjoint, but overlap when vendors disagree about one version.",
       "detail": {
         "merged_conditions": 506
       }

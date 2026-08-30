@@ -107,7 +107,7 @@ def test_recorded_fleet_reconciles_with_only_the_expected_warnings(
 
     assert [warning.code for warning in plan.warnings] == [
         WarningCode.UNRECOGNIZED_FIXABILITY,
-        WarningCode.GROUPED_CVE_COUNT_IS_LOWER_BOUND,
+        WarningCode.MERGED_CVE_COUNT_IS_UPPER_BOUND,
     ]
 
 
@@ -349,7 +349,7 @@ def test_merging_conditions_warns_that_the_cve_count_is_no_longer_exact(
     plan = build_patch_plan(snapshot, mapping)
 
     assert plan.actions[0].cve_count == 8
-    assert WarningCode.GROUPED_CVE_COUNT_IS_LOWER_BOUND in {
+    assert WarningCode.MERGED_CVE_COUNT_IS_UPPER_BOUND in {
         warning.code for warning in plan.warnings
     }
 

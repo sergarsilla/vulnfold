@@ -51,7 +51,13 @@ class WarningCode(str, Enum):
     BUCKET_SUM_MISMATCH = "bucket_sum_mismatch"
     AGENT_TERMS_TRUNCATED = "agent_terms_truncated"
     UNRECOGNIZED_SEVERITY = "unrecognized_severity"
+    #: Kernel grouping takes the largest constituent cardinality, so the
+    #: reported count cannot exceed the true union: it understates.
     GROUPED_CVE_COUNT_IS_LOWER_BOUND = "grouped_cve_count_is_lower_bound"
+    #: Condition merging sums per-condition cardinalities. Those sets are
+    #: usually disjoint, but they overlap when one package version resolves
+    #: differently across vendors, so the sum can only overstate.
+    MERGED_CVE_COUNT_IS_UPPER_BOUND = "merged_cve_count_is_upper_bound"
     UNRECOGNIZED_FIXABILITY = "unrecognized_fixability"
 
 

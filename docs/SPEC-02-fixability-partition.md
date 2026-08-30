@@ -161,9 +161,12 @@ Consequences the implementer must handle:
 - **Re-aggregation is required.** Buckets sharing `(package, version)` but
   differing in condition must be merged back together per class before ranking,
   summing findings, unioning agents, and summing severity counts. `cve_count` is
-  a cardinality and **is not additive**: sum it and emit
-  `GROUPED_CVE_COUNT_IS_LOWER_BOUND`, which already exists for exactly this
-  situation in kernel grouping.
+  a cardinality and **is not additive**: sum it and emit a warning. Note that
+  summing overstates while kernel grouping's max-of-constituents understates, so
+  these need **separate** warning codes — `MERGED_CVE_COUNT_IS_UPPER_BOUND` here,
+  `GROUPED_CVE_COUNT_IS_LOWER_BOUND` for kernel grouping. Reusing one code for
+  two opposite errors breaks the rule in `models.py` that consumers match on the
+  code and never on the message text.
 - **One installed version may carry several target versions** (different CVEs
   fixed in different releases). The action's `target_version` is the **maximum**
   by the comparison in §5.
@@ -225,11 +228,19 @@ Replaces the current impact block. Four figures, always printed, whatever
 32,718 findings → 13,664 fixable (41.8%) · 19,039 with no vendor fix (58.2%)
 Criticals: 2,492 → 1,322 fixable · 1,170 with no vendor fix
 
-13,664 fixable findings → 187 actions across 453 packages (ratio 73:1)
-Each action clears 73.1 findings: 49.1 CVEs per package version × 1.49 hosts
+13,664 fixable findings → 560 actions across 453 packages (ratio 30:1)
+Each action clears 24.4 findings: 19.7 CVEs per package version × 1.24 hosts
 First 12 by findings: 8,271 fixable findings (60.5%), on N hosts
 First 12 by criticals: 1,015 fixable criticals (76.8%), on N hosts
 ```
+
+> **Corrected 2026-08-30.** An earlier revision of this block invented "187
+> actions" and a "73:1" ratio. Both were wrong. 73:1 was findings ÷ actions,
+> which SPEC-01 §6 and the `collapse_ratio` docstring explicitly reject;
+> `collapse_ratio` is findings ÷ distinct packages, which over the fixable set
+> is 13,664 ÷ 453 = 30:1. The figures above are measured from a live run. Only
+> the *shape* of this block is normative — the binding rule is §6, that every
+> figure derived from actions is computed over the fixable set.
 
 Every percentage states its denominator in words. No percentage in the output
 may be computed over `total_findings` except the fixable/no-fix split itself.
