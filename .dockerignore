@@ -1,0 +1,27 @@
+# Keep the build context to what the wheel actually needs. Beyond build speed,
+# this is what stops a stray .env or a local venv reaching the image.
+.git
+.gitignore
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.env
+*.log
+
+# Not needed to build or run the wheel.
+tests/
+docs/
+deploy/
+CONTEXT.md
+CLAUDE.md
+Dockerfile
+.dockerignore
+compose.yaml
