@@ -313,7 +313,10 @@ class PatchPlan(BaseModel):
     warnings: list[ScanWarning] = Field(default_factory=list)
 
 
-EVIDENCE_SCHEMA_VERSION = "1"
+#: Rises when the shape of a record changes. Version 2 added the fixability
+#: partition; a version-1 record carries none of it, and its coverage figures
+#: are over the undifferentiated total, so the two are not comparable.
+EVIDENCE_SCHEMA_VERSION = "2"
 
 
 class EvidenceRecord(BaseModel):
@@ -324,9 +327,10 @@ class EvidenceRecord(BaseModel):
     and ``schema_version`` rises when that promise cannot be kept. It is
     documented in ``docs/evidence-schema.md``.
 
-    ``actions`` is always the complete ranked plan. ``min_severity`` is a
-    display filter and is recorded here for reproducibility, but it never
-    shortens the evidence.
+    ``actions`` is always the complete ranked plan and ``unfixable`` the
+    complete register. ``min_severity`` is a display filter and is recorded here
+    for reproducibility, but it never shortens the evidence, and neither does
+    ``--no-unfixable``: the register is the part an auditor reads.
     """
 
     schema_version: str = EVIDENCE_SCHEMA_VERSION
@@ -339,12 +343,20 @@ class EvidenceRecord(BaseModel):
     group_kernels: bool
     min_severity: str | None
     total_findings: int
+    total_criticals: int
     total_agents: int
     total_distinct_cves: int
     total_distinct_packages: int
+    fixable_findings: int
+    fixable_criticals: int
+    fixable_distinct_packages: int
+    no_fix_findings: int
+    no_fix_criticals: int
+    unknown_fixability_findings: int
     collapse_ratio: float
     collapse_sources: CollapseSources
     actions: list[RemediationAction]
+    unfixable: list[UnfixableEntry]
     coverage_by_findings: list[CoveragePoint]
     coverage_by_criticals: list[CoveragePoint]
     warnings: list[ScanWarning] = Field(default_factory=list)

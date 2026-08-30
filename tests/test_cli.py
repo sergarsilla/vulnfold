@@ -388,7 +388,7 @@ def test_evidence_records_the_run(
     record = json.loads(destination.read_text())
 
     assert result.exit_code == 0
-    assert record["schema_version"] == "1"
+    assert record["schema_version"] == "2"
     assert record["indexer_url"] == INDEXER_URL
     assert record["index_pattern"] == "wazuh-states-vulnerabilities-*"
     assert record["mapping_version"] == "4.x"
@@ -547,3 +547,49 @@ def test_min_severity_filters_both_tables(
 
     assert result.exit_code == 0
     assert 0 < len(plan["unfixable"]) < 359
+
+
+@respx.mock
+def test_evidence_records_the_fixability_partition(
+    fake_indexer: FakeIndexer,
+    indexer_password: str,
+    tmp_path: Path,
+) -> None:
+    """SPEC-02 section 9: the register is the part an auditor reads."""
+    respx.route().mock(side_effect=fake_indexer)
+    destination = tmp_path / "evidence.json"
+
+    runner.invoke(
+        app,
+        [*BASE_ARGUMENTS, "--format", "json", "--evidence", str(destination)],
+        env=WIDE_TERMINAL,
+    )
+    record = json.loads(destination.read_text())
+
+    assert record["fixable_findings"] == 13_664
+    assert record["fixable_criticals"] == 1_322
+    assert record["no_fix_findings"] == 19_039
+    assert record["no_fix_criticals"] == 1_170
+    assert record["unknown_fixability_findings"] == 15
+    assert record["total_criticals"] == 2_492
+    assert record["fixable_distinct_packages"] == 453
+    assert len(record["unfixable"]) == 359
+
+
+@respx.mock
+def test_evidence_keeps_the_register_when_the_display_hides_it(
+    fake_indexer: FakeIndexer,
+    indexer_password: str,
+    tmp_path: Path,
+) -> None:
+    respx.route().mock(side_effect=fake_indexer)
+    destination = tmp_path / "evidence.json"
+
+    runner.invoke(
+        app,
+        [*BASE_ARGUMENTS, "--no-unfixable", "--evidence", str(destination)],
+        env=WIDE_TERMINAL,
+    )
+    record = json.loads(destination.read_text())
+
+    assert len(record["unfixable"]) == 359

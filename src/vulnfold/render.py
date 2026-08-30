@@ -156,7 +156,7 @@ def build_evidence_record(
     """Assemble the audit record for one scan.
 
     Args:
-        plan: The complete plan, unshortened by any display filter.
+        plan: The complete plan and register, unshortened by any display filter.
         generated_at: When the scan ran. Passed in so the record stays pure.
         tool_version: Version of vulnfold that produced it.
         indexer_url: Indexer the scan read. Credentials are stripped.
@@ -178,12 +178,20 @@ def build_evidence_record(
         group_kernels=group_kernels,
         min_severity=min_severity,
         total_findings=plan.total_findings,
+        total_criticals=plan.total_criticals,
         total_agents=plan.total_agents,
         total_distinct_cves=plan.total_distinct_cves,
         total_distinct_packages=plan.total_distinct_packages,
+        fixable_findings=plan.fixable_findings,
+        fixable_criticals=plan.fixable_criticals,
+        fixable_distinct_packages=plan.fixable_distinct_packages,
+        no_fix_findings=plan.no_fix_findings,
+        no_fix_criticals=plan.no_fix_criticals,
+        unknown_fixability_findings=plan.unknown_fixability_findings,
         collapse_ratio=plan.collapse_ratio,
         collapse_sources=plan.collapse_sources,
         actions=plan.actions,
+        unfixable=plan.unfixable,
         coverage_by_findings=plan.coverage_by_findings,
         coverage_by_criticals=plan.coverage_by_criticals,
         warnings=plan.warnings,
