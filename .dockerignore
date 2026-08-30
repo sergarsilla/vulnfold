@@ -16,8 +16,8 @@ htmlcov/
 .env
 *.log
 
-# Not needed to build or run the wheel.
-tests/
+# tests/ is deliberately NOT excluded: the test stage runs the suite, and it is
+# the only place the suite runs in CI.
 docs/
 deploy/
 CONTEXT.md
