@@ -17,7 +17,7 @@ from vulnfold.mapping import (
     parse_count,
     parse_totals,
 )
-from vulnfold.models import FieldMapping, Fixability
+from vulnfold.models import FieldMapping, Fixability, FixabilityRules
 
 ALTERNATE_MAPPING = """
 version: "5.x"
@@ -34,6 +34,7 @@ severity_order: ["Severe", "Elevated", "Moderate", "Minor"]
 severity_unknown: ["n/a", ""]
 fixability:
   no_fix_values: ["no remedy published"]
+  no_fix_prefixes: ["affected up to "]
   fixed_version_prefix: "fixed in "
 """
 
@@ -337,7 +338,29 @@ def test_classify_recognises_a_condition_naming_a_fixed_version(
 
 
 def test_classify_reports_an_unrecognised_condition_as_unknown(mapping: FieldMapping) -> None:
-    assert mapping.fixability.classify("Package equal to 7.2.12") is Fixability.UNKNOWN
+    assert mapping.fixability.classify("Package newer than 7.2.12") is Fixability.UNKNOWN
+
+
+def test_classify_reports_an_exactly_affected_version_as_no_fix(mapping: FieldMapping) -> None:
+    """SPEC-03 section 1: the condition names what is affected, not a remedy."""
+    assert mapping.fixability.classify("Package equal to 7.2.12") is Fixability.NO_FIX
+    assert mapping.fixability.target_version("Package equal to 7.2.12") is None
+
+
+def test_an_inclusive_upper_bound_is_no_fix_not_a_target_version(
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-03 section 0: the bound is itself affected, so it is no target.
+
+    ``Package less than or equal to 1.114.4`` opens with ``Package less than ``,
+    so stripping the fixed-version prefix first left ``or equal to 1.114.4``
+    standing in the plan's target column, and — ordering non-digit runs by code
+    point — winning the maximum for every action it merged into.
+    """
+    condition = "Package less than or equal to 1.114.4"
+
+    assert mapping.fixability.classify(condition) is Fixability.NO_FIX
+    assert mapping.fixability.target_version(condition) is None
 
 
 def test_a_fixed_version_prefix_naming_no_version_is_unknown(mapping: FieldMapping) -> None:
@@ -354,6 +377,33 @@ def test_a_no_fix_condition_names_no_target_version(mapping: FieldMapping) -> No
     assert mapping.fixability.target_version("Package default status") is None
 
 
+def test_a_no_fix_prefix_is_matched_before_the_fixed_version_prefix() -> None:
+    """SPEC-03 section 2: the matching order is what fixes the defect.
+
+    The rules below are built so that either prefix matches the condition. The
+    order is the only thing that decides the answer, so reversing the two checks
+    in ``classify`` fails here and nowhere else.
+    """
+    rules = FixabilityRules(
+        no_fix_values=[],
+        no_fix_prefixes=["up to "],
+        fixed_version_prefix="up to ",
+    )
+
+    assert rules.classify("up to 1.114.4") is Fixability.NO_FIX
+    assert rules.target_version("up to 1.114.4") is None
+
+
+def test_an_exact_no_fix_value_is_matched_before_either_prefix() -> None:
+    rules = FixabilityRules(
+        no_fix_values=["up to date"],
+        no_fix_prefixes=["up to d"],
+        fixed_version_prefix="up to ",
+    )
+
+    assert rules.classify("up to date") is Fixability.NO_FIX
+
+
 def test_swapping_the_mapping_retargets_the_fixability_vocabulary(
     mapping: FieldMapping,
     alternate_mapping: FieldMapping,
@@ -362,6 +412,7 @@ def test_swapping_the_mapping_retargets_the_fixability_vocabulary(
     rules = alternate_mapping.fixability
 
     assert rules.classify("no remedy published") is Fixability.NO_FIX
+    assert rules.classify("affected up to 9.0") is Fixability.NO_FIX
     assert rules.classify("fixed in 9.1") is Fixability.FIXABLE
     assert rules.target_version("fixed in 9.1") == "9.1"
     # The Wazuh 4.x wording means nothing under this deployment's vocabulary.

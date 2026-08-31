@@ -94,6 +94,7 @@ class FixabilityRules(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     no_fix_values: list[str]
+    no_fix_prefixes: list[str]
     fixed_version_prefix: str
 
     def classify(self, raw: str) -> Fixability:
@@ -107,9 +108,18 @@ class FixabilityRules(BaseModel):
             :attr:`Fixability.UNKNOWN`, never folded into ``NO_FIX``: absorbing
             it would destroy the signal that the mapping is wrong against this
             deployment's schema.
+
+        Note:
+            The three vocabularies are matched in the order written here, and
+            the order is load-bearing: ``fixed_version_prefix`` is itself a
+            prefix of a ``no_fix_prefixes`` entry, so testing it first would
+            classify ``Package less than or equal to X`` as fixable and hand
+            ``or equal to X`` on as a target version (SPEC-03 section 2).
         """
         folded = raw.strip().casefold()
         if any(value.strip().casefold() == folded for value in self.no_fix_values):
+            return Fixability.NO_FIX
+        if any(self._starts_with(raw, prefix) for prefix in self.no_fix_prefixes):
             return Fixability.NO_FIX
         if self.target_version(raw) is not None:
             return Fixability.FIXABLE
@@ -125,13 +135,22 @@ class FixabilityRules(BaseModel):
             The remainder after the fixed-version prefix, or ``None`` when the
             condition introduces no version. Matching ignores case and
             surrounding whitespace, for the same reason
-            :meth:`FieldMapping.canonical_severity` does.
+            :meth:`FieldMapping.canonical_severity` does. A condition a
+            ``no_fix_prefixes`` entry claims names no version, whatever follows
+            it, so it yields ``None`` here too.
         """
-        prefix = self.fixed_version_prefix.strip()
-        condition = raw.strip()
-        if condition[: len(prefix)].casefold() != prefix.casefold():
+        if any(self._starts_with(raw, prefix) for prefix in self.no_fix_prefixes):
             return None
-        return condition[len(prefix) :].strip() or None
+        if not self._starts_with(raw, self.fixed_version_prefix):
+            return None
+        remainder = raw.strip()[len(self.fixed_version_prefix.strip()) :]
+        return remainder.strip() or None
+
+    @staticmethod
+    def _starts_with(raw: str, prefix: str) -> bool:
+        """Report whether a condition opens with a marker, ignoring case."""
+        marker = prefix.strip()
+        return raw.strip()[: len(marker)].casefold() == marker.casefold()
 
 
 class FieldMapping(BaseModel):

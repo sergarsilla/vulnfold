@@ -65,17 +65,21 @@ MEASURED_SEVERITIES = {
     "Low": 484,
     "None": 2,
 }
-MEASURED_FIXABLE_FINDINGS = 13_664
+MEASURED_FIXABLE_FINDINGS = 13_659
 MEASURED_FIXABLE_CRITICALS = 1_322
-MEASURED_NO_FIX_FINDINGS = 19_039
+MEASURED_NO_FIX_FINDINGS = 19_059
 MEASURED_NO_FIX_CRITICALS = 1_170
-MEASURED_UNKNOWN_FINDINGS = 15
+#: SPEC-03 modelled the two remaining condition forms, so nothing recorded is
+#: unrecognised any more. A non-zero count here means the deployment emitted a
+#: fifth form and the mapping's vocabulary has fallen behind it again.
+MEASURED_UNKNOWN_FINDINGS = 0
 
 # The marker strings the recorded deployment emits. They live in
 # ``mappings/wazuh-4.x.yaml`` for the production code; this script restates them
 # because it verifies the recording, and a verifier that read its expectations
 # from the thing under test would verify nothing.
 NO_FIX_CONDITION = "package default status"
+NO_FIX_PREFIXES = ("package equal to ", "package less than or equal to ")
 FIXED_VERSION_PREFIX = "package less than "
 
 CRITICAL = "Critical"
@@ -186,8 +190,15 @@ def _verify(entries: list[dict[str, Any]], totals: dict[str, int]) -> None:
 
 
 def _classify(condition: str | None) -> str:
+    """Classify a recorded condition, testing the no-fix prefixes first.
+
+    ``FIXED_VERSION_PREFIX`` is a prefix of one of ``NO_FIX_PREFIXES``, so the
+    order of these two checks decides the answer for an inclusive upper bound.
+    """
     folded = (condition or "").strip().casefold()
     if folded == NO_FIX_CONDITION:
+        return "no_fix"
+    if any(folded.startswith(prefix) for prefix in NO_FIX_PREFIXES):
         return "no_fix"
     if folded.startswith(FIXED_VERSION_PREFIX) and folded[len(FIXED_VERSION_PREFIX) :].strip():
         return "fixable"

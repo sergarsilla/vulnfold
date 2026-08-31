@@ -60,14 +60,14 @@ def test_impact_lines_open_with_the_fixability_split(real_plan: PatchPlan) -> No
     lines = impact_lines(real_plan, top=7)
 
     assert lines[0] == (
-        "32,718 findings → 13,664 fixable (41.8%) · 19,039 with no vendor fix (58.2%)"
+        "32,718 findings → 13,659 fixable (41.7%) · 19,059 with no vendor fix (58.3%)"
     )
     assert lines[1] == "Criticals: 2,492 → 1,322 fixable · 1,170 with no vendor fix"
 
 
 def test_impact_line_states_the_collapse_of_the_fixable_half(real_plan: PatchPlan) -> None:
     assert impact_lines(real_plan, top=7)[3] == (
-        "13,664 fixable findings → 560 actions across 453 packages (ratio 30:1)"
+        "13,659 fixable findings → 560 actions across 453 packages (ratio 30:1)"
     )
 
 
@@ -76,7 +76,7 @@ def test_impact_lines_state_both_product_claims(real_plan: PatchPlan) -> None:
     lines = impact_lines(real_plan, top=7)
 
     assert lines[5] == (
-        "First 7 by findings: 7,727 of the 13,664 fixable findings (56.5%), on 7 hosts."
+        "First 7 by findings: 7,727 of the 13,659 fixable findings (56.6%), on 7 hosts."
     )
     assert lines[6] == (
         "First 7 by criticals: 920 of the 1,322 fixable criticals (69.6%), on 7 hosts."
@@ -103,7 +103,7 @@ def test_impact_lines_separate_cve_depth_from_host_spread(real_plan: PatchPlan) 
     sources = impact_lines(real_plan, top=7)[4]
 
     assert sources == (
-        "Each action clears 24.4 findings: 19.7 CVEs per package version "
+        "Each action clears 24.4 findings: 19.6 CVEs per package version "
         "× 1.24 hosts carrying it."
     )
 
@@ -148,12 +148,28 @@ def test_impact_line_says_so_when_there_is_nothing_to_do(mapping: FieldMapping) 
 def test_json_is_the_whole_plan_and_parses(real_plan: PatchPlan) -> None:
     document = json.loads(render_json(real_plan))
 
-    assert document["collapse_ratio"] == 30.16
+    assert document["collapse_ratio"] == 30.15
     assert document["total_findings"] == 32_718
     assert document["fixable_findings"] == MEASURED_FIXABLE_FINDINGS
     assert len(document["actions"]) == MEASURED_ACTIONS
     assert len(document["coverage_curve"]) == MEASURED_ACTIONS
-    assert len(document["unfixable"]) == 359
+    assert len(document["unfixable"]) == 362
+
+
+def test_no_target_version_in_the_rendered_plan_begins_with_a_non_digit(
+    real_plan: PatchPlan,
+) -> None:
+    """SPEC-03 section 4, criterion 3, over the whole plan rather than a sample.
+
+    JSON is the render that carries every action; ``--top`` only shortens the
+    two tables. A target beginning with a letter is a condition string that was
+    parsed as if it named a fixed version.
+    """
+    document = json.loads(render_json(real_plan))
+    targets = [action["target_version"] for action in document["actions"]]
+
+    assert len(targets) == MEASURED_ACTIONS
+    assert [target for target in targets if not target[:1].isdigit()] == []
 
 
 def test_json_round_trips_back_into_a_plan(real_plan: PatchPlan) -> None:
@@ -165,7 +181,7 @@ def test_json_is_not_shortened_by_the_top_option(real_plan: PatchPlan) -> None:
     document = json.loads(render_json(real_plan))
 
     assert len(document["actions"]) == MEASURED_ACTIONS
-    assert len(document["unfixable"]) == 359
+    assert len(document["unfixable"]) == 362
 
 
 def test_json_reports_warnings_as_codes(mapping: FieldMapping) -> None:
@@ -186,12 +202,12 @@ def test_markdown_opens_with_the_impact_line(real_plan: PatchPlan) -> None:
 
     assert report.startswith("# vulnfold patch plan")
     assert (
-        "**32,718 findings → 13,664 fixable (41.8%) · 19,039 with no vendor fix (58.2%)**"
+        "**32,718 findings → 13,659 fixable (41.7%) · 19,059 with no vendor fix (58.3%)**"
         in report
     )
-    assert "**13,664 fixable findings → 560 actions across 453 packages (ratio 30:1)**" in report
+    assert "**13,659 fixable findings → 560 actions across 453 packages (ratio 30:1)**" in report
     assert (
-        "**First 7 by findings: 7,727 of the 13,664 fixable findings (56.5%), on 7 hosts.**"
+        "**First 7 by findings: 7,727 of the 13,659 fixable findings (56.6%), on 7 hosts.**"
         in report
     )
     assert "**First 7 by criticals:" in report
@@ -245,9 +261,9 @@ def test_markdown_renders_an_empty_plan(mapping: FieldMapping) -> None:
 def test_table_opens_with_the_impact_line(real_plan: PatchPlan) -> None:
     output = render_table(real_plan, top=7)
 
-    assert "32,718 findings → 13,664 fixable (41.8%)" in output
-    assert "13,664 fixable findings → 560 actions across 453 packages (ratio 30:1)" in output
-    assert "First 7 by findings: 7,727 of the 13,664 fixable findings (56.5%), on 7 hosts." in (
+    assert "32,718 findings → 13,659 fixable (41.7%)" in output
+    assert "13,659 fixable findings → 560 actions across 453 packages (ratio 30:1)" in output
+    assert "First 7 by findings: 7,727 of the 13,659 fixable findings (56.6%), on 7 hosts." in (
         output
     )
     assert "First 7 by criticals:" in output
@@ -347,7 +363,7 @@ def test_the_register_heading_says_what_it_is_and_what_to_do_with_it(
 ) -> None:
     report = render_markdown(real_plan, top=3)
 
-    assert "## No vendor fix available — 19,039 findings, 1,170 critical" in report
+    assert "## No vendor fix available — 19,059 findings, 1,170 critical" in report
     assert "require documented risk acceptance" in report
 
 
