@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated
@@ -18,6 +19,7 @@ from vulnfold.config import (
     DEFAULT_PASSWORD_ENV_VAR,
     DEFAULT_TIMEOUT_SECONDS,
     DEFAULT_TOP_ACTIONS,
+    EVIDENCE_FILE_MODE,
     ScanConfig,
 )
 from vulnfold.errors import ConfigurationError, VulnfoldError
@@ -195,10 +197,43 @@ def _write_evidence(
         min_severity=min_severity,
     )
     try:
-        path.write_text(render_evidence(record), encoding="utf-8")
+        _replace_atomically(path, render_evidence(record))
     except OSError as exc:
         raise ConfigurationError(f"Cannot write the evidence file {path}: {exc}") from exc
     _stderr.print(f"evidence written to {path}")
+
+
+def _replace_atomically(path: Path, payload: str) -> None:
+    """Put ``payload`` at ``path`` in one step, or leave ``path`` as it was.
+
+    Writing in place truncates first, so an I/O failure partway through — a
+    full disk is the realistic one — would leave a truncated file carrying the
+    day's name. A reader under audit pressure takes an empty or half-written
+    ``scan-<date>.json`` for "we scanned and found nothing", which is the worst
+    way for this artefact to fail.
+
+    Args:
+        path: Destination file, replaced only once the payload is on disk.
+        payload: Complete file contents.
+
+    Raises:
+        OSError: If the payload could not be written or the file not replaced.
+            The destination is untouched and no temporary file is left behind.
+    """
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=path.parent, prefix=f".{path.name}.", suffix=".tmp"
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        temporary.chmod(EVIDENCE_FILE_MODE)
+        os.replace(temporary, path)
+    except OSError:
+        temporary.unlink(missing_ok=True)
+        raise
 
 
 def _resolve_password(password_env: str, password: str | None) -> str:
