@@ -6,6 +6,10 @@ import pytest
 from conftest import (
     DEFECT_PACKAGE,
     DEFECT_VERSION,
+    GRAMMAR_DEFECT_CONDITION,
+    GRAMMAR_DEFECT_PACKAGE,
+    GRAMMAR_DEFECT_TARGET,
+    GRAMMAR_DEFECT_VERSION,
     MEASURED_ACTIONS,
     MEASURED_AGENTS,
     MEASURED_COLLAPSE_RATIO,
@@ -102,11 +106,14 @@ def test_recorded_fleet_reconciles_with_only_the_expected_warnings(
     real_snapshot: IndexerSnapshot,
     mapping: FieldMapping,
 ) -> None:
-    """Nothing about the fleet is anomalous; both warnings are structural."""
+    """Nothing about the fleet is anomalous; the one warning is structural.
+
+    SPEC-03 section 4, criterion 2: with all four condition forms modelled, no
+    recorded string is left unrecognised and the fixability warning is silent.
+    """
     plan = build_patch_plan(real_snapshot, mapping)
 
     assert [warning.code for warning in plan.warnings] == [
-        WarningCode.UNRECOGNIZED_FIXABILITY,
         WarningCode.MERGED_CVE_COUNT_IS_UPPER_BOUND,
     ]
 
@@ -182,6 +189,65 @@ def test_linux_oracle_is_in_the_register_and_nowhere_in_the_patch_plan(
     registered = [entry for entry in plan.unfixable if entry.package_name == DEFECT_PACKAGE]
     assert [(entry.current_version, entry.finding_count) for entry in registered] == [
         (DEFECT_VERSION, 4_226)
+    ]
+
+
+def test_an_inclusive_upper_bound_never_reaches_the_target_version_ordering(
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-03 section 4, criterion 4: the defect, in one package version.
+
+    The two conditions describe the same installed version, so they used to
+    merge into one action whose target was chosen between "1.114.3" and the
+    prose "or equal to 1.114.4" — and the prose won. Classifying the inclusive
+    bound as no-fix leaves it carrying no target version at all, so nothing of
+    it is ever offered to ``max_target_version``.
+    """
+    buckets = [
+        make_bucket(
+            package=GRAMMAR_DEFECT_PACKAGE,
+            version=GRAMMAR_DEFECT_VERSION,
+            findings=189,
+            condition="Package less than 1.114.3",
+        ),
+        make_bucket(
+            package=GRAMMAR_DEFECT_PACKAGE,
+            version=GRAMMAR_DEFECT_VERSION,
+            findings=1,
+            condition=GRAMMAR_DEFECT_CONDITION,
+        ),
+    ]
+    assert buckets[1].fixability is Fixability.NO_FIX
+    assert buckets[1].target_version is None
+
+    plan = build_patch_plan(make_snapshot(buckets), mapping)
+
+    assert [(action.current_version, action.target_version) for action in plan.actions] == [
+        (GRAMMAR_DEFECT_VERSION, "1.114.3")
+    ]
+    assert [entry.finding_count for entry in plan.unfixable] == [1]
+
+
+def test_the_recorded_n8n_action_targets_a_version_not_a_condition_fragment(
+    real_snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+) -> None:
+    """SPEC-03 section 4, criterion 7: the row the specification quotes.
+
+    The target is the highest version n8n's remaining "Package less than"
+    conditions name. SPEC-03 predicts "1.114.4"; the recording says the group
+    also carries conditions up to "Package less than 2.31.5", and the rule that
+    an action targets the maximum of its group (SPEC-02 section 4) makes that
+    the answer. What the criterion is really about — that the column holds a
+    version and not a fragment of prose — holds either way.
+    """
+    plan = build_patch_plan(real_snapshot, mapping)
+
+    actions = [
+        action for action in plan.actions if action.package_name == GRAMMAR_DEFECT_PACKAGE
+    ]
+    assert [(action.current_version, action.target_version) for action in actions] == [
+        (GRAMMAR_DEFECT_VERSION, GRAMMAR_DEFECT_TARGET)
     ]
 
 
@@ -288,7 +354,7 @@ def test_the_unrecognised_fixability_warning_quotes_the_condition_strings(
 ) -> None:
     snapshot = make_snapshot(
         [
-            make_bucket(package=name, findings=2, condition=f"Package equal to {name}")
+            make_bucket(package=name, findings=2, condition=f"Package newer than {name}")
             for name in ("a", "b", "c", "d")
         ]
     )
@@ -303,14 +369,14 @@ def test_the_unrecognised_fixability_warning_quotes_the_condition_strings(
     assert warning.detail["findings"] == 8
     assert warning.detail["buckets"] == 4
     # Three examples at most, so the warning stays readable.
-    assert str(warning.detail["examples"]).count("Package equal to") == 3
+    assert str(warning.detail["examples"]).count("Package newer than") == 3
 
 
 def test_an_unrecognised_condition_is_never_treated_as_no_fix(
     mapping: FieldMapping,
 ) -> None:
     """SPEC-02 section 11: absorbing it would destroy the mapping signal."""
-    snapshot = make_snapshot([make_bucket(findings=6, condition="Package equal to 7.2.12")])
+    snapshot = make_snapshot([make_bucket(findings=6, condition="Package newer than 7.2.12")])
 
     plan = build_patch_plan(snapshot, mapping)
 

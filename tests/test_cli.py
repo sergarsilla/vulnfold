@@ -50,7 +50,7 @@ def test_json_output_is_the_only_thing_on_stdout(
     result = runner.invoke(app, [*BASE_ARGUMENTS, "--format", "json"], env=WIDE_TERMINAL)
 
     assert result.exit_code == 0
-    assert json.loads(result.stdout)["collapse_ratio"] == 30.16
+    assert json.loads(result.stdout)["collapse_ratio"] == 30.15
 
 
 @respx.mock
@@ -73,7 +73,7 @@ def test_json_output_can_be_piped_through_jq(
         check=True,
     )
 
-    assert piped.stdout.strip() == "30.16"
+    assert piped.stdout.strip() == "30.15"
 
 
 @respx.mock
@@ -90,7 +90,7 @@ def test_markdown_output_opens_with_the_impact_line(
     assert result.exit_code == 0
     assert "# vulnfold patch plan" in result.stdout
     assert (
-        "First 7 by findings: 7,727 of the 13,664 fixable findings (56.5%), on 7 hosts."
+        "First 7 by findings: 7,727 of the 13,659 fixable findings (56.6%), on 7 hosts."
         in result.stdout
     )
 
@@ -105,9 +105,9 @@ def test_table_is_the_default_format(
     result = runner.invoke(app, [*BASE_ARGUMENTS, "--top", "7"], env=WIDE_TERMINAL)
 
     assert result.exit_code == 0
-    assert "32,718 findings → 13,664 fixable (41.8%)" in result.stdout
+    assert "32,718 findings → 13,659 fixable (41.7%)" in result.stdout
     assert (
-        "13,664 fixable findings → 560 actions across 453 packages (ratio 30:1)"
+        "13,659 fixable findings → 560 actions across 453 packages (ratio 30:1)"
         in result.stdout
     )
     assert "linux-image-6.14.0-37-generic" in result.stdout
@@ -546,7 +546,7 @@ def test_min_severity_filters_both_tables(
     plan = json.loads(result.stdout)
 
     assert result.exit_code == 0
-    assert 0 < len(plan["unfixable"]) < 359
+    assert 0 < len(plan["unfixable"]) < 362
 
 
 @respx.mock
@@ -566,14 +566,14 @@ def test_evidence_records_the_fixability_partition(
     )
     record = json.loads(destination.read_text())
 
-    assert record["fixable_findings"] == 13_664
+    assert record["fixable_findings"] == 13_659
     assert record["fixable_criticals"] == 1_322
-    assert record["no_fix_findings"] == 19_039
+    assert record["no_fix_findings"] == 19_059
     assert record["no_fix_criticals"] == 1_170
-    assert record["unknown_fixability_findings"] == 15
+    assert record["unknown_fixability_findings"] == 0
     assert record["total_criticals"] == 2_492
     assert record["fixable_distinct_packages"] == 453
-    assert len(record["unfixable"]) == 359
+    assert len(record["unfixable"]) == 362
 
 
 @respx.mock
@@ -592,4 +592,4 @@ def test_evidence_keeps_the_register_when_the_display_hides_it(
     )
     record = json.loads(destination.read_text())
 
-    assert len(record["unfixable"]) == 359
+    assert len(record["unfixable"]) == 362

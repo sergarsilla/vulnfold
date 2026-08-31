@@ -226,16 +226,16 @@ real record of the recorded lab fleet, not an invented one:
   "total_agents": 15,
   "total_distinct_cves": 5950,
   "total_distinct_packages": 554,
-  "fixable_findings": 13664,
+  "fixable_findings": 13659,
   "fixable_criticals": 1322,
   "fixable_distinct_packages": 453,
-  "no_fix_findings": 19039,
+  "no_fix_findings": 19059,
   "no_fix_criticals": 1170,
-  "unknown_fixability_findings": 15,
-  "collapse_ratio": 30.16,
+  "unknown_fixability_findings": 0,
+  "collapse_ratio": 30.15,
   "collapse_sources": {
     "findings_per_action": 24.4,
-    "cves_per_action": 19.66,
+    "cves_per_action": 19.65,
     "hosts_per_action": 1.24
   },
   "actions": [
@@ -308,19 +308,10 @@ real record of the recorded lab fleet, not an invented one:
   ],
   "warnings": [
     {
-      "code": "unrecognized_fixability",
-      "message": "15 finding(s) in 1 bucket(s) carry a scanner condition the mapping does not recognise, so they appear neither in the plan nor in the register. This is a gap in the mapping's fixability vocabulary, not a class of finding. Example condition(s): 'Package equal to 7.2.12'.",
-      "detail": {
-        "findings": 15,
-        "buckets": 1,
-        "examples": "'Package equal to 7.2.12'"
-      }
-    },
-    {
       "code": "merged_cve_count_is_upper_bound",
-      "message": "506 row(s) were merged across scanner conditions, because one installed version can have several outstanding fixed versions. Their CVE counts are sums of per-condition cardinalities, so they are upper bounds: the sets are usually disjoint, but overlap when vendors disagree about one version.",
+      "message": "504 row(s) were merged across scanner conditions, because one installed version can have several outstanding fixed versions. Their CVE counts are sums of per-condition cardinalities, so they are upper bounds: the sets are usually disjoint, but overlap when vendors disagree about one version.",
       "detail": {
-        "merged_conditions": 506
+        "merged_conditions": 504
       }
     }
   ]

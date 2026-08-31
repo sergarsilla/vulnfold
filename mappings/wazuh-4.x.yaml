@@ -20,6 +20,12 @@ severity_unknown: ["-", "None", ""]
 fixability:
   # Exact value (case-insensitive) meaning "affected, no fixed version exists".
   no_fix_values: ["Package default status"]
+  # Conditions that identify an affected range but name no fixed version. The
+  # bound they name is itself affected, so it is not a version to upgrade to.
+  no_fix_prefixes:
+    - "Package equal to "
+    - "Package less than or equal to "
   # Prefix (case-insensitive) introducing a target version; the remainder of
-  # the string after this prefix is the version to upgrade to.
+  # the string after this prefix is the version to upgrade to. Matched last:
+  # it is a prefix of "Package less than or equal to " above.
   fixed_version_prefix: "Package less than "

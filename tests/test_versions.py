@@ -77,3 +77,13 @@ def test_surrounding_whitespace_does_not_change_the_ordering() -> None:
 def test_max_target_version_rejects_an_empty_candidate_list() -> None:
     with pytest.raises(ValueError, match="empty candidate list"):
         max_target_version([])
+
+
+def test_max_target_version_rejects_a_candidate_that_is_not_a_version() -> None:
+    """SPEC-03 section 3: the guard names the string that should not be here."""
+    with pytest.raises(ValueError, match="'or equal to 1.114.4' is not a version string"):
+        max_target_version(["1.114.3", "or equal to 1.114.4"])
+
+
+def test_the_guard_accepts_a_debian_epoch() -> None:
+    assert max_target_version(["0:2.52.3-0ubuntu0.24.04.1"]) == "0:2.52.3-0ubuntu0.24.04.1"

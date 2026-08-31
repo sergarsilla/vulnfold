@@ -28,24 +28,38 @@ MEASURED_DISTINCT_CVES = 5_950
 MEASURED_DISTINCT_PACKAGES = 554
 MEASURED_BUCKETS = 1_426
 
-#: The fixability split, measured on 2026-08-30 (SPEC-02 section 0). The
-#: unknown class is one condition string, "Package equal to 7.2.12", that the
-#: 4.x mapping's vocabulary does not cover.
-MEASURED_FIXABLE_FINDINGS = 13_664
+#: The fixability split, measured on 2026-08-30 (SPEC-02 section 0) and
+#: restated by SPEC-03 section 4 once the mapping modelled all four condition
+#: forms. The twenty findings SPEC-03 moved — fifteen "Package equal to" that
+#: were unknown, five "Package less than or equal to" that were mis-parsed as
+#: fixable — carry no criticals, so only the finding counts moved. Nothing is
+#: left unrecognised: the mapping now covers all 418 recorded condition strings.
+MEASURED_FIXABLE_FINDINGS = 13_659
 MEASURED_FIXABLE_CRITICALS = 1_322
 MEASURED_FIXABLE_PACKAGES = 453
-MEASURED_NO_FIX_FINDINGS = 19_039
+MEASURED_NO_FIX_FINDINGS = 19_059
 MEASURED_NO_FIX_CRITICALS = 1_170
-MEASURED_UNKNOWN_FINDINGS = 15
+MEASURED_UNKNOWN_FINDINGS = 0
 
 MEASURED_ACTIONS = 560
-MEASURED_UNFIXABLE_ENTRIES = 359
-MEASURED_COLLAPSE_RATIO = 30.16
+MEASURED_UNFIXABLE_ENTRIES = 362
+MEASURED_COLLAPSE_RATIO = 30.15
 
 #: The row SPEC-02 was written to get out of the patch plan: 4,226 findings and
 #: 358 criticals on hosts whose apt candidate version equals the installed one.
 DEFECT_PACKAGE = "linux-oracle"
 DEFECT_VERSION = "6.17.0-1020.20"
+
+#: The row SPEC-03 was written to get out of the patch plan. This condition
+#: opens with the fixed-version prefix, so stripping that prefix first left
+#: "or equal to 1.114.4" in the target column — and, since a letter outranks
+#: every digit in the version ordering, it won the maximum for the whole group.
+GRAMMAR_DEFECT_PACKAGE = "n8n"
+GRAMMAR_DEFECT_VERSION = "1.101.2"
+GRAMMAR_DEFECT_CONDITION = "Package less than or equal to 1.114.4"
+#: The highest version the group's remaining "Package less than" conditions
+#: name, which is what the action targets once the prose is out of the running.
+GRAMMAR_DEFECT_TARGET = "2.31.5"
 
 INDEXER_URL = "https://indexer.example.test:9200"
 INDEX_PATTERN = "wazuh-states-vulnerabilities-*"

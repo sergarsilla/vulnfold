@@ -27,6 +27,12 @@ from functools import cmp_to_key
 #: with the non-digit one so that two versions' parts line up like with like.
 _PART = re.compile(r"(\D*)(\d*)")
 
+#: A version opens with a digit. A Debian epoch such as ``0:2.52.3`` does too,
+#: so the epochs in the measured data pass unchanged. Prose reaching this module
+#: means a condition form the mapping does not model was parsed as if it named a
+#: version (SPEC-03 section 3).
+_VERSION_START = re.compile(r"[0-9]")
+
 #: Sort value of a tilde, and of the end of a string. Every other character
 #: keeps its code point, which is positive, so both sort below all of them and
 #: the tilde sorts below the end of the string.
@@ -48,8 +54,9 @@ def max_target_version(candidates: list[str]) -> str:
         deterministic.
 
     Raises:
-        ValueError: ``candidates`` is empty. Only fixable buckets reach here and
-            every one of them carries a target version, so an empty list is a
+        ValueError: ``candidates`` is empty, or one of them does not open like a
+            version. Only fixable buckets reach here and every one of them
+            carries a target version parsed out of a condition, so either is a
             defect in the caller rather than a runtime condition.
     """
     if not candidates:
@@ -58,6 +65,8 @@ def max_target_version(candidates: list[str]) -> str:
             "findings that name a fixed version become remediation actions, so "
             "this list is never empty in a correct call."
         )
+    for candidate in candidates:
+        _reject_non_version(candidate)
     ordering = cmp_to_key(compare_versions)
     # The string itself breaks ties: two spellings of one version order equal,
     # and max() would otherwise return whichever the caller listed first.
@@ -88,6 +97,25 @@ def compare_versions(left: str, right: str) -> int:
         if left_number != right_number:
             return left_number - right_number
     return 0
+
+
+def _reject_non_version(candidate: str) -> None:
+    """Refuse a candidate that cannot be a version string.
+
+    The ordering here compares non-digit runs by code point, where a letter
+    outranks every digit. So a condition form the mapping failed to model does
+    not merely sort oddly: it wins its group's maximum and prints prose into the
+    plan's version column. Failing at the point of damage keeps the next
+    unmodelled form loud (SPEC-03 section 3).
+    """
+    if _VERSION_START.match(candidate.strip()) is None:
+        raise ValueError(
+            f"{candidate!r} is not a version string: a version opens with a "
+            f"digit or a Debian epoch. It reached the target-version ordering, "
+            f"which means a scanner condition was parsed as naming a fixed "
+            f"version when it does not. Extend the fixability vocabulary in "
+            f"mappings/ to cover the condition form that produced it."
+        )
 
 
 def _split(version: str) -> list[tuple[str, int]]:
