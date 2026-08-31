@@ -176,8 +176,14 @@ severity_order: ["Critical", "High", "Medium", "Low"]
 severity_unknown: ["-", "None", ""]
 fixability:
   no_fix_values: ["Package default status"]
+  no_fix_prefixes: ["Package equal to ", "Package less than or equal to "]
   fixed_version_prefix: "Package less than "
 ```
+
+The three vocabularies are matched in that order, and the order matters:
+`fixed_version_prefix` is itself a prefix of a `no_fix_prefixes` entry, so
+testing it first would read `Package less than or equal to 1.114.4` as fixable
+and hand `or equal to 1.114.4` on as a target version.
 
 The fixability markers are vocabulary, not code: a Wazuh release that rewords
 them is a YAML change.
