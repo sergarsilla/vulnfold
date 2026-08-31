@@ -44,6 +44,12 @@ UNKNOWN_VERSION = "unknown"
 #: Key used in ``severity_breakdown`` for findings carrying no usable severity.
 UNKNOWN_SEVERITY = "unknown"
 
+#: Mode given to a written evidence file. The atomic write creates its
+#: temporary file 0600; an evidence record holds no secret and is read under
+#: audit by whoever holds the host, so that private mode must not survive onto
+#: the artefact.
+EVIDENCE_FILE_MODE = 0o644
+
 #: Distinct condition strings quoted when the mapping recognises none of them.
 #: Enough to see the pattern, few enough to keep the warning readable.
 UNKNOWN_FIXABILITY_EXAMPLES = 3

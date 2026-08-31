@@ -156,6 +156,41 @@ contract documented in [docs/evidence-schema.md](docs/evidence-schema.md).
 Wazuh ships self-signed certificates by default. `--insecure` disables
 certificate verification and says so on stderr; verification is on otherwise.
 
+## Scheduled scanning
+
+A systemd timer runs one scan a day from `/opt/vulnfold` and writes
+`evidence/scan-YYYY-MM-DD.json` into the directory the deployment hook creates,
+owned by the image's non-root uid. There is no daemon: vulnfold is a command
+that exits, so the scheduler is the operating system's, and a failed run
+reports itself through `systemctl status` and `journalctl` — deliberately the
+only notification channel.
+
+```bash
+install -o root -g root -m 755 deploy/vulnfold-scan.sh /usr/local/sbin/vulnfold-scan
+install -o root -g root -m 644 deploy/vulnfold-scan.service \
+        deploy/vulnfold-scan.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable --now vulnfold-scan.timer
+```
+
+The timer is `OnCalendar=daily` with an hour of randomised delay, because the
+underlying data moves on the vendor feeds' schedule and not faster, and
+`Persistent=true`, so a host that was off still produces the day's evidence
+when it comes back. A second run on the same day overwrites: the file is that
+day's state, not an append log.
+
+**Evidence is kept for 90 days.** Older files are deleted after a successful
+scan and never before one, so a failed scan cannot delete history. Nothing is
+compressed or moved into subdirectories — the one moment the file matters is
+when someone opens it under audit pressure.
+
+A failed scan leaves no file at all, not even an empty one. The record is built
+before anything is written, and the write goes through a temporary file in the
+same directory that is then renamed onto the target, so a failure partway
+through — a full disk is the realistic one — cannot leave a truncated
+`scan-<date>.json` behind. An empty file carrying the day's name would read as
+"we scanned and found nothing".
+
 ## Field mappings
 
 Every schema dependency lives in `mappings/`. Supporting another Wazuh release

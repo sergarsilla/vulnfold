@@ -2,20 +2,31 @@
 
 from __future__ import annotations
 
+import errno
 import json
+import os
 import shutil
+import stat
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+import httpx
 import pytest
 import respx
-from conftest import INDEXER_URL, MEASURED_ACTIONS, FakeIndexer
+from conftest import (
+    INDEXER_URL,
+    MEASURED_ACTIONS,
+    MEASURED_FINDINGS,
+    MEASURED_UNFIXABLE_ENTRIES,
+    FakeIndexer,
+)
 from typer.testing import CliRunner
 
 from vulnfold.cli import app
 from vulnfold.config import DEFAULT_PASSWORD_ENV_VAR
+from vulnfold.models import EvidenceRecord
 
 runner = CliRunner()
 
@@ -471,6 +482,89 @@ def test_an_unwritable_evidence_path_exits_nonzero(
 
     assert result.exit_code == 1
     assert "evidence file" in result.stderr
+
+
+@respx.mock
+def test_the_written_evidence_file_validates_against_the_schema(
+    fake_indexer: FakeIndexer,
+    indexer_password: str,
+    tmp_path: Path,
+) -> None:
+    """SPEC-04 section 5, criterion 3: the file reads back as a complete record."""
+    respx.route().mock(side_effect=fake_indexer)
+    destination = tmp_path / "scan-2026-08-31.json"
+
+    runner.invoke(app, [*BASE_ARGUMENTS, "--evidence", str(destination)], env=WIDE_TERMINAL)
+    record = EvidenceRecord.model_validate_json(destination.read_text(encoding="utf-8"))
+
+    assert record.total_findings == MEASURED_FINDINGS
+    assert len(record.actions) == MEASURED_ACTIONS
+    assert len(record.unfixable) == MEASURED_UNFIXABLE_ENTRIES
+
+
+@respx.mock
+def test_a_failed_scan_writes_no_evidence_file_at_all(
+    indexer_password: str,
+    tmp_path: Path,
+) -> None:
+    """SPEC-04 section 5, criterion 4, with the cheapest failure: bad credentials."""
+    respx.route().mock(return_value=httpx.Response(401, json={}))
+    destination = tmp_path / "scan-2026-08-31.json"
+
+    result = runner.invoke(
+        app, [*BASE_ARGUMENTS, "--evidence", str(destination)], env=WIDE_TERMINAL
+    )
+
+    assert result.exit_code == 1
+    assert not destination.exists()
+    assert list(tmp_path.iterdir()) == []
+
+
+@respx.mock
+def test_a_write_that_fails_partway_leaves_no_partial_evidence_file(
+    fake_indexer: FakeIndexer,
+    indexer_password: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """SPEC-04 section 4: what the atomic rename buys.
+
+    A full disk is the realistic partway failure, and on a filesystem that
+    allocates lazily it surfaces when the buffer reaches the disk rather than
+    at the write() call.
+    """
+    respx.route().mock(side_effect=fake_indexer)
+    yesterday = tmp_path / "scan-2026-08-30.json"
+    yesterday.write_text('{"schema_version": "2"}', encoding="utf-8")
+    today = tmp_path / "scan-2026-08-31.json"
+
+    def out_of_space(descriptor: int) -> None:
+        raise OSError(errno.ENOSPC, "No space left on device")
+
+    monkeypatch.setattr(os, "fsync", out_of_space)
+    result = runner.invoke(app, [*BASE_ARGUMENTS, "--evidence", str(today)], env=WIDE_TERMINAL)
+
+    assert result.exit_code == 1
+    assert "No space left on device" in result.stderr
+    assert not today.exists()
+    assert yesterday.read_text(encoding="utf-8") == '{"schema_version": "2"}'
+    assert list(tmp_path.iterdir()) == [yesterday]
+
+
+@respx.mock
+def test_the_evidence_file_stays_readable_to_an_auditor(
+    fake_indexer: FakeIndexer,
+    indexer_password: str,
+    tmp_path: Path,
+) -> None:
+    """The temporary file the atomic write goes through is private; this is not."""
+    respx.route().mock(side_effect=fake_indexer)
+    destination = tmp_path / "evidence.json"
+
+    runner.invoke(app, [*BASE_ARGUMENTS, "--evidence", str(destination)], env=WIDE_TERMINAL)
+
+    assert destination.stat().st_mode & stat.S_IRGRP
+    assert destination.stat().st_mode & stat.S_IROTH
 
 
 @respx.mock
