@@ -1,0 +1,31 @@
+# One scan, then exit. vulnfold is a command, not a service, so there is no
+# Restart=, no health check and nothing resident: a resident process would be
+# permanent maintenance surface for work that takes about a second a day.
+#
+# Install manually as root; the copy in the source tree is inert until then.
+# The install and enable sequence is in deploy/vulnfold-scan.sh.
+
+[Unit]
+Description=vulnfold vulnerability scan and evidence retention
+# Ordering only, deliberately without Wants=: if the Docker daemon is down the
+# scan must fail and say so in the journal, not start a daemon the operator
+# stopped.
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/vulnfold-scan
+
+# The unit runs as root, so directives that cost nothing here are worth having.
+# None had to be dropped for Docker socket access: connecting to a unix socket
+# is exempt from the read-only check the kernel applies to regular files, so
+# /run/docker.sock stays usable under ProtectSystem=strict. ProtectHome=true
+# hides /root/.docker, which the unit does not need — the deployment hook
+# builds the image locally, so no registry credential is ever read.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+# Retention deletes evidence files from here; the scan itself writes through
+# the Docker daemon, which is outside this unit's namespace.
+ReadWritePaths=/opt/vulnfold

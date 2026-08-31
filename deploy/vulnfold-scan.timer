@@ -1,0 +1,17 @@
+# Schedules deploy/vulnfold-scan.service. Install manually as root; the copy in
+# the source tree is inert until then. See deploy/vulnfold-scan.sh.
+
+[Unit]
+Description=Daily vulnfold vulnerability scan
+
+[Timer]
+# Daily because the underlying data changes on the vendor feeds' schedule, not
+# faster. Scanning more often would produce more files, not more information.
+OnCalendar=daily
+RandomizedDelaySec=1h
+# A host that was off still produces the day's evidence when it comes back. An
+# audit trail with silent holes is worth less than one without.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -20,6 +20,10 @@
 #                          loopback; leave unset for a reachable remote indexer
 #   VULNFOLD_EXTRA_ARGS    extra CLI flags, e.g. --insecure for a self-signed
 #                          indexer certificate
+#
+# VULNFOLD_EVIDENCE_ARG is not a .env key: the scheduled scan exports it with
+# the day's file name, because arguments given to `docker compose run` replace
+# the service command below rather than adding to it.
 
 services:
   scan:
@@ -51,4 +55,5 @@ services:
       --url=${VULNFOLD_URL:-}
       --user=${VULNFOLD_USER:-}
       --format=markdown
+      ${VULNFOLD_EVIDENCE_ARG:-}
       ${VULNFOLD_EXTRA_ARGS:-}
