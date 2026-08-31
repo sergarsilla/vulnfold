@@ -118,8 +118,17 @@ damage instead of printing prose into a version column.
    classifies as `NO_FIX`.
 6. `max_target_version` raises `ValueError` on a non-version candidate, with the
    offending value in the message.
-7. The n8n action's target becomes `1.114.4`, sourced from its remaining
-   `Package less than` findings.
+7. The n8n action's target is sourced from its remaining `Package less than`
+   findings.
+
+> **Criterion 7 corrected 2026-08-31.** This originally demanded the target
+> become `1.114.4`. That was wrong, and it was wrong because it was read off the
+> corrupted row rather than from the data. `n8n 1.101.2` carries 52 distinct
+> conditions: 51 name a fixed version and one is the inclusive bound. The
+> highest of the 51 is **`2.31.5`**, which is what the implementation correctly
+> produces. Verified independently against the indexer. A criterion asserting a
+> specific value must be derived from the source data, never from the output
+> being fixed.
 
 ---
 
