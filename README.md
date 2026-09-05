@@ -231,6 +231,27 @@ Pass a file directly with `--mapping ./mappings/wazuh-5.x.yaml`.
 all). They are counted in `unknown_severity_count`, never folded into Low, and
 never hidden by `--min-severity`.
 
+## What is not proven
+
+One action touches **1.23 hosts** on average in the deployment this was measured
+against. That fleet compresses through CVE volume per package, not through
+duplication across machines: the rows spanning five hosts carry twenty-two
+findings, and the row carrying three thousand nine hundred spans one.
+
+A homogeneous, centrally managed fleet running one kernel version everywhere
+should behave differently, and that has not been tested. If you run vulnfold
+against such a fleet, the `hosts_per_action` figure in the header is the number
+worth reporting back — it is the one measurement this project cannot make for
+itself.
+
+## Reporting a security issue
+
+Privately, through the Security tab. See [SECURITY.md](SECURITY.md).
+
+## Changes
+
+See [CHANGELOG.md](CHANGELOG.md).
+
 ## Licence
 
 Apache 2.0. See `LICENSE`.
