@@ -16,10 +16,10 @@ htmlcov/
 .env
 *.log
 
-# tests/ is deliberately NOT excluded: the test stage runs the suite, and it is
-# the only place the suite runs in CI.
+# tests/ and deploy/ are deliberately NOT excluded: the test stage runs the
+# suite, which executes the deployment scripts, and the runtime stage copies
+# neither, so nothing here reaches the published image.
 docs/
-deploy/
 CONTEXT.md
 CLAUDE.md
 Dockerfile

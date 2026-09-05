@@ -26,7 +26,10 @@ RUN python -m build --wheel --no-isolation --outdir /dist
 # dependency-group from pyproject.toml, so the pins are declared in one place.
 FROM build AS test
 RUN pip install --no-cache-dir uv==0.9.28
+# deploy/ is here because the suite executes those scripts, not because the
+# image needs them: the runtime stage below copies only the wheel.
 COPY tests ./tests
+COPY deploy ./deploy
 RUN uv run --group dev --python "$(command -v python)" pytest -q \
  && uv run --group dev --python "$(command -v python)" mypy
 
