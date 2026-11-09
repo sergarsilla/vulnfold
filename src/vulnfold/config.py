@@ -75,6 +75,16 @@ DEFAULT_METRICS_ROWS = 50
 #: Agents named in one ``hosts`` label before the rest are only counted.
 METRICS_HOSTS_IN_LABEL = 10
 
+#: An agent last seen longer ago than this is stale and leaves the plan.
+#: A week tolerates laptops switched off over a holiday weekend (SPEC-06).
+DEFAULT_STALE_AFTER_DAYS = 7
+#: Monitoring snapshots this close to the newest one define who is registered.
+#: Wider than any sane snapshot interval, so a slow schedule loses no agent.
+LIVENESS_WINDOW_HOURS = 24
+#: Distinct state indices one agent can be spread over before the inventory
+#: aggregation would truncate.
+INDEX_TERMS_SIZE = 100
+
 
 @dataclass(frozen=True)
 class ScanConfig:

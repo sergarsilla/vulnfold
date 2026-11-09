@@ -68,7 +68,12 @@ Options:
                          [default: criticals]
   --group-kernels        Merge each kernel package's versions.
   --evidence PATH        Write the complete run to this JSON file.
+  --metrics PATH         Write the run as a Prometheus textfile.
+  --metrics-rows INTEGER Actions and register rows in --metrics.  [default: 50]
   --min-severity TEXT    List only rows relevant at this severity or above.
+  --stale-after-days INTEGER
+                         Leave agents unseen for longer out of the plan.
+                         [default: 7]
   --no-unfixable         Suppress the register of findings with no fix.
   --timeout FLOAT        Per-request timeout in seconds.  [default: 30.0]
   --insecure             Disable TLS certificate verification.
@@ -110,6 +115,37 @@ hard as one package repeated across a thousand hosts, and the remediation work
 is nothing alike. `1.24 hosts carrying it` says this fleet collapses through CVE
 volume, not through fleet duplication. Reading the ratio alone would suggest the
 opposite.
+
+## Agents that stopped reporting
+
+The state index keeps the last known state of every agent for as long as the
+index exists: a laptop switched off in March, an agent deleted and registered
+again under a new id, or a whole index left behind when the manager was
+renamed all keep contributing findings. On the deployment this was measured
+against, 86% of the "fixable criticals" came from such agents, and every
+machine actually running carried none.
+
+So the plan covers agents seen in the last `--stale-after-days` days (7 by
+default), read from the monitoring index the Wazuh dashboard writes
+(`wazuh-monitoring-*`). Everything else is listed apart, with its last-seen
+date:
+
+```
+Plan covers 9 of 18 agents: those seen in the last 7 days.
+Whole fleet: 2,251 fixable criticals, 2,037 of them on 9 agents that stopped reporting or no longer exist.
+```
+
+When an agent's findings sit in more than one state index, only the index
+holding its newest detection counts; the older copies are excluded and a
+warning names the index. If the monitoring index cannot be read, every agent
+counts as active, a warning says so, and the plan is unscoped as before.
+
+The evidence record keeps the plan of every agent and adds `scope`, with each
+agent's status, so the scoping never removes anything an auditor reads.
+
+The account vulnfold uses therefore needs read access to two index patterns:
+`wazuh-states-vulnerabilities-*` and `wazuh-monitoring-*`. Read access is all
+it needs: never give it an administrator account.
 
 ## Findings with no vendor fix
 

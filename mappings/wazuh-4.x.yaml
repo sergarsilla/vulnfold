@@ -12,6 +12,15 @@ fields:
   agent_id: "agent.id"
   agent_name: "agent.name"
   scanner_condition: "vulnerability.scanner.condition"
+  detected_at: "vulnerability.detected_at"
+# Per-agent liveness, written by the Wazuh dashboard every few minutes. Read
+# to tell running machines from ones that stopped reporting (SPEC-06).
+liveness:
+  index_pattern: "wazuh-monitoring-*"
+  agent_id: "id"
+  agent_name: "name"
+  last_seen: "lastKeepAlive"
+  snapshot_time: "timestamp"
 severity_order: ["Critical", "High", "Medium", "Low"]
 severity_unknown: ["-", "None", ""]
 

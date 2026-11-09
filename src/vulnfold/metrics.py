@@ -13,6 +13,7 @@ from datetime import datetime
 
 from vulnfold.config import METRICS_HOSTS_IN_LABEL
 from vulnfold.models import PatchPlan, RemediationAction, UnfixableEntry
+from vulnfold.scope import IN_PLAN_STATUSES
 
 METRIC_PREFIX = "vulnfold_"
 
@@ -108,6 +109,7 @@ def render_prometheus(plan: PatchPlan, *, generated_at: datetime, rows: int) -> 
         ("warnings", "Warnings raised by the scan, by code.",
          [({"code": code}, count) for code, count in sorted(warning_counts.items())]),
     ]
+    families += _scope_families(plan)
 
     lines: list[str] = []
     for name, help_text, samples in families:
@@ -117,6 +119,42 @@ def render_prometheus(plan: PatchPlan, *, generated_at: datetime, rows: int) -> 
         lines.extend(f"{metric}{_format_labels(labels)} {_format_value(value)}"
                      for labels, value in samples)
     return "\n".join(lines) + "\n"
+
+
+def _scope_families(plan: PatchPlan) -> list[tuple[str, str, list[Sample]]]:
+    """Fleet-wide counters and the agents the plan leaves out (SPEC-06)."""
+    scope = plan.scope
+    if scope is None:
+        return []
+    fleet = scope.fleet
+    statuses = Counter(agent.status.value for agent in scope.agents)
+    excluded = [agent for agent in scope.agents if agent.status not in IN_PLAN_STATUSES]
+    labels = [
+        {
+            "agent": f"{agent.name} ({agent.agent_id})" if agent.name else agent.agent_id,
+            "status": agent.status.value,
+            "last_seen": agent.last_seen.date().isoformat() if agent.last_seen else "never",
+        }
+        for agent in excluded
+    ]
+    return [
+        ("fleet_findings", "Findings by fixability class across every agent, in scope or not.", [
+            ({"class": "fixable"}, fleet.fixable_findings),
+            ({"class": "no_fix"}, fleet.no_fix_findings),
+        ]),
+        ("fleet_criticals", "Critical findings by fixability class across every agent.", [
+            ({"class": "fixable"}, fleet.fixable_criticals),
+            ({"class": "no_fix"}, fleet.no_fix_criticals),
+        ]),
+        ("agents_by_status", "Agents with findings, by liveness status.",
+         [({"status": status}, count) for status, count in sorted(statuses.items())]),
+        ("excluded_agent_findings", "Findings on an agent left out of the plan.",
+         _rows(labels, (agent.findings for agent in excluded))),
+        ("excluded_agent_fixable_findings", "Fixable findings on an agent left out of the plan.",
+         _rows(labels, (agent.fixable_findings for agent in excluded))),
+        ("superseded_findings", "Findings excluded as stale copies in a superseded state index.",
+         [({}, scope.superseded_findings)]),
+    ]
 
 
 def _action_labels(rank: int, action: RemediationAction, agent_names: dict[str, str]) -> Labels:

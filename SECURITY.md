@@ -58,6 +58,19 @@ docker run --rm --read-only --cap-drop=ALL --security-opt=no-new-privileges:true
   -e VULNFOLD_PASSWORD vulnfold:latest scan --url https://indexer:9200 --user readonly
 ```
 
-Give the indexer account read access to the vulnerability state index and
-nothing else. vulnfold never needs more, and an account that can do more is a
-liability that this tool cannot protect you from.
+Give the indexer account read access to the vulnerability state index and the
+monitoring index, and nothing else. vulnfold never needs more, and an account
+that can do more is a liability that this tool cannot protect you from. With
+the OpenSearch security plugin, as Wazuh ships it, that is one role:
+
+```json
+{
+  "index_permissions": [{
+    "index_patterns": ["wazuh-states-vulnerabilities-*", "wazuh-monitoring-*"],
+    "allowed_actions": ["read", "indices:admin/get"]
+  }]
+}
+```
+
+`indices:admin/get` lets the start-up check confirm the index exists before the
+scan relies on it.

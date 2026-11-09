@@ -17,6 +17,7 @@ Current version: **`"2"`**.
 | `"1"` | Initial shape (SPEC-01). |
 | `"2"` | Added the fixability partition: `unfixable`, the five class counters, `total_criticals` and `fixable_distinct_packages` (SPEC-02). |
 | `"2"` | Added `agent_names` (SPEC-05). An addition, so the version is unchanged; a record without it reads as an empty object. |
+| `"2"` | Added `scope` (SPEC-06). Copies of an agent's findings in a superseded state index are no longer counted anywhere, so totals can be lower than a record from before SPEC-06 for the same fleet; they no longer count one finding twice. |
 
 **A version-1 record carries no fixability information.** Its `collapse_ratio`,
 `collapse_sources` and coverage curves are computed over the undifferentiated
@@ -83,6 +84,7 @@ so the on-screen output can be reproduced.
 | `coverage_by_criticals` | array | Cumulative curve under criticals-first ordering. |
 | `warnings` | array | Conditions that degrade the plan without invalidating it. |
 | `agent_names` | object | Agent id to agent name, for every agent whose name the index carries. Ids missing from it have no recorded name. |
+| `scope` | object \| null | Which agents were current (SPEC-06): `stale_after_days`, `liveness_available`, `liveness_snapshot_time`, `active` and `fleet` totals (`agents`, `findings`, `criticals`, `fixable_findings`, `fixable_criticals`, `no_fix_findings`, `no_fix_criticals`), `agents[]` (`agent_id`, `name`, `status`: `active`/`stale`/`unregistered`/`unknown`, `last_seen`, `findings`, `fixable_findings`), `superseded_findings`, `superseded_indices`. `actions` and `unfixable` in this file still cover every agent. |
 
 The three class counters partition the fleet:
 `fixable_findings + no_fix_findings + unknown_fixability_findings ==

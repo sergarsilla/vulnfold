@@ -193,17 +193,32 @@ class FakeIndexer:
         pages: list[dict[str, Any]],
         *,
         total_findings: int = MEASURED_FINDINGS,
+        inventory: dict[str, Any] | None = None,
+        liveness: tuple[dict[str, Any], dict[str, Any]] | None = None,
     ) -> None:
         self.pages = pages
         self.total_findings = total_findings
+        self.inventory = inventory or {"aggregations": {"inventory": {"buckets": []}}}
+        # (latest-snapshot response, liveness response); None answers 404 like
+        # a deployment without the monitoring index.
+        self.liveness = liveness
         self.requests: list[httpx.Request] = []
 
     def __call__(self, request: httpx.Request) -> httpx.Response:
         self.requests.append(request)
         endpoint = request.url.path.rsplit("/", 1)[-1]
+        if "wazuh-monitoring" in request.url.path:
+            if self.liveness is None:
+                return httpx.Response(404, json={"error": "index_not_found_exception"})
+            body = json.loads(request.content)
+            latest, agents = self.liveness
+            return httpx.Response(200, json=agents if "query" in body else latest)
         if endpoint == "_count":
             return httpx.Response(200, json={"count": self.total_findings})
         if endpoint == "_search":
+            body = json.loads(request.content)
+            if "inventory" in body.get("aggs", {}):
+                return httpx.Response(200, json=self.inventory)
             return httpx.Response(200, json=self._page_for(request))
         return httpx.Response(200, json={INDEX_PATTERN.replace("*", "2026.08.29"): {}})
 
@@ -211,9 +226,14 @@ class FakeIndexer:
     def search_bodies(self) -> list[dict[str, Any]]:
         """Every ``_search`` body the client sent, in order."""
         return [
-            json.loads(request.content)
-            for request in self.requests
-            if request.url.path.endswith("_search")
+            body
+            for body in (
+                json.loads(request.content)
+                for request in self.requests
+                if request.url.path.endswith("_search")
+                and "wazuh-monitoring" not in request.url.path
+            )
+            if "inventory" not in body.get("aggs", {})
         ]
 
     def _page_for(self, request: httpx.Request) -> dict[str, Any]:
