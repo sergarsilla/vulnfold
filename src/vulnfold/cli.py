@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import tempfile
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated
@@ -18,15 +19,31 @@ from vulnfold.config import (
     DEFAULT_MAPPING_NAME,
     DEFAULT_METRICS_ROWS,
     DEFAULT_PASSWORD_ENV_VAR,
+    DEFAULT_STALE_AFTER_DAYS,
     DEFAULT_TIMEOUT_SECONDS,
     DEFAULT_TOP_ACTIONS,
     EVIDENCE_FILE_MODE,
     ScanConfig,
 )
 from vulnfold.errors import ConfigurationError, VulnfoldError
-from vulnfold.mapping import load_mapping
+from vulnfold.mapping import build_document_filter, load_mapping
 from vulnfold.metrics import render_prometheus
-from vulnfold.models import FieldMapping, IndexerSnapshot, PatchPlan, RankBy
+from vulnfold.models import (
+    AgentStatus,
+    FieldMapping,
+    IndexerSnapshot,
+    LivenessSnapshot,
+    PatchPlan,
+    RankBy,
+)
+from vulnfold.scope import (
+    agents_in_plan,
+    build_fleet_scope,
+    classify_agents,
+    count_superseded_findings,
+    find_superseded_indices,
+    scope_warnings,
+)
 from vulnfold.render import (
     OutputFormat,
     build_evidence_record,
@@ -100,6 +117,12 @@ def scan(
         str | None,
         typer.Option("--min-severity", help="List only rows relevant at this severity or above."),
     ] = None,
+    stale_after_days: Annotated[
+        int,
+        typer.Option(
+            "--stale-after-days", min=1, help="Leave agents unseen for longer out of the plan."
+        ),
+    ] = DEFAULT_STALE_AFTER_DAYS,
     no_unfixable: Annotated[
         bool,
         typer.Option("--no-unfixable", help="Suppress the register of findings with no fix."),
@@ -114,7 +137,8 @@ def scan(
     """Read a Wazuh indexer and print the patch plan it implies."""
     try:
         mapping = load_mapping(mapping_name)
-        snapshot = _read_fleet(
+        now = datetime.now(timezone.utc)
+        fleet_read = _read_fleet(
             url=url,
             user=user,
             password=_resolve_password(password_env, password),
@@ -122,39 +146,80 @@ def scan(
             mapping=mapping,
             timeout=timeout,
             insecure=insecure,
+            now=now,
+            stale_after_days=stale_after_days,
         )
-        plan = build_patch_plan(
-            snapshot,
-            mapping,
-            rank_by=rank_by,
-            group_kernels=group_kernels,
-            min_severity=min_severity,
+        active_complete = build_patch_plan(
+            fleet_read.active, mapping, rank_by=rank_by, group_kernels=group_kernels
         )
-        if evidence is not None:
-            _write_evidence(
-                snapshot,
+        fleet_complete = (
+            active_complete
+            if fleet_read.fleet is fleet_read.active
+            else build_patch_plan(
+                fleet_read.fleet, mapping, rank_by=rank_by, group_kernels=group_kernels
+            )
+        )
+        scope = build_fleet_scope(
+            active_plan=active_complete,
+            fleet_plan=fleet_complete,
+            fleet=fleet_read.fleet,
+            statuses=fleet_read.statuses,
+            liveness=fleet_read.liveness,
+            stale_after_days=stale_after_days,
+            superseded_findings=fleet_read.superseded_findings,
+            superseded_indices=fleet_read.superseded_indices,
+        )
+        extra_warnings = scope_warnings(
+            liveness_configured=mapping.liveness is not None,
+            liveness=fleet_read.liveness,
+            superseded_findings=fleet_read.superseded_findings,
+            superseded_indices=fleet_read.superseded_indices,
+        )
+
+        def scoped(source: PatchPlan) -> PatchPlan:
+            return source.model_copy(
+                update={"scope": scope, "warnings": [*source.warnings, *extra_warnings]}
+            )
+
+        plan = scoped(
+            build_patch_plan(
+                fleet_read.active,
                 mapping,
-                path=evidence,
-                url=url,
-                index_pattern=index_pattern or mapping.index_pattern,
                 rank_by=rank_by,
                 group_kernels=group_kernels,
                 min_severity=min_severity,
             )
-        if metrics is not None:
-            _write_metrics(
-                snapshot,
+        )
+        if evidence is not None:
+            _write_evidence(
+                scoped(fleet_complete),
                 mapping,
-                path=metrics,
-                rank_by=rank_by,
+                path=evidence,
+                url=url,
+                index_pattern=index_pattern or mapping.index_pattern,
                 group_kernels=group_kernels,
-                rows=metrics_rows,
+                min_severity=min_severity,
+                generated_at=now,
             )
+        if metrics is not None:
+            _write_metrics(scoped(active_complete), path=metrics, rows=metrics_rows, generated_at=now)
     except VulnfoldError as exc:
         _stderr.print(f"[red]error[/red] {exc}")
         raise typer.Exit(code=1) from exc
 
     _write(plan, output_format, top, show_unfixable=not no_unfixable)
+
+
+@dataclass(frozen=True)
+class FleetRead:
+    """What one run read: snapshots in and out of scope, and why (SPEC-06)."""
+
+    active: IndexerSnapshot
+    fleet: IndexerSnapshot
+    statuses: dict[str, AgentStatus]
+    liveness: LivenessSnapshot | None
+    superseded_findings: int
+    superseded_indices: list[str]
 
 
 def _read_fleet(
@@ -166,8 +231,14 @@ def _read_fleet(
     mapping: FieldMapping,
     timeout: float,
     insecure: bool,
-) -> IndexerSnapshot:
-    """Open a read-only connection and take one snapshot of the fleet."""
+    now: datetime,
+    stale_after_days: int,
+) -> FleetRead:
+    """Open a read-only connection and read the fleet, scoped to current agents.
+
+    The scoped snapshot is only fetched again when some agent is out of scope;
+    otherwise both views are the same object.
+    """
     if insecure:
         _stderr.print(
             "[yellow]warning[/yellow] TLS certificate verification is disabled. "
@@ -185,29 +256,52 @@ def _read_fleet(
 
     with IndexerClient(config, mapping) as client:
         client.verify_readable()
-        return client.fetch_snapshot()
+        inventory = client.fetch_inventory()
+        liveness = client.fetch_liveness()
+        superseded = find_superseded_indices(inventory)
+        statuses = classify_agents(
+            inventory.findings, liveness, now=now, stale_after_days=stale_after_days
+        )
+        fleet = client.fetch_snapshot(
+            build_document_filter(mapping, superseded=superseded, agents=None)
+        )
+        in_plan = agents_in_plan(statuses)
+        active = (
+            fleet
+            if len(in_plan) == len(statuses)
+            else client.fetch_snapshot(
+                build_document_filter(mapping, superseded=superseded, agents=in_plan)
+            )
+        )
+    return FleetRead(
+        active=active,
+        fleet=fleet,
+        statuses=statuses,
+        liveness=liveness,
+        superseded_findings=count_superseded_findings(inventory, superseded),
+        superseded_indices=sorted(superseded),
+    )
 
 
 def _write_evidence(
-    snapshot: IndexerSnapshot,
+    complete: PatchPlan,
     mapping: FieldMapping,
     *,
     path: Path,
     url: str,
     index_pattern: str,
-    rank_by: RankBy,
     group_kernels: bool,
     min_severity: str | None,
+    generated_at: datetime,
 ) -> None:
     """Write the audit record for this run.
 
-    The record is built from the unfiltered plan: --min-severity chooses what
-    is listed on screen, and must never shorten an audit artefact.
+    ``complete`` is the plan of every agent, unshortened by --min-severity:
+    display choices must never shorten an audit artefact.
     """
-    complete = build_patch_plan(snapshot, mapping, rank_by=rank_by, group_kernels=group_kernels)
     record = build_evidence_record(
         complete,
-        generated_at=datetime.now(timezone.utc),
+        generated_at=generated_at,
         tool_version=__version__,
         indexer_url=url,
         index_pattern=index_pattern,
@@ -222,18 +316,9 @@ def _write_evidence(
     _stderr.print(f"evidence written to {path}")
 
 
-def _write_metrics(
-    snapshot: IndexerSnapshot,
-    mapping: FieldMapping,
-    *,
-    path: Path,
-    rank_by: RankBy,
-    group_kernels: bool,
-    rows: int,
-) -> None:
+def _write_metrics(complete: PatchPlan, *, path: Path, rows: int, generated_at: datetime) -> None:
     """Write the Prometheus textfile for this run, from the unfiltered plan."""
-    complete = build_patch_plan(snapshot, mapping, rank_by=rank_by, group_kernels=group_kernels)
-    payload = render_prometheus(complete, generated_at=datetime.now(timezone.utc), rows=rows)
+    payload = render_prometheus(complete, generated_at=generated_at, rows=rows)
     try:
         _replace_atomically(path, payload)
     except OSError as exc:

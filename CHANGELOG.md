@@ -8,6 +8,18 @@ versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Plan the agents that are reporting.** The plan, headline and dashboard
+  cover agents seen within `--stale-after-days` (default 7), read from the
+  Wazuh monitoring index. Agents that stopped reporting or no longer exist are
+  listed apart with their last-seen date; the evidence keeps every agent and
+  records each one's status (SPEC-06).
+
+### Fixed
+
+- **Findings counted twice.** Copies of an agent's findings left in a
+  superseded state index (for instance after renaming the manager) are
+  excluded, and a warning names the index.
+
 - **Prometheus export and Grafana dashboard.** `--metrics` writes a node-exporter
   textfile with the plan's totals, top actions, no-fix register and coverage
   curve; `dashboards/vulnfold.json` charts it. The scheduled scan writes it daily.

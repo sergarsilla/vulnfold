@@ -15,7 +15,14 @@ from rich.table import Table
 from rich.text import Text
 
 from vulnfold.config import UNKNOWN_SEVERITY
-from vulnfold.models import EvidenceRecord, PatchPlan, RemediationAction, UnfixableEntry
+from vulnfold.models import (
+    AgentScope,
+    EvidenceRecord,
+    PatchPlan,
+    RemediationAction,
+    UnfixableEntry,
+)
+from vulnfold.scope import IN_PLAN_STATUSES
 
 NOTHING_TO_REMEDIATE = "Nothing to remediate."
 NOTHING_UNFIXABLE = "Every finding has a published fix."
@@ -130,6 +137,37 @@ def impact_lines(plan: PatchPlan, top: int) -> list[str]:
     ]
 
 
+_EXCLUDED_COLUMNS = ("Agent", "Status", "Last seen", "Findings", "Fixable")
+NEVER_SEEN = "never"
+
+
+def excluded_agents(plan: PatchPlan) -> list[AgentScope]:
+    """Return the agents whose findings the plan leaves out, largest first."""
+    if plan.scope is None:
+        return []
+    return [agent for agent in plan.scope.agents if agent.status not in IN_PLAN_STATUSES]
+
+
+def scope_lines(plan: PatchPlan) -> list[str]:
+    """Say which agents the plan covers, when it does not cover all of them.
+
+    Returns:
+        Two lines, or none when every agent with findings is in the plan.
+    """
+    excluded = excluded_agents(plan)
+    if plan.scope is None or not excluded:
+        return []
+    scope = plan.scope
+    left_out = scope.fleet.fixable_criticals - scope.active.fixable_criticals
+    return [
+        f"Plan covers {scope.active.agents:,} of {scope.fleet.agents:,} agents: those seen "
+        f"in the last {scope.stale_after_days} days.",
+        f"Whole fleet: {scope.fleet.fixable_criticals:,} fixable criticals, {left_out:,} of "
+        f"them on {len(excluded):,} agents that stopped reporting or no longer exist.",
+        "",
+    ]
+
+
 def unfixable_heading(plan: PatchPlan) -> str:
     """Name the register and what it totals."""
     return (
@@ -196,6 +234,7 @@ def build_evidence_record(
         coverage_by_criticals=plan.coverage_by_criticals,
         warnings=plan.warnings,
         agent_names=plan.agent_names,
+        scope=plan.scope,
     )
 
 
@@ -248,6 +287,7 @@ def render_markdown(plan: PatchPlan, top: int, *, show_unfixable: bool = True) -
     """
     listed = plan.actions[:top]
     lines = ["# vulnfold patch plan", ""]
+    lines += scope_lines(plan)
     lines += [f"**{line}**" if line else "" for line in impact_lines(plan, top)]
     lines += [
         "",
@@ -276,6 +316,11 @@ def render_markdown(plan: PatchPlan, top: int, *, show_unfixable: bool = True) -
             if register
             else ["", NOTHING_UNFIXABLE]
         )
+
+    excluded = excluded_agents(plan)
+    if excluded:
+        lines += ["", "## Agents not in this plan", ""]
+        lines += _markdown_table(_EXCLUDED_COLUMNS, [_excluded_cells(agent) for agent in excluded])
 
     if plan.warnings:
         lines += ["", "## Warnings", ""]
@@ -306,7 +351,7 @@ def build_table_view(plan: PatchPlan, top: int, *, show_unfixable: bool = True) 
         then warnings.
     """
     listed = plan.actions[:top]
-    header = Text("\n".join(impact_lines(plan, top)), style="bold")
+    header = Text("\n".join([*scope_lines(plan), *impact_lines(plan, top)]), style="bold")
 
     widths = {
         "Package": max((len(action.package_name) for action in listed), default=0),
@@ -321,6 +366,12 @@ def build_table_view(plan: PatchPlan, top: int, *, show_unfixable: bool = True) 
 
     if show_unfixable:
         parts += _register_view(plan, top)
+    excluded = excluded_agents(plan)
+    if excluded:
+        excluded_table = _table(_EXCLUDED_COLUMNS, {})
+        for agent in excluded:
+            excluded_table.add_row(*_excluded_cells(agent))
+        parts += ["", Text("Agents not in this plan", style="bold"), excluded_table]
     if plan.warnings:
         parts.append("")
         parts.append(
@@ -403,6 +454,12 @@ def _entry_cells(entry: UnfixableEntry) -> list[str]:
         f"{entry.high_count:,}",
         KERNEL_MARK if entry.is_kernel else "",
     ]
+
+
+def _excluded_cells(agent: AgentScope) -> list[str]:
+    label = f"{agent.name} ({agent.agent_id})" if agent.name else agent.agent_id
+    seen = agent.last_seen.date().isoformat() if agent.last_seen else NEVER_SEEN
+    return [label, agent.status.value, seen, f"{agent.findings:,}", f"{agent.fixable_findings:,}"]
 
 
 def _share(part: int, whole: int) -> float:

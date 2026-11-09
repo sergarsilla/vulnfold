@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Final
 
@@ -18,13 +19,22 @@ import yaml
 
 from vulnfold.config import (
     AGENT_TERMS_SIZE,
+    INDEX_TERMS_SIZE,
     MAPPING_FILE_SUFFIX,
     MAPPING_SEARCH_PATHS,
     SEVERITY_TERMS_SIZE,
     UNKNOWN_VERSION,
 )
 from vulnfold.errors import AggregationError, MappingError
-from vulnfold.models import FieldMapping, Fixability, PackageBucket
+from vulnfold.models import (
+    AgentLiveness,
+    FieldMapping,
+    Fixability,
+    IndexInventory,
+    LivenessFields,
+    LivenessSnapshot,
+    PackageBucket,
+)
 
 #: Names vulnfold gives its own aggregations. These are query labels, not
 #: schema fields, so they are fixed here rather than in ``mappings/``.
@@ -38,6 +48,14 @@ TOTAL_CVES_AGG: Final = "total_cves"
 TOTAL_PACKAGES_AGG: Final = "total_packages"
 AGENT_NAMES_AGG: Final = "agent_names"
 AGENT_NAME_AGG: Final = "name"
+INVENTORY_AGG: Final = "inventory"
+INDICES_AGG: Final = "indices"
+NEWEST_AGG: Final = "newest"
+LATEST_SNAPSHOT_AGG: Final = "latest"
+LIVENESS_AGG: Final = "liveness"
+LAST_SEEN_AGG: Final = "last_seen"
+#: Built-in field naming the index a document lives in; not schema-specific.
+INDEX_FIELD: Final = "_index"
 PACKAGE_SOURCE: Final = "pkg"
 VERSION_SOURCE: Final = "ver"
 CONDITION_SOURCE: Final = "cond"
@@ -113,9 +131,186 @@ def _resolve_mapping_path(name: str, search_paths: Sequence[Path]) -> Path:
     raise MappingError(f"Mapping {name!r} not found. Looked in: {locations}")
 
 
-def build_count_query() -> dict[str, object]:
-    """Build the body that totals the findings a scan is about to collapse."""
-    return {"query": {"match_all": {}}}
+def build_count_query(query: Mapping[str, object] | None = None) -> dict[str, object]:
+    """Build the body that totals the findings a scan is about to collapse.
+
+    Args:
+        query: Document filter the scan applies, or ``None`` for every document.
+
+    Returns:
+        A request body ready to POST to ``_count``.
+    """
+    return {"query": dict(query) if query is not None else {"match_all": {}}}
+
+
+def build_document_filter(
+    mapping: FieldMapping,
+    *,
+    superseded: Mapping[str, Sequence[str]],
+    agents: Sequence[str] | None,
+) -> dict[str, object] | None:
+    """Build the query that keeps current documents of the agents in scope.
+
+    Args:
+        mapping: Field mapping in force.
+        superseded: Index name to the agents whose documents there are
+            superseded copies.
+        agents: Agents to keep, or ``None`` to keep every agent.
+
+    Returns:
+        A ``bool`` query, or ``None`` when nothing needs filtering.
+    """
+    field = mapping.fields.agent_id
+    must_not: list[object] = [
+        {"bool": {"filter": [{"term": {INDEX_FIELD: index}}, {"terms": {field: sorted(ids)}}]}}
+        for index, ids in sorted(superseded.items())
+        if ids
+    ]
+    clauses: dict[str, object] = {}
+    if must_not:
+        clauses["must_not"] = must_not
+    if agents is not None:
+        clauses["filter"] = [{"terms": {field: sorted(agents)}}]
+    return {"bool": clauses} if clauses else None
+
+
+def build_inventory_query(mapping: FieldMapping) -> dict[str, object]:
+    """Build the body listing which state indices hold each agent.
+
+    Args:
+        mapping: Field mapping in force.
+
+    Returns:
+        A request body ready to POST to ``_search``.
+    """
+    fields = mapping.fields
+    per_index: dict[str, object] = {"terms": {"field": INDEX_FIELD, "size": INDEX_TERMS_SIZE}}
+    if fields.detected_at is not None:
+        per_index["aggs"] = {NEWEST_AGG: {"max": {"field": fields.detected_at}}}
+    return {
+        "size": 0,
+        "track_total_hits": False,
+        "aggs": {
+            INVENTORY_AGG: {
+                "terms": {"field": fields.agent_id, "size": AGENT_TERMS_SIZE},
+                "aggs": {INDICES_AGG: per_index},
+            }
+        },
+    }
+
+
+def parse_inventory(response: Mapping[str, object]) -> IndexInventory:
+    """Read which indices hold each agent from an inventory response.
+
+    Args:
+        response: Decoded ``_search`` body of :func:`build_inventory_query`.
+
+    Returns:
+        Per agent, the findings and newest detection in each index.
+
+    Raises:
+        AggregationError: The response does not have the requested shape.
+    """
+    aggregations = _require_mapping(_get(response, "aggregations"), "aggregations")
+    inventory = _require_mapping(_get(aggregations, INVENTORY_AGG), INVENTORY_AGG)
+    newest: dict[str, dict[str, str | None]] = {}
+    findings: dict[str, dict[str, int]] = {}
+    for position, raw in enumerate(_require_list(_get(inventory, "buckets"), INVENTORY_AGG)):
+        path = f"{INVENTORY_AGG}.buckets[{position}]"
+        bucket = _require_mapping(raw, path)
+        agent = _key_string(_get(bucket, "key", path), f"{path}.key")
+        indices = _require_mapping(_get(bucket, INDICES_AGG, path), f"{path}.{INDICES_AGG}")
+        newest[agent] = {}
+        findings[agent] = {}
+        for index_position, raw_index in enumerate(
+            _require_list(_get(indices, "buckets"), f"{path}.{INDICES_AGG}")
+        ):
+            index_path = f"{path}.{INDICES_AGG}.buckets[{index_position}]"
+            index_bucket = _require_mapping(raw_index, index_path)
+            index = _key_string(_get(index_bucket, "key", index_path), f"{index_path}.key")
+            findings[agent][index] = _require_int(
+                _get(index_bucket, "doc_count", index_path), f"{index_path}.doc_count"
+            )
+            newest_agg = index_bucket.get(NEWEST_AGG)
+            stamp = newest_agg.get("value_as_string") if isinstance(newest_agg, Mapping) else None
+            newest[agent][index] = str(stamp) if stamp else None
+    return IndexInventory(newest_detection=newest, findings=findings)
+
+
+def build_latest_snapshot_query(liveness: LivenessFields) -> dict[str, object]:
+    """Build the body asking when the newest monitoring snapshot was taken."""
+    return {
+        "size": 0,
+        "track_total_hits": False,
+        "aggs": {LATEST_SNAPSHOT_AGG: {"max": {"field": liveness.snapshot_time}}},
+    }
+
+
+def parse_latest_snapshot(response: Mapping[str, object]) -> datetime | None:
+    """Read the newest snapshot time, or ``None`` when there is none."""
+    aggregations = response.get("aggregations")
+    latest = aggregations.get(LATEST_SNAPSHOT_AGG) if isinstance(aggregations, Mapping) else None
+    value = latest.get("value") if isinstance(latest, Mapping) else None
+    return _epoch_millis(value)
+
+
+def build_liveness_query(liveness: LivenessFields, *, since: datetime) -> dict[str, object]:
+    """Build the body listing every agent in the snapshots taken since ``since``.
+
+    Args:
+        liveness: Liveness field mapping in force.
+        since: Start of the window that defines who is registered.
+
+    Returns:
+        A request body ready to POST to ``_search``.
+    """
+    return {
+        "size": 0,
+        "track_total_hits": False,
+        "query": {"range": {liveness.snapshot_time: {"gte": since.isoformat()}}},
+        "aggs": {
+            LIVENESS_AGG: {
+                "terms": {"field": liveness.agent_id, "size": AGENT_TERMS_SIZE},
+                "aggs": {
+                    LAST_SEEN_AGG: {"max": {"field": liveness.last_seen}},
+                    AGENT_NAME_AGG: {"terms": {"field": liveness.agent_name, "size": 1}},
+                },
+            }
+        },
+    }
+
+
+def parse_liveness(response: Mapping[str, object], *, snapshot_time: datetime) -> LivenessSnapshot:
+    """Read every registered agent and when it was last seen.
+
+    Malformed entries are skipped rather than failing the scan: liveness only
+    scopes the plan, and a missing agent is reported as unregistered.
+    """
+    agents: dict[str, AgentLiveness] = {}
+    aggregations = response.get("aggregations")
+    liveness = aggregations.get(LIVENESS_AGG) if isinstance(aggregations, Mapping) else None
+    buckets = liveness.get("buckets") if isinstance(liveness, Mapping) else None
+    for raw in buckets if isinstance(buckets, list) else []:
+        if not isinstance(raw, Mapping) or raw.get("key") is None:
+            continue
+        agent = str(raw["key"])
+        last_seen_agg = raw.get(LAST_SEEN_AGG)
+        last_seen = _epoch_millis(
+            last_seen_agg.get("value") if isinstance(last_seen_agg, Mapping) else None
+        )
+        name_agg = raw.get(AGENT_NAME_AGG)
+        name_buckets = name_agg.get("buckets") if isinstance(name_agg, Mapping) else None
+        name = None
+        if isinstance(name_buckets, list) and name_buckets and isinstance(name_buckets[0], Mapping):
+            name = str(name_buckets[0].get("key")) or None
+        agents[agent] = AgentLiveness(agent_id=agent, name=name, last_seen=last_seen)
+    return LivenessSnapshot(snapshot_time=snapshot_time, agents=agents)
+
+
+def _epoch_millis(value: object) -> datetime | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return datetime.fromtimestamp(value / 1000, tz=timezone.utc)
 
 
 def build_composite_query(
@@ -123,6 +318,7 @@ def build_composite_query(
     *,
     page_size: int,
     after_key: Mapping[str, str | None] | None = None,
+    query: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Build one page of the ``(package, version, condition)`` composite aggregation.
 
@@ -130,6 +326,7 @@ def build_composite_query(
         mapping: Field mapping that supplies every field name in the body.
         page_size: Buckets requested for this page.
         after_key: Cursor returned by the previous page, or ``None`` to start.
+        query: Document filter to apply, or ``None`` for every document.
 
     Returns:
         A request body ready to POST to ``_search``.
@@ -174,7 +371,10 @@ def build_composite_query(
             "aggs": {AGENT_NAME_AGG: {"terms": {"field": fields.agent_name, "size": 1}}},
         }
 
-    return {"size": 0, "track_total_hits": False, "aggs": aggregations}
+    body: dict[str, object] = {"size": 0, "track_total_hits": False, "aggs": aggregations}
+    if query is not None:
+        body["query"] = dict(query)
+    return body
 
 
 def parse_totals(response: Mapping[str, object]) -> SnapshotTotals:

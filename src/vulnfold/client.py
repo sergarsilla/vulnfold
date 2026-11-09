@@ -12,11 +12,13 @@ from __future__ import annotations
 
 import time
 from collections.abc import Mapping
+from datetime import timedelta
 from types import TracebackType
 
 import httpx
 
 from vulnfold.config import (
+    LIVENESS_WINDOW_HOURS,
     MAX_REQUEST_ATTEMPTS,
     RETRY_BACKOFF_SECONDS,
     RETRYABLE_STATUS_CODES,
@@ -27,21 +29,35 @@ from vulnfold.errors import (
     IndexerError,
     IndexNotReadableError,
     ReadOnlyViolationError,
+    VulnfoldError,
 )
 from vulnfold.mapping import (
     build_composite_query,
     build_count_query,
+    build_inventory_query,
+    build_latest_snapshot_query,
+    build_liveness_query,
     parse_agent_names,
     parse_composite_page,
     parse_count,
+    parse_inventory,
+    parse_latest_snapshot,
+    parse_liveness,
     parse_totals,
 )
-from vulnfold.models import FieldMapping, IndexerSnapshot, PackageBucket
+from vulnfold.models import (
+    FieldMapping,
+    IndexerSnapshot,
+    IndexInventory,
+    LivenessSnapshot,
+    PackageBucket,
+)
 
 READ_METHOD = "GET"
 SEARCH_ENDPOINT = "_search"
 COUNT_ENDPOINT = "_count"
 SEARCH_METHOD = "POST"
+HTTP_OK = 200
 ALLOWED_POST_ENDPOINTS: frozenset[str] = frozenset({SEARCH_ENDPOINT, COUNT_ENDPOINT})
 
 
@@ -130,8 +146,11 @@ class IndexerClient:
                 f"detection has run at least once."
             )
 
-    def count_findings(self) -> int:
+    def count_findings(self, query: Mapping[str, object] | None = None) -> int:
         """Total the findings the scan is about to collapse.
+
+        Args:
+            query: Document filter the scan applies, or ``None`` for all.
 
         Returns:
             Documents matching the index pattern.
@@ -142,16 +161,19 @@ class IndexerClient:
         response = self._send(
             SEARCH_METHOD,
             self._endpoint(COUNT_ENDPOINT),
-            json_body=build_count_query(),
+            json_body=build_count_query(query),
         )
         return parse_count(self._require_success(response, COUNT_ENDPOINT))
 
-    def fetch_snapshot(self) -> IndexerSnapshot:
+    def fetch_snapshot(self, query: Mapping[str, object] | None = None) -> IndexerSnapshot:
         """Read the fleet's vulnerability state in full.
 
         Walks the ``composite`` aggregation to exhaustion. A fixed-size
         aggregation would truncate silently on a real fleet and produce a
         confidently wrong plan.
+
+        Args:
+            query: Document filter, or ``None`` for every document.
 
         Returns:
             Every ``(package, version)`` bucket plus the fleet-wide totals.
@@ -159,9 +181,9 @@ class IndexerClient:
         Raises:
             IndexerError: The indexer refused a request or answered oddly.
         """
-        total_findings = self.count_findings()
+        total_findings = self.count_findings(query)
 
-        first = self._search(after_key=None)
+        first = self._search(after_key=None, query=query)
         totals = parse_totals(first)
         agent_names = parse_agent_names(first)
         page = parse_composite_page(first, self._mapping)
@@ -169,7 +191,9 @@ class IndexerClient:
         after_key = page.after_key if page.buckets else None
 
         while after_key is not None:
-            page = parse_composite_page(self._search(after_key=after_key), self._mapping)
+            page = parse_composite_page(
+                self._search(after_key=after_key, query=query), self._mapping
+            )
             if not page.buckets:
                 break
             if page.after_key == after_key:
@@ -190,11 +214,64 @@ class IndexerClient:
             agent_names=agent_names,
         )
 
-    def _search(self, *, after_key: Mapping[str, str | None] | None) -> Mapping[str, object]:
+    def fetch_inventory(self) -> IndexInventory:
+        """List which state indices hold each agent's findings.
+
+        Returns:
+            Per agent, the findings and newest detection in each index.
+
+        Raises:
+            IndexerError: The indexer refused the request or answered oddly.
+        """
+        response = self._send(
+            SEARCH_METHOD,
+            self._endpoint(SEARCH_ENDPOINT),
+            json_body=build_inventory_query(self._mapping),
+        )
+        return parse_inventory(self._require_success(response, SEARCH_ENDPOINT))
+
+    def fetch_liveness(self) -> LivenessSnapshot | None:
+        """Read when each registered agent was last seen.
+
+        Returns:
+            The newest monitoring snapshots, or ``None`` when the mapping names
+            no liveness source or it cannot be read. Liveness only scopes the
+            plan, so its absence degrades the output instead of failing it.
+        """
+        liveness = self._mapping.liveness
+        if liveness is None:
+            return None
+        path = f"/{liveness.index_pattern}/{SEARCH_ENDPOINT}"
+        try:
+            latest_response = self._send(
+                SEARCH_METHOD, path, json_body=build_latest_snapshot_query(liveness)
+            )
+            if latest_response.status_code != HTTP_OK:
+                return None
+            latest = parse_latest_snapshot(self._decode(latest_response, path))
+            if latest is None:
+                return None
+            since = latest - timedelta(hours=LIVENESS_WINDOW_HOURS)
+            response = self._send(
+                SEARCH_METHOD, path, json_body=build_liveness_query(liveness, since=since)
+            )
+            if response.status_code != HTTP_OK:
+                return None
+            return parse_liveness(self._decode(response, path), snapshot_time=latest)
+        except VulnfoldError:
+            return None
+
+    def _search(
+        self,
+        *,
+        after_key: Mapping[str, str | None] | None,
+        query: Mapping[str, object] | None = None,
+    ) -> Mapping[str, object]:
         body = build_composite_query(
             self._mapping,
             page_size=self._config.page_size,
             after_key=after_key,
+            query=query,
         )
         response = self._send(
             SEARCH_METHOD,
