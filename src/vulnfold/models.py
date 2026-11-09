@@ -59,6 +59,10 @@ class WarningCode(str, Enum):
     #: differently across vendors, so the sum can only overstate.
     MERGED_CVE_COUNT_IS_UPPER_BOUND = "merged_cve_count_is_upper_bound"
     UNRECOGNIZED_FIXABILITY = "unrecognized_fixability"
+    #: The monitoring index could not be read; every agent counts as active.
+    LIVENESS_UNAVAILABLE = "liveness_unavailable"
+    #: Findings in a state index that a newer index supersedes for that agent.
+    SUPERSEDED_INDEX_FINDINGS = "superseded_index_findings"
 
 
 class ScanWarning(BaseModel):
@@ -81,6 +85,21 @@ class MappingFields(BaseModel):
     agent_id: str
     agent_name: str
     scanner_condition: str
+    #: Optional so mappings written before SPEC-06 still load; without it
+    #: superseded state indices cannot be told apart and none are excluded.
+    detected_at: str | None = None
+
+
+class LivenessFields(BaseModel):
+    """Where the per-agent liveness snapshots live, and what they call things."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    index_pattern: str
+    agent_id: str
+    agent_name: str
+    last_seen: str
+    snapshot_time: str
 
 
 class FixabilityRules(BaseModel):
@@ -164,6 +183,7 @@ class FieldMapping(BaseModel):
     severity_order: list[str] = Field(min_length=1)
     severity_unknown: list[str]
     fixability: FixabilityRules
+    liveness: LivenessFields | None = None
 
     def canonical_severity(self, raw: str) -> str | None:
         """Resolve a raw severity string to its canonical spelling.
@@ -207,6 +227,40 @@ class PackageBucket(BaseModel):
     fixability: Fixability
     target_version: str | None
     scanner_condition: str | None
+
+
+class AgentStatus(str, Enum):
+    """Whether an agent's findings describe a machine that is reporting now."""
+
+    ACTIVE = "active"
+    STALE = "stale"
+    UNREGISTERED = "unregistered"
+    #: No liveness data was available; the agent is treated as active.
+    UNKNOWN = "unknown"
+
+
+class AgentLiveness(BaseModel):
+    """What the newest monitoring snapshots say about one agent."""
+
+    agent_id: str
+    name: str | None
+    last_seen: datetime | None
+
+
+class LivenessSnapshot(BaseModel):
+    """Registered agents as of the newest monitoring snapshot."""
+
+    snapshot_time: datetime
+    agents: dict[str, AgentLiveness]
+
+
+class IndexInventory(BaseModel):
+    """Which state indices hold each agent, and their newest detection there."""
+
+    #: agent id -> index name -> newest detection (ISO 8601), or None.
+    newest_detection: dict[str, dict[str, str | None]]
+    #: agent id -> index name -> findings stored there.
+    findings: dict[str, dict[str, int]]
 
 
 class IndexerSnapshot(BaseModel):
@@ -299,6 +353,46 @@ class CollapseSources(BaseModel):
     hosts_per_action: float
 
 
+class ScopeTotals(BaseModel):
+    """The headline counters for one set of agents."""
+
+    agents: int
+    findings: int
+    criticals: int
+    fixable_findings: int
+    fixable_criticals: int
+    no_fix_findings: int
+    no_fix_criticals: int
+
+
+class AgentScope(BaseModel):
+    """One agent's status and the findings it carries."""
+
+    agent_id: str
+    name: str | None
+    status: AgentStatus
+    last_seen: datetime | None
+    findings: int
+    fixable_findings: int
+
+
+class FleetScope(BaseModel):
+    """Which agents a plan covers, and what it leaves out (SPEC-06).
+
+    ``active`` describes the agents the displayed plan covers and ``fleet``
+    every agent; superseded copies in older state indices are in neither.
+    """
+
+    stale_after_days: int
+    liveness_available: bool
+    liveness_snapshot_time: datetime | None
+    active: ScopeTotals
+    fleet: ScopeTotals
+    agents: list[AgentScope]
+    superseded_findings: int
+    superseded_indices: list[str]
+
+
 class PatchPlan(BaseModel):
     """The ranked remediation plan for one fleet, and what it cannot cover.
 
@@ -338,6 +432,7 @@ class PatchPlan(BaseModel):
     coverage_by_criticals: list[CoveragePoint]
     warnings: list[ScanWarning] = Field(default_factory=list)
     agent_names: dict[str, str] = Field(default_factory=dict)
+    scope: FleetScope | None = None
 
 
 #: Rises when the shape of a record changes. Version 2 added the fixability
@@ -388,3 +483,4 @@ class EvidenceRecord(BaseModel):
     coverage_by_criticals: list[CoveragePoint]
     warnings: list[ScanWarning] = Field(default_factory=list)
     agent_names: dict[str, str] = Field(default_factory=dict)
+    scope: FleetScope | None = None
