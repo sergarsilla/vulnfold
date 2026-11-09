@@ -4,9 +4,12 @@
 > touching anything. Version-controlled: when the reasoning changes, this file is
 > updated — conversations are never re-pasted.
 
-**Version:** 3.0
-**Last updated:** 2026-08-31
+**Version:** 3.1
+**Last updated:** 2026-11-09
 
+> **What changed in 3.1.** D4 now allows a per-run export to a monitoring
+> stack (SPEC-05). vulnfold still persists nothing itself.
+>
 > **What changed in 3.0.** Commercial strategy, pricing and the operator's
 > circumstances were removed; this file is now safe to publish. Only the
 > engineering rationale remains, and the decision identifiers (D1-D4, D10, D11)
@@ -178,6 +181,12 @@ mappings, and the evidence record for one run.
 tracking, multi-tenancy across clusters, and comparing one scan to another. A
 specification that asks for any of these is asking for the wrong thing; say so
 rather than building it.
+
+**Revised in 3.1:** vulnfold may export one run in a format a monitoring stack
+ingests (Prometheus exposition, SPEC-05), and the repository may ship a
+dashboard that charts those series over time. The line D4 draws is unchanged
+for vulnfold itself: it keeps no database, reads no previous run and computes
+no difference between runs. Any history lives in the operator's own stack.
 
 ### D10 — Read-only index access is correct engineering, not a moat
 

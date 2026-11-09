@@ -36,6 +36,8 @@ CVES_AGG: Final = "cves"
 TOTAL_AGENTS_AGG: Final = "total_agents"
 TOTAL_CVES_AGG: Final = "total_cves"
 TOTAL_PACKAGES_AGG: Final = "total_packages"
+AGENT_NAMES_AGG: Final = "agent_names"
+AGENT_NAME_AGG: Final = "name"
 PACKAGE_SOURCE: Final = "pkg"
 VERSION_SOURCE: Final = "ver"
 CONDITION_SOURCE: Final = "cond"
@@ -167,6 +169,10 @@ def build_composite_query(
         aggregations[TOTAL_AGENTS_AGG] = {"cardinality": {"field": fields.agent_id}}
         aggregations[TOTAL_CVES_AGG] = {"cardinality": {"field": fields.cve_id}}
         aggregations[TOTAL_PACKAGES_AGG] = {"cardinality": {"field": fields.package_name}}
+        aggregations[AGENT_NAMES_AGG] = {
+            "terms": {"field": fields.agent_id, "size": AGENT_TERMS_SIZE},
+            "aggs": {AGENT_NAME_AGG: {"terms": {"field": fields.agent_name, "size": 1}}},
+        }
 
     return {"size": 0, "track_total_hits": False, "aggs": aggregations}
 
@@ -189,6 +195,40 @@ def parse_totals(response: Mapping[str, object]) -> SnapshotTotals:
         distinct_cves=_cardinality(aggregations, TOTAL_CVES_AGG),
         distinct_packages=_cardinality(aggregations, TOTAL_PACKAGES_AGG),
     )
+
+
+def parse_agent_names(response: Mapping[str, object]) -> dict[str, str]:
+    """Read each agent's name from a first-page response.
+
+    Names only label output, so an index or response without them yields an
+    empty or partial mapping rather than failing the scan; output then falls
+    back to the agent id.
+
+    Args:
+        response: Decoded ``_search`` body of the first composite page.
+
+    Returns:
+        Agent id to agent name, for every agent whose name the index carries.
+    """
+    aggregations = response.get("aggregations")
+    if not isinstance(aggregations, Mapping):
+        return {}
+    agents = aggregations.get(AGENT_NAMES_AGG)
+    raw_buckets = agents.get("buckets") if isinstance(agents, Mapping) else None
+    if not isinstance(raw_buckets, list):
+        return {}
+    names: dict[str, str] = {}
+    for bucket in raw_buckets:
+        if not isinstance(bucket, Mapping):
+            continue
+        name_agg = bucket.get(AGENT_NAME_AGG)
+        name_buckets = name_agg.get("buckets") if isinstance(name_agg, Mapping) else None
+        if not isinstance(name_buckets, list) or not name_buckets:
+            continue
+        first = name_buckets[0]
+        if isinstance(first, Mapping) and first.get("key") and bucket.get("key") is not None:
+            names[str(bucket["key"])] = str(first["key"])
+    return names
 
 
 def parse_count(response: Mapping[str, object]) -> int:

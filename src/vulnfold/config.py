@@ -23,7 +23,9 @@ MAPPING_FILE_SUFFIX = ".yaml"
 
 DEFAULT_TIMEOUT_SECONDS = 30.0
 MAX_REQUEST_ATTEMPTS = 3
-RETRY_BACKOFF_SECONDS = 1.0
+#: An indexer shedding load answers 429 for tens of seconds, not one: doubling
+#: from 8 s waits 24 s across the three attempts before giving up.
+RETRY_BACKOFF_SECONDS = 8.0
 RETRYABLE_STATUS_CODES: frozenset[int] = frozenset({429, 500, 502, 503, 504})
 
 #: Buckets requested per ``composite`` page. Pagination follows ``after_key``
@@ -66,6 +68,12 @@ KERNEL_PACKAGE_PATTERNS: tuple[str, ...] = (
 
 DEFAULT_PASSWORD_ENV_VAR = "VULNFOLD_PASSWORD"
 DEFAULT_TOP_ACTIONS = 20
+
+#: Rows per row metric in the Prometheus export. Bounds series cardinality by
+#: this number rather than by the size of the fleet (SPEC-05 section 2).
+DEFAULT_METRICS_ROWS = 50
+#: Agents named in one ``hosts`` label before the rest are only counted.
+METRICS_HOSTS_IN_LABEL = 10
 
 
 @dataclass(frozen=True)

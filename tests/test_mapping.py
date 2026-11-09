@@ -13,6 +13,7 @@ from vulnfold.mapping import (
     build_composite_query,
     build_count_query,
     load_mapping,
+    parse_agent_names,
     parse_composite_page,
     parse_count,
     parse_totals,
@@ -134,6 +135,7 @@ def test_swapping_the_mapping_retargets_every_query_field(
         "threat.cve",
         "threat.rating",
         "endpoint.uid",
+        "endpoint.label",
         "threat.remedy_state",
     }
     back_translated = _substitute(
@@ -144,6 +146,7 @@ def test_swapping_the_mapping_retargets_every_query_field(
             "threat.cve": mapping.fields.cve_id,
             "threat.rating": mapping.fields.severity,
             "endpoint.uid": mapping.fields.agent_id,
+            "endpoint.label": mapping.fields.agent_name,
             "threat.remedy_state": mapping.fields.scanner_condition,
         },
     )
@@ -445,3 +448,46 @@ def test_parse_composite_page_reports_a_bucket_with_no_condition_as_unknown(
     assert page.buckets[0].fixability is Fixability.UNKNOWN
     assert page.buckets[0].target_version is None
     assert page.buckets[0].scanner_condition is None
+
+
+# ---------------------------------------------------------------------------
+# Agent names (SPEC-05)
+# ---------------------------------------------------------------------------
+
+
+def test_parse_agent_names_maps_each_id_to_its_name() -> None:
+    response = {
+        "aggregations": {
+            "agent_names": {
+                "buckets": [
+                    {"key": "001", "name": {"buckets": [{"key": "web-01", "doc_count": 9}]}},
+                    {"key": "002", "name": {"buckets": [{"key": "db-01", "doc_count": 4}]}},
+                ]
+            }
+        }
+    }
+
+    assert parse_agent_names(response) == {"001": "web-01", "002": "db-01"}
+
+
+def test_parse_agent_names_skips_agents_without_a_name() -> None:
+    response = {
+        "aggregations": {
+            "agent_names": {"buckets": [{"key": "003", "name": {"buckets": []}}]}
+        }
+    }
+
+    assert parse_agent_names(response) == {}
+
+
+def test_parse_agent_names_tolerates_a_response_without_the_aggregation() -> None:
+    assert parse_agent_names({"aggregations": {}}) == {}
+    assert parse_agent_names({}) == {}
+
+
+def test_only_the_first_page_asks_for_agent_names(mapping: FieldMapping) -> None:
+    first = build_composite_query(mapping, page_size=10)
+    later = build_composite_query(mapping, page_size=10, after_key={"pkg": "a"})
+
+    assert "agent_names" in str(first["aggs"])
+    assert "agent_names" not in str(later["aggs"])

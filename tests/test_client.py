@@ -254,6 +254,23 @@ def test_retries_stop_after_three_attempts(
 
 
 @respx.mock
+def test_an_overloaded_indexer_is_not_reported_as_a_credential_problem(
+    scan_config: ScanConfig,
+    mapping: FieldMapping,
+) -> None:
+    respx.route().mock(return_value=httpx.Response(429))
+
+    with IndexerClient(scan_config, mapping) as client:
+        with pytest.raises(IndexerError) as raised:
+            client.count_findings()
+
+    message = str(raised.value)
+    assert "429" in message
+    assert "not access" in message
+    assert "credentials" not in message
+
+
+@respx.mock
 def test_a_client_error_is_not_retried(
     scan_config: ScanConfig,
     mapping: FieldMapping,

@@ -217,6 +217,7 @@ class IndexerSnapshot(BaseModel):
     total_distinct_cves: int
     total_distinct_packages: int
     buckets: list[PackageBucket]
+    agent_names: dict[str, str] = Field(default_factory=dict)
 
 
 class RemediationAction(BaseModel):
@@ -336,6 +337,7 @@ class PatchPlan(BaseModel):
     coverage_by_findings: list[CoveragePoint]
     coverage_by_criticals: list[CoveragePoint]
     warnings: list[ScanWarning] = Field(default_factory=list)
+    agent_names: dict[str, str] = Field(default_factory=dict)
 
 
 #: Rises when the shape of a record changes. Version 2 added the fixability
@@ -385,3 +387,4 @@ class EvidenceRecord(BaseModel):
     coverage_by_findings: list[CoveragePoint]
     coverage_by_criticals: list[CoveragePoint]
     warnings: list[ScanWarning] = Field(default_factory=list)
+    agent_names: dict[str, str] = Field(default_factory=dict)

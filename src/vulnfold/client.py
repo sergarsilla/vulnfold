@@ -31,6 +31,7 @@ from vulnfold.errors import (
 from vulnfold.mapping import (
     build_composite_query,
     build_count_query,
+    parse_agent_names,
     parse_composite_page,
     parse_count,
     parse_totals,
@@ -120,6 +121,7 @@ class IndexerClient:
             raise IndexNotReadableError(
                 f"Index pattern {pattern!r} does not exist on {self._config.url}."
             )
+        self._raise_if_unavailable(response, f"GET /{pattern}")
         body = self._decode(response, f"GET /{pattern}")
         if not body:
             raise IndexNotReadableError(
@@ -161,6 +163,7 @@ class IndexerClient:
 
         first = self._search(after_key=None)
         totals = parse_totals(first)
+        agent_names = parse_agent_names(first)
         page = parse_composite_page(first, self._mapping)
         buckets: list[PackageBucket] = list(page.buckets)
         after_key = page.after_key if page.buckets else None
@@ -184,6 +187,7 @@ class IndexerClient:
             total_distinct_cves=totals.distinct_cves,
             total_distinct_packages=totals.distinct_packages,
             buckets=buckets,
+            agent_names=agent_names,
         )
 
     def _search(self, *, after_key: Mapping[str, str | None] | None) -> Mapping[str, object]:
@@ -235,7 +239,17 @@ class IndexerClient:
                 f"certificate, whether --insecure is needed."
             ) from exc
 
+    def _raise_if_unavailable(self, response: httpx.Response, context: str) -> None:
+        if response.status_code in RETRYABLE_STATUS_CODES:
+            raise IndexerError(
+                f"The indexer answered HTTP {response.status_code} to {context} on "
+                f"{self._config.index_pattern!r} on all {MAX_REQUEST_ATTEMPTS} attempts. "
+                f"This is load or availability on the indexer, not access: check "
+                f"its cluster health and heap, then re-run the scan."
+            )
+
     def _require_success(self, response: httpx.Response, context: str) -> Mapping[str, object]:
+        self._raise_if_unavailable(response, context)
         if response.status_code >= 400:
             raise IndexerError(
                 f"The indexer answered HTTP {response.status_code} to {context} on "
