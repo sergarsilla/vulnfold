@@ -16,6 +16,7 @@ Current version: **`"2"`**.
 |---|---|
 | `"1"` | Initial shape (SPEC-01). |
 | `"2"` | Added the fixability partition: `unfixable`, the five class counters, `total_criticals` and `fixable_distinct_packages` (SPEC-02). |
+| `"2"` | Added `agent_names` (SPEC-05). An addition, so the version is unchanged; a record without it reads as an empty object. |
 
 **A version-1 record carries no fixability information.** Its `collapse_ratio`,
 `collapse_sources` and coverage curves are computed over the undifferentiated
@@ -81,6 +82,7 @@ so the on-screen output can be reproduced.
 | `coverage_by_findings` | array | Cumulative curve under findings-first ordering. |
 | `coverage_by_criticals` | array | Cumulative curve under criticals-first ordering. |
 | `warnings` | array | Conditions that degrade the plan without invalidating it. |
+| `agent_names` | object | Agent id to agent name, for every agent whose name the index carries. Ids missing from it have no recorded name. |
 
 The three class counters partition the fleet:
 `fixable_findings + no_fix_findings + unknown_fixability_findings ==

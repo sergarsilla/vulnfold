@@ -431,6 +431,7 @@ def build_patch_plan(
         coverage_by_findings=by_findings,
         coverage_by_criticals=by_criticals,
         warnings=warnings,
+        agent_names=snapshot.agent_names,
     )
 
 

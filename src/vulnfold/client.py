@@ -31,6 +31,7 @@ from vulnfold.errors import (
 from vulnfold.mapping import (
     build_composite_query,
     build_count_query,
+    parse_agent_names,
     parse_composite_page,
     parse_count,
     parse_totals,
@@ -161,6 +162,7 @@ class IndexerClient:
 
         first = self._search(after_key=None)
         totals = parse_totals(first)
+        agent_names = parse_agent_names(first)
         page = parse_composite_page(first, self._mapping)
         buckets: list[PackageBucket] = list(page.buckets)
         after_key = page.after_key if page.buckets else None
@@ -184,6 +186,7 @@ class IndexerClient:
             total_distinct_cves=totals.distinct_cves,
             total_distinct_packages=totals.distinct_packages,
             buckets=buckets,
+            agent_names=agent_names,
         )
 
     def _search(self, *, after_key: Mapping[str, str | None] | None) -> Mapping[str, object]:
