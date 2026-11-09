@@ -179,6 +179,13 @@ underlying data moves on the vendor feeds' schedule and not faster, and
 when it comes back. A second run on the same day overwrites: the file is that
 day's state, not an append log.
 
+**Deploying with a mirroring sync** (`rsync --delete` from CI, for instance):
+exclude `evidence/` and `metrics/`. Both are written on the host at run time
+and exist in no checkout, so a mirroring sync deletes them: the first is the
+audit history, the second blanks the dashboard until the next scan. The
+deployment hook recreates both directories with the image's uid, but it cannot
+bring back what the sync removed.
+
 **Evidence is kept for 90 days.** Older files are deleted after a successful
 scan and never before one, so a failed scan cannot delete history. Nothing is
 compressed or moved into subdirectories — the one moment the file matters is
