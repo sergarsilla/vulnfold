@@ -120,6 +120,7 @@ class IndexerClient:
             raise IndexNotReadableError(
                 f"Index pattern {pattern!r} does not exist on {self._config.url}."
             )
+        self._raise_if_unavailable(response, f"GET /{pattern}")
         body = self._decode(response, f"GET /{pattern}")
         if not body:
             raise IndexNotReadableError(
@@ -235,7 +236,17 @@ class IndexerClient:
                 f"certificate, whether --insecure is needed."
             ) from exc
 
+    def _raise_if_unavailable(self, response: httpx.Response, context: str) -> None:
+        if response.status_code in RETRYABLE_STATUS_CODES:
+            raise IndexerError(
+                f"The indexer answered HTTP {response.status_code} to {context} on "
+                f"{self._config.index_pattern!r} on all {MAX_REQUEST_ATTEMPTS} attempts. "
+                f"This is load or availability on the indexer, not access: check "
+                f"its cluster health and heap, then re-run the scan."
+            )
+
     def _require_success(self, response: httpx.Response, context: str) -> Mapping[str, object]:
+        self._raise_if_unavailable(response, context)
         if response.status_code >= 400:
             raise IndexerError(
                 f"The indexer answered HTTP {response.status_code} to {context} on "
