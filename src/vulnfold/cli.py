@@ -16,6 +16,7 @@ from vulnfold.client import IndexerClient
 from vulnfold.collapse import build_patch_plan
 from vulnfold.config import (
     DEFAULT_MAPPING_NAME,
+    DEFAULT_METRICS_ROWS,
     DEFAULT_PASSWORD_ENV_VAR,
     DEFAULT_TIMEOUT_SECONDS,
     DEFAULT_TOP_ACTIONS,
@@ -24,6 +25,7 @@ from vulnfold.config import (
 )
 from vulnfold.errors import ConfigurationError, VulnfoldError
 from vulnfold.mapping import load_mapping
+from vulnfold.metrics import render_prometheus
 from vulnfold.models import FieldMapping, IndexerSnapshot, PatchPlan, RankBy
 from vulnfold.render import (
     OutputFormat,
@@ -86,6 +88,14 @@ def scan(
         Path | None,
         typer.Option("--evidence", help="Write the complete run to this JSON file."),
     ] = None,
+    metrics: Annotated[
+        Path | None,
+        typer.Option("--metrics", help="Write the run as a Prometheus textfile."),
+    ] = None,
+    metrics_rows: Annotated[
+        int,
+        typer.Option("--metrics-rows", min=1, help="Actions and register rows in --metrics."),
+    ] = DEFAULT_METRICS_ROWS,
     min_severity: Annotated[
         str | None,
         typer.Option("--min-severity", help="List only rows relevant at this severity or above."),
@@ -130,6 +140,15 @@ def scan(
                 rank_by=rank_by,
                 group_kernels=group_kernels,
                 min_severity=min_severity,
+            )
+        if metrics is not None:
+            _write_metrics(
+                snapshot,
+                mapping,
+                path=metrics,
+                rank_by=rank_by,
+                group_kernels=group_kernels,
+                rows=metrics_rows,
             )
     except VulnfoldError as exc:
         _stderr.print(f"[red]error[/red] {exc}")
@@ -201,6 +220,25 @@ def _write_evidence(
     except OSError as exc:
         raise ConfigurationError(f"Cannot write the evidence file {path}: {exc}") from exc
     _stderr.print(f"evidence written to {path}")
+
+
+def _write_metrics(
+    snapshot: IndexerSnapshot,
+    mapping: FieldMapping,
+    *,
+    path: Path,
+    rank_by: RankBy,
+    group_kernels: bool,
+    rows: int,
+) -> None:
+    """Write the Prometheus textfile for this run, from the unfiltered plan."""
+    complete = build_patch_plan(snapshot, mapping, rank_by=rank_by, group_kernels=group_kernels)
+    payload = render_prometheus(complete, generated_at=datetime.now(timezone.utc), rows=rows)
+    try:
+        _replace_atomically(path, payload)
+    except OSError as exc:
+        raise ConfigurationError(f"Cannot write the metrics file {path}: {exc}") from exc
+    _stderr.print(f"metrics written to {path}")
 
 
 def _replace_atomically(path: Path, payload: str) -> None:

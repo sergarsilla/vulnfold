@@ -67,6 +67,12 @@ KERNEL_PACKAGE_PATTERNS: tuple[str, ...] = (
 DEFAULT_PASSWORD_ENV_VAR = "VULNFOLD_PASSWORD"
 DEFAULT_TOP_ACTIONS = 20
 
+#: Rows per row metric in the Prometheus export. Bounds series cardinality by
+#: this number rather than by the size of the fleet (SPEC-05 section 2).
+DEFAULT_METRICS_ROWS = 50
+#: Agents named in one ``hosts`` label before the rest are only counted.
+METRICS_HOSTS_IN_LABEL = 10
+
 
 @dataclass(frozen=True)
 class ScanConfig:

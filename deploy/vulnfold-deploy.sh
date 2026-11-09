@@ -19,8 +19,8 @@ APP_DIR=/opt/vulnfold
 
 cd "$APP_DIR"
 
-# Must match the image's non-root uid, or evidence files are unwritable.
-install -d -o 10001 -g 10001 -m 755 "$APP_DIR/evidence"
+# Must match the image's non-root uid, or evidence and metrics are unwritable.
+install -d -o 10001 -g 10001 -m 755 "$APP_DIR/evidence" "$APP_DIR/metrics"
 
 docker compose build scan
 
