@@ -23,7 +23,9 @@ MAPPING_FILE_SUFFIX = ".yaml"
 
 DEFAULT_TIMEOUT_SECONDS = 30.0
 MAX_REQUEST_ATTEMPTS = 3
-RETRY_BACKOFF_SECONDS = 1.0
+#: An indexer shedding load answers 429 for tens of seconds, not one: doubling
+#: from 8 s waits 24 s across the three attempts before giving up.
+RETRY_BACKOFF_SECONDS = 8.0
 RETRYABLE_STATUS_CODES: frozenset[int] = frozenset({429, 500, 502, 503, 504})
 
 #: Buckets requested per ``composite`` page. Pagination follows ``after_key``
