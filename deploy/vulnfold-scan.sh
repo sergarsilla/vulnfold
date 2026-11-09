@@ -43,6 +43,11 @@ EVIDENCE_FILE="$EVIDENCE_DIR/scan-$(date -u +%Y-%m-%d).json"
 VULNFOLD_EVIDENCE_ARG="--evidence=$EVIDENCE_FILE"
 export VULNFOLD_EVIDENCE_ARG
 
+# One file, replaced on every run: node-exporter's textfile collector serves
+# the latest scan and the monitoring stack keeps the history (SPEC-05).
+VULNFOLD_METRICS_ARG="--metrics=metrics/vulnfold.prom"
+export VULNFOLD_METRICS_ARG
+
 docker compose run --rm --no-deps scan
 
 # Reached only when the scan exited zero, because of set -e above, and that

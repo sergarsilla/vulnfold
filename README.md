@@ -191,6 +191,23 @@ through — a full disk is the realistic one — cannot leave a truncated
 `scan-<date>.json` behind. An empty file carrying the day's name would read as
 "we scanned and found nothing".
 
+## Dashboard (Prometheus + Grafana)
+
+`--metrics PATH` writes the run as a Prometheus textfile: fleet totals, the top
+50 actions and register entries as rows (`--metrics-rows`), and the coverage
+curve. The scheduled scan writes it to `metrics/vulnfold.prom` on every run.
+vulnfold keeps no history; Prometheus does.
+
+1. Point node-exporter's textfile collector at that directory:
+   `--collector.textfile.directory=/opt/vulnfold/metrics` (or the path it is
+   mounted at inside the node-exporter container).
+2. Import `dashboards/vulnfold.json` into Grafana and choose the Prometheus
+   datasource. It shows the patch plan and the no-fix register as tables, what
+   the first actions clear, scan freshness, and fixable versus no-fix findings
+   over time. It also provisions from a dashboards directory unchanged.
+
+Metric names and labels are listed in `docs/SPEC-05-prometheus-export.md`.
+
 ## Field mappings
 
 Every schema dependency lives in `mappings/`. Supporting another Wazuh release

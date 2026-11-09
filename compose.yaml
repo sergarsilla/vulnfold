@@ -21,9 +21,9 @@
 #   VULNFOLD_EXTRA_ARGS    extra CLI flags, e.g. --insecure for a self-signed
 #                          indexer certificate
 #
-# VULNFOLD_EVIDENCE_ARG is not a .env key: the scheduled scan exports it with
-# the day's file name, because arguments given to `docker compose run` replace
-# the service command below rather than adding to it.
+# VULNFOLD_EVIDENCE_ARG and VULNFOLD_METRICS_ARG are not .env keys: the
+# scheduled scan exports them, because arguments given to `docker compose run`
+# replace the service command below rather than adding to it.
 
 services:
   scan:
@@ -43,10 +43,11 @@ services:
     read_only: true
     cap_drop: ["ALL"]
     security_opt: ["no-new-privileges:true"]
-    # Evidence files land on the host. The directory must be writable by uid
-    # 10001; the deployment hook creates it with that owner.
+    # Evidence and the Prometheus textfile land on the host. Both directories
+    # must be writable by uid 10001; the deployment hook creates them so.
     volumes:
       - ./evidence:/home/vulnfold/evidence
+      - ./metrics:/home/vulnfold/metrics
     # String form so an unset VULNFOLD_EXTRA_ARGS collapses to nothing rather
     # than becoming an empty argument. vulnfold reports a missing or unreachable
     # indexer far better than compose would, so no variable is made mandatory.
@@ -56,4 +57,5 @@ services:
       --user=${VULNFOLD_USER:-}
       --format=markdown
       ${VULNFOLD_EVIDENCE_ARG:-}
+      ${VULNFOLD_METRICS_ARG:-}
       ${VULNFOLD_EXTRA_ARGS:-}

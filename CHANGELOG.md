@@ -4,6 +4,16 @@ Notable changes to vulnfold. Format follows [Keep a
 Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [semantic
 versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Prometheus export and Grafana dashboard.** `--metrics` writes a node-exporter
+  textfile with the plan's totals, top actions, no-fix register and coverage
+  curve; `dashboards/vulnfold.json` charts it. The scheduled scan writes it daily.
+- **Agent names.** Actions, the register and the evidence (`agent_names`) name
+  each host next to its id.
+
 ## [0.1.0] — 2026-09-05
 
 First public release.

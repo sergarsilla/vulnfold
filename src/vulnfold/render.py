@@ -195,6 +195,7 @@ def build_evidence_record(
         coverage_by_findings=plan.coverage_by_findings,
         coverage_by_criticals=plan.coverage_by_criticals,
         warnings=plan.warnings,
+        agent_names=plan.agent_names,
     )
 
 
